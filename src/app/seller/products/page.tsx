@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
 
@@ -80,7 +80,7 @@ export default function SellerProductsDashboard() {
               <div style={{ height: '200px', background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
                 {p.foto ? (
                    // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`http://localhost:8000/storage/${p.foto}`} alt={p.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={getStorageUrl(p.foto) || ''} alt={p.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : '📦'}
               </div>
               <div style={{ padding: '1.5rem' }} className="flex-col gap-3">

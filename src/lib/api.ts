@@ -35,3 +35,20 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
   return data;
 }
+
+export function getStorageUrl(path: string | null) {
+  if (!path) return null;
+  
+  // If it's already a full URL, return it
+  if (path.startsWith('http')) return path;
+  
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  
+  // Clean up the path to ensure it doesn't have double /storage
+  let cleanPath = path;
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
+  }
+  
+  return `${baseUrl}/${cleanPath}`;
+}

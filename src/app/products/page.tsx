@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 
 export default function ProductCatalog() {
   const [products, setProducts] = useState<any[]>([]);
@@ -68,7 +68,10 @@ export default function ProductCatalog() {
               color: 'var(--border)',
               fontSize: '3rem'
             }}>
-              📦
+              {product.foto ? (
+                 // eslint-disable-next-line @next/next/no-img-element
+                <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : '📦'}
             </div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>{product.nama_barang}</div>
             <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {product.harga.toLocaleString('id-ID')}</div>

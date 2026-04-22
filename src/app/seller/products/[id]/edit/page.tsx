@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import dynamic from 'next/dynamic';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
+
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
 export default function EditProduct() {
   const router = useRouter();
@@ -52,14 +55,14 @@ export default function EditProduct() {
       
       const p = productRes.data || productRes;
       setFormData({
-        nama_barang: p.nama_barang,
-        harga: p.harga.toString(),
-        category_id: p.category_id.toString(),
-        kondisi: p.kondisi,
-        deskripsi: p.deskripsi,
+        nama_barang: p.nama_barang || '',
+        harga: p.harga?.toString() || '',
+        category_id: p.category_id?.toString() || '',
+        kondisi: p.kondisi || 'baru',
+        deskripsi: p.deskripsi || '',
         status_terjual: p.status_terjual ? '1' : '0',
-        latitude: p.latitude || '',
-        longitude: p.longitude || '',
+        latitude: p.latitude?.toString() || '',
+        longitude: p.longitude?.toString() || '',
       });
       setCurrentFoto(p.foto);
 
@@ -80,6 +83,14 @@ export default function EditProduct() {
     if (e.target.files && e.target.files.length > 0) {
       setFoto(e.target.files[0]);
     }
+  };
+
+  const handleLocationChange = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat.toString(),
+      longitude: lng.toString()
+    }));
   };
 
   const getLocation = () => {
@@ -258,21 +269,27 @@ export default function EditProduct() {
           </div>
 
           <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lokasi Barang (Wajib untuk jarak COD)</label>
-            <div className="flex gap-2">
+            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lokasi Barang (Pin Point Peta)</label>
+            <div className="flex gap-2" style={{ marginBottom: '1rem' }}>
               <input 
                  type="text" 
                  className="input-field" 
                  style={{ flex: 1 }}
-                 placeholder="Klik tombol di samping untuk otomatis mengambil koordinat..." 
+                 placeholder="Koordinat terpilih..." 
                  readOnly
                  required
                  value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
               />
               <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap' }}>
-                📍 Perbarui Lokasi
+                📍 Gunakan GPS Saya
               </button>
             </div>
+
+            <LocationPicker 
+              lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
+              lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
+              onChange={handleLocationChange} 
+            />
           </div>
 
           <div className="flex-col gap-2">
@@ -280,7 +297,7 @@ export default function EditProduct() {
             {currentFoto && (
               <div style={{ marginBottom: '0.5rem', width: '150px', height: '100px', borderRadius: 'var(--radius)', overflow: 'hidden', background: '#f5f5f5' }}>
                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`http://localhost:8000/storage/${currentFoto}`} alt="Current Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={getStorageUrl(currentFoto) || ''} alt="Current Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             )}
             <input 

@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
+
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
 export default function CreateProduct() {
   const router = useRouter();
@@ -53,6 +56,14 @@ export default function CreateProduct() {
     if (e.target.files && e.target.files.length > 0) {
       setFoto(e.target.files[0]);
     }
+  };
+
+  const handleLocationChange = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat.toString(),
+      longitude: lng.toString()
+    }));
   };
 
   const getLocation = () => {
@@ -206,21 +217,27 @@ export default function CreateProduct() {
           </div>
 
           <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lokasi Barang (Wajib untuk jarak COD)</label>
-            <div className="flex gap-2">
+            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lokasi Barang (Pin Point Peta)</label>
+            <div className="flex gap-2" style={{ marginBottom: '1rem' }}>
               <input 
                  type="text" 
                  className="input-field" 
                  style={{ flex: 1 }}
-                 placeholder="Klik tombol di samping untuk otomatis mengambil koordinat..." 
+                 placeholder="Koordinat terpilih..." 
                  readOnly
                  required
                  value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
               />
               <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap' }}>
-                📍 Lacak Lokasi
+                📍 Gunakan GPS Saya
               </button>
             </div>
+
+            <LocationPicker 
+              lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
+              lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
+              onChange={handleLocationChange} 
+            />
           </div>
 
           <div className="flex-col gap-2">

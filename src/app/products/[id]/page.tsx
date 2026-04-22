@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 
 function calculateDistanceKM(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -137,7 +137,7 @@ export default function ProductDetail() {
         <div className="card" style={{ padding: 0, overflow: 'hidden', height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--input)', fontSize: '5rem' }}>
           {product?.foto ? (
              // eslint-disable-next-line @next/next/no-img-element
-            <img src={`http://localhost:8000/storage/${product.foto}`} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : '📦'}
         </div>
 
