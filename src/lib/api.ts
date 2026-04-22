@@ -9,15 +9,28 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  // Ensure URL is constructed correctly without double slashes
+  const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${baseUrl}${cleanEndpoint}`;
+
+  const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include', // Important for Sanctum/CORS sessions
   });
 
-  const data = await response.json();
+  // Handle non-JSON responses (like 204 No Content or server errors)
+  const contentType = response.headers.get('content-type');
+  let data;
+  if (contentType && contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    data = { message: await response.text() };
+  }
 
   if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong');
+    throw new Error(data.message || `Error: ${response.status} ${response.statusText}`);
   }
 
   return data;

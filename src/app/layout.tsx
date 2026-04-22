@@ -4,11 +4,11 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/components/AuthProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: "Lapak Kos - Cari Kos Terbaik",
-  description: "Platform cari kos dan barang kos terbaik untuk mahasiswa.",
+  title: "Lapak Kos - Marketplace Barang Bekas Mahasiswa",
+  description: "Platform jual beli barang bekas kos terdekat untuk mahasiswa dengan fitur geolocation.",
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${inter.variable}`}>
         <AuthProvider>
           <Navbar />
           {children}

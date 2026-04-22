@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import { USER_ROLES } from "@/lib/constants";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -22,17 +25,17 @@ export default function Home() {
       }}>
         <div className="container">
           <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-0.05em', lineHeight: 1.1 }}>
-            Temukan <span style={{ color: 'var(--primary)' }}>Kos & Barang</span> Impianmu
+            Marketplace <span style={{ color: 'var(--primary)' }}>Barang Bekas Kos</span> Terdekat
           </h1>
           <p style={{ fontSize: '1.25rem', color: 'var(--card-foreground)', opacity: 0.8, maxWidth: '700px', margin: '0 auto 2.5rem' }}>
-            Satu platform untuk semua kebutuhan mahasiswa. Dari mencari kos hingga belanja barang bekas berkualitas di sekitar kampus.
+            Satu platform untuk jual beli barang bekas keperluan kos mahasiswa. Transaksi aman, COD mudah sesuai jarak terdekat kampusmu.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/products" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
               Lihat Produk
             </Link>
-            <Link href="/auth/register" className="btn" style={{ padding: '1rem 2rem', fontSize: '1.1rem', border: '1px solid var(--border)' }}>
-              Mulai Menjual
+            <Link href={user && user.role === USER_ROLES.PENJUAL ? "/seller/products" : "/auth/register?role=penjual"} className="btn" style={{ padding: '1rem 2rem', fontSize: '1.1rem', border: '1px solid var(--border)' }}>
+              {user && user.role === USER_ROLES.PENJUAL ? "Kelola Jualan" : "Mulai Menjual"}
             </Link>
           </div>
         </div>
@@ -111,12 +114,12 @@ export default function Home() {
       {/* Footer CTA */}
       <section style={{ padding: '100px 0', background: 'var(--primary)', color: 'white', textAlign: 'center' }}>
         <div className="container">
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>Siap Jualan Barang Tak Terpakai?</h2>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>Menjual Barang Tak Terpakai?</h2>
           <p style={{ fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-            Gabung dengan ratusan mahasiswa lainnya yang sudah mendapatkan uang tambahan dari barang kos yang tidak terpakai lagi.
+            Gabung dengan mahasiswa lainnya yang sudah mendapatkan uang tambahan dari barang kos yang tidak dibutuhkan lagi.
           </p>
-          <Link href="/auth/register?role=penjual" className="btn" style={{ background: 'white', color: 'var(--primary)', padding: '1rem 2.5rem', fontSize: '1.1rem', fontWeight: 700 }}>
-            Daftar Sebagai Penjual Sekarang
+          <Link href={user && user.role === USER_ROLES.PENJUAL ? "/seller/products/create" : "/auth/register?role=penjual"} className="btn" style={{ background: 'white', color: 'var(--primary)', padding: '1rem 2.5rem', fontSize: '1.1rem', fontWeight: 700 }}>
+            {user && user.role === USER_ROLES.PENJUAL ? "Pasang Lapak Baru Sekarang" : "Daftar Sebagai Penjual Sekarang"}
           </Link>
         </div>
       </section>

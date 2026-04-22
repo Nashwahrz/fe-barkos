@@ -40,16 +40,16 @@ export default function AdminDashboard() {
         <div className="flex-col gap-6">
           <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu Utama</div>
           <Link href="/admin/dashboard" style={{ fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            📊 Dashboard
+            Dashboard
           </Link>
           <Link href="/admin/reports" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            🚩 Laporan Pengguna
+            Laporan Pengguna
           </Link>
           <Link href="/admin/users" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            👥 Manajemen User
+            Manajemen User
           </Link>
           <Link href="/admin/settings" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            ⚙️ Pengaturan
+            Pengaturan
           </Link>
         </div>
       </aside>

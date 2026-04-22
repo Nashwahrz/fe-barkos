@@ -15,7 +15,7 @@ export default function Navbar() {
         </Link>
         
         <div className="flex items-center gap-4">
-          <Link href="/products" className="btn" style={{ fontWeight: 500 }}>Cari Kos</Link>
+          <Link href="/products" className="btn" style={{ fontWeight: 500 }}>Cari Barang</Link>
           
           {!loading && (
             <>
@@ -24,6 +24,11 @@ export default function Navbar() {
                   {user.role === USER_ROLES.SUPER_ADMIN && (
                     <Link href="/admin/dashboard" className="btn" style={{ fontWeight: 600, color: 'var(--accent)' }}>
                       🛡️ Admin
+                    </Link>
+                  )}
+                  {user.role === USER_ROLES.PENJUAL && (
+                    <Link href="/seller/products" className="btn" style={{ fontWeight: 600, color: 'var(--primary)' }}>
+                      🏪 Lapak Saya
                     </Link>
                   )}
                   <div className="flex items-center gap-2">

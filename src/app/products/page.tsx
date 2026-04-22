@@ -38,12 +38,12 @@ export default function ProductCatalog() {
   return (
     <div className="container" style={{ padding: '40px 1rem' }}>
       <header style={{ marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem' }}>Katalog Produk</h1>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem' }}>Katalog Barang Bekas</h1>
         <div className="flex gap-4" style={{ maxWidth: '600px' }}>
           <input 
             type="text" 
             className="input-field" 
-            placeholder="Cari kos, meja, kulkas..." 
+            placeholder="Cari kasur, lemari, kipas angin..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
