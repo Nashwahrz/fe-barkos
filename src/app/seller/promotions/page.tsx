@@ -156,7 +156,7 @@ export default function SellerPromotions() {
               <p style={{ opacity: 0.6, textAlign: 'center', padding: '2rem 0' }}>Belum ada riwayat promosi.</p>
             ) : (
               myPromotions.map(promo => {
-                const isActive = promo.status === 'active' && new Date(promo.end_date) > new Date();
+                const isActive = promo.status === 'active' && new Date(promo.end_at) > new Date();
                 return (
                   <div key={promo.id} style={{ padding: '1rem', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <div style={{ width: '60px', height: '60px', borderRadius: '4px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0 }}>
@@ -169,7 +169,7 @@ export default function SellerPromotions() {
                       <div style={{ fontWeight: 800 }}>{promo.product?.nama_barang}</div>
                       <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.25rem' }}>{promo.package?.name}</div>
                       <div style={{ fontSize: '0.8rem' }}>
-                        Hingga: {new Date(promo.end_date).toLocaleDateString('id-ID')} {new Date(promo.end_date).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}
+                        Hingga: {new Date(promo.end_at).toLocaleDateString('id-ID')} {new Date(promo.end_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}
                       </div>
                     </div>
                     <div>

@@ -132,8 +132,14 @@ export default function Home() {
                     e.currentTarget.style.boxShadow = 'var(--shadow)';
                   }}>
                   {product.is_promoted && (
-                    <div style={{ position: 'absolute', top: 10, right: 10, background: 'var(--primary)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', zIndex: 10 }}>
-                      🔥 Promoted
+                    <div style={{ 
+                      position: 'absolute', top: '12px', left: '12px', zIndex: 2,
+                      background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                      color: 'white', fontWeight: 800, fontSize: '0.75rem',
+                      padding: '4px 10px', borderRadius: '20px',
+                      boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+                    }}>
+                      🔥 Promosi
                     </div>
                   )}
                   <div style={{ 

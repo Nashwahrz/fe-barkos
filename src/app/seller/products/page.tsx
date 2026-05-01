@@ -77,11 +77,22 @@ export default function SellerProductsDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
           {products.map((p: any) => (
             <div key={p.id} className="card flex-col" style={{ padding: 0, overflow: 'hidden' }}>
-              <div style={{ height: '200px', background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+              <div style={{ height: '200px', background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', position: 'relative' }}>
                 {p.foto ? (
                    // eslint-disable-next-line @next/next/no-img-element
                   <img src={getStorageUrl(p.foto) || ''} alt={p.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : '📦'}
+                {p.is_promoted && (
+                  <div style={{
+                    position: 'absolute', top: '10px', left: '10px',
+                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                    color: 'white', fontWeight: 800, fontSize: '0.72rem',
+                    padding: '3px 10px', borderRadius: '20px',
+                    boxShadow: '0 2px 8px rgba(245,158,11,0.4)'
+                  }}>
+                    🔥 Sedang Dipromosikan
+                  </div>
+                )}
               </div>
               <div style={{ padding: '1.5rem' }} className="flex-col gap-3">
                 <div className="flex items-center justify-between">
@@ -108,6 +119,11 @@ export default function SellerProductsDashboard() {
                   <Link href={`/seller/products/${p.id}/edit`} className="btn flex-1" style={{ border: '1px solid var(--border)' }}>
                     Edit
                   </Link>
+                  {!p.status_terjual && (
+                    <Link href="/seller/promotions" className="btn" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 700, border: '1px solid #f59e0b' }}>
+                      🔥
+                    </Link>
+                  )}
                   <button onClick={() => handleDelete(p.id)} className="btn" style={{ background: '#fef2f2', color: '#ef4444', fontWeight: 600 }}>
                     Hapus
                   </button>

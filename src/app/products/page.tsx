@@ -174,6 +174,18 @@ export default function ProductCatalog() {
           }}>
             {products.map((product) => (
               <Link href={`/products/${product.id}`} key={product.id} className="card" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+                {/* Promotion Badge */}
+                {product.is_promoted && (
+                  <div style={{ 
+                    position: 'absolute', top: '12px', left: '12px', zIndex: 2,
+                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                    color: 'white', fontWeight: 800, fontSize: '0.75rem',
+                    padding: '4px 10px', borderRadius: '20px',
+                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+                  }}>
+                    🔥 Promosi
+                  </div>
+                )}
                 <div style={{ 
                   height: '240px', 
                   background: 'var(--input)', 
@@ -183,7 +195,8 @@ export default function ProductCatalog() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'var(--border)',
-                  fontSize: '3rem'
+                  fontSize: '3rem',
+                  border: product.is_promoted ? '2px solid #f59e0b' : 'none'
                 }}>
                   {product.foto ? (
                      // eslint-disable-next-line @next/next/no-img-element
@@ -197,6 +210,9 @@ export default function ProductCatalog() {
                     <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
                     <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus || 'UB - Malang'}</span>
                   </div>
+                  {product.distance_km != null && (
+                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>📍 {product.distance_km} km</span>
+                  )}
                 </div>
               </Link>
             ))}

@@ -7,6 +7,7 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
     { name: 'Kategori', path: '/admin/categories', icon: '📂' },
     { name: 'Transaksi', path: '/admin/transactions', icon: '💸' },
     { name: 'Manajemen User', path: '/admin/users', icon: '👥' },
+    { name: 'Monitor Promosi', path: '/admin/promotions', icon: '🔥' },
     { name: 'Laporan', path: '/admin/reports', icon: '🚩' },
   ];
 
