@@ -134,63 +134,56 @@ export default function ChatDetailPage() {
     }
   }
 
-  if (loading || authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div style={{ fontSize: '1.2rem', opacity: 0.5 }}>Memuat obrolan...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container" style={{ padding: '20px 1rem', maxWidth: '800px', height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#efeae2' }}>
       
       {/* Chat Header */}
-      <div className="card flex items-center justify-between" style={{ padding: '1rem', marginBottom: '1rem', borderRadius: 'var(--radius)', borderBottom: '1px solid var(--border)' }}>
-        <div className="flex items-center gap-4">
-          <button onClick={() => router.push('/chat')} style={{ fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.7 }}>
-            ⬅️
-          </button>
-          <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem' }}>
-            {otherUser?.name?.charAt(0).toUpperCase() || '?'}
-          </div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{otherUser?.name || 'Pengguna'}</div>
-            {product && (
-              <Link href={`/products/${product.id}`} style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none' }}>
-                📦 {product.nama_barang}
-              </Link>
-            )}
-          </div>
+      <div style={{ padding: '0.75rem 1rem', background: 'var(--card)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10 }}>
+        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.2rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          ⬅️
+        </button>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem' }}>
+          {otherUser?.name?.charAt(0).toUpperCase() || '?'}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: '1.05rem', lineHeight: '1.2' }}>{otherUser?.name || 'Memuat pengguna...'}</div>
+          {product && (
+            <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none', display: 'block', marginTop: '2px' }}>
+              📦 {product.nama_barang}
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Messages Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', background: 'var(--input)', borderRadius: 'var(--radius)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {messages.length === 0 ? (
-          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.5 }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
-            <p>Mulai percakapan dengan {otherUser?.name || 'pengguna ini'}!</p>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        {loading || authLoading ? (
+          <div style={{ margin: 'auto', opacity: 0.5 }}>Memuat pesan...</div>
+        ) : messages.length === 0 ? (
+          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.5, background: 'rgba(255,255,255,0.8)', padding: '1rem 2rem', borderRadius: '1rem' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👋</div>
+            <p>Mulai percakapan dengan {otherUser?.name || 'pengguna ini'}</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === user?.id;
             return (
-              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '85%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ 
-                  background: isMe ? 'var(--primary)' : 'var(--card)', 
-                  color: isMe ? 'white' : 'var(--foreground)',
-                  padding: '0.75rem 1rem', 
-                  borderRadius: '1.25rem',
-                  borderBottomRightRadius: isMe ? '0.25rem' : '1.25rem',
-                  borderBottomLeftRadius: !isMe ? '0.25rem' : '1.25rem',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                  border: isMe ? 'none' : '1px solid var(--border)'
+                  background: isMe ? '#dcf8c6' : '#ffffff', 
+                  color: '#000000',
+                  padding: '0.5rem 0.75rem', 
+                  borderRadius: '0.75rem',
+                  borderTopRightRadius: isMe ? '0' : '0.75rem',
+                  borderTopLeftRadius: !isMe ? '0' : '0.75rem',
+                  boxShadow: '0 1px 1px rgba(0,0,0,0.1)',
+                  position: 'relative'
                 }}>
-                  {msg.message}
-                </div>
-                <div style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.25rem', textAlign: isMe ? 'right' : 'left' }}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <div style={{ fontSize: '0.95rem', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.message}</div>
+                  <div style={{ fontSize: '0.65rem', opacity: 0.6, textAlign: 'right', marginTop: '0.2rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '4px' }}>
+                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {isMe && <span style={{ color: msg.is_read ? '#53bdeb' : '#999' }}>✓✓</span>}
+                  </div>
                 </div>
               </div>
             );
@@ -200,25 +193,28 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="flex gap-2" style={{ padding: '0.5rem 0' }}>
-        <input 
-          type="text" 
-          className="input-field" 
-          style={{ flex: 1, borderRadius: '30px', paddingLeft: '1.5rem' }} 
-          placeholder="Ketik pesan..." 
-          value={newMessage}
-          onChange={e => setNewMessage(e.target.value)}
-          disabled={sending}
-        />
-        <button 
-          type="submit" 
-          className="btn btn-primary" 
-          style={{ borderRadius: '50%', width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          disabled={sending || !newMessage.trim()}
-        >
-          ➤
-        </button>
-      </form>
+      <div style={{ background: 'var(--card)', padding: '0.75rem', borderTop: '1px solid var(--border)' }}>
+        <form onSubmit={handleSendMessage} className="container flex gap-2" style={{ maxWidth: '800px', margin: '0 auto', padding: 0 }}>
+          <input 
+            type="text" 
+            className="input-field" 
+            style={{ flex: 1, borderRadius: '24px', padding: '0.75rem 1.25rem', background: 'var(--input)', border: 'none', outline: 'none' }} 
+            placeholder="Ketik pesan..." 
+            value={newMessage}
+            onChange={e => setNewMessage(e.target.value)}
+            disabled={sending}
+            autoFocus
+          />
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            style={{ borderRadius: '50%', width: '45px', height: '45px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s', transform: sending ? 'scale(0.9)' : 'scale(1)' }}
+            disabled={sending || !newMessage.trim()}
+          >
+            ➤
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
