@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-int
 export const metadata: Metadata = {
   title: "Lapak Kos - Marketplace Barang Bekas Mahasiswa",
   description: "Platform jual beli barang bekas kos terdekat untuk mahasiswa dengan fitur geolocation.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

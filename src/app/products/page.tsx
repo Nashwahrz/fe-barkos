@@ -160,66 +160,40 @@ export default function ProductCatalog() {
         </div>
       </header>
 
-      {loading ? (
-        <div className="flex items-center justify-center" style={{ height: '50vh' }}>
-          <div style={{ fontSize: '1.2rem', fontWeight: 600, opacity: 0.5 }}>Memuat produk...</div>
-        </div>
-      ) : (
-        <>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-            gap: '2rem' 
-          }}>
-            {products.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="card" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                }} 
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow)';
-                }}
-              >
-                {product.is_promoted && (
-                  <div style={{ position: 'absolute', top: 10, right: 10, background: 'var(--primary)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', zIndex: 10 }}>
-                    🔥 Promoted
-                  </div>
-                )}
-                <div style={{ 
-                  height: '240px', 
-                  background: 'var(--input)', 
-                  borderRadius: 'calc(var(--radius) - 4px)', 
-                  marginBottom: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--border)',
-                  fontSize: '3rem',
-                  overflow: 'hidden'
-                }}>
-                  {product.foto ? (
-                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : '📦'}
-                </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>{product.nama_barang}</div>
-                <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {Number(product.harga).toLocaleString('id-ID')}</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                    <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
-                    <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus || 'Kampus'}</span>
-                  </div>
-                  {product.distance_km !== undefined && product.distance_km !== null && (
-                    <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>
-                      📍 {product.distance_km} km
-                    </div>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+        gap: '2rem' 
+      }}>
+        {filteredProducts.map((product) => (
+          <Link href={`/products/${product.id}`} key={product.id} className="card" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ 
+              height: '240px', 
+              background: 'var(--input)', 
+              borderRadius: 'calc(var(--radius) - 4px)', 
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--border)',
+              fontSize: '3rem'
+            }}>
+              {product.foto ? (
+                 // eslint-disable-next-line @next/next/no-img-element
+                <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : '📦'}
+            </div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>{product.nama_barang}</div>
+            <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {product.harga.toLocaleString('id-ID')}</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
+                <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
+                <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus || 'UB - Malang'}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
 
           {products.length === 0 && (
             <div style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
