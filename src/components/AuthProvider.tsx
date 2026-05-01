@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, ApiError } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -62,8 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await fetchApi('/me');
       setUser(data.data || data); // Handle both resource wrapper or flat object
-    } catch (err) {
-      console.error('Failed to fetch user:', err);
+    } catch (err: any) {
+      // 401 = token expired/invalid — expected scenario, clear silently.
+      // Any other error (network down, 500, etc.) gets logged for debugging.
+      if (!(err instanceof ApiError && err.status === 401)) {
+        console.error('Unexpected error fetching user:', err);
+      }
       localStorage.removeItem('auth_token');
       setUser(null);
     } finally {
