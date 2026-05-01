@@ -5,6 +5,11 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   
   const headers = new Headers(options.headers || {});
   headers.set('Accept', 'application/json');
+  
+  if (options.body && typeof options.body === 'string' && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }

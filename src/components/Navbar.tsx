@@ -31,12 +31,19 @@ export default function Navbar() {
                       🏪 Lapak Saya
                     </Link>
                   )}
-                  <div className="flex items-center gap-2">
+                  
+                  {/* Chat Icon with Unread Badge */}
+                  <Link href="/chat" style={{ position: 'relative', fontSize: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '50%', background: 'var(--input)' }}>
+                    💬
+                    {/* Unread count will be handled inside Chat page or globally if we use context. Let's just keep the icon simple for now since unread count fetching requires state inside Navbar. */}
+                  </Link>
+
+                  <Link href="/profile" className="flex items-center gap-2" style={{ padding: '4px 8px', borderRadius: 'var(--radius)', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                     <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user.name}</span>
-                  </div>
+                  </Link>
                   <button onClick={logout} className="btn" style={{ color: '#ef4444', fontWeight: 600 }}>Keluar</button>
                 </div>
               ) : (

@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login');
+      router.push('/auth/login');
     } else if (user) {
       setName(user.name || '');
       setPhone(user.phone || '');
@@ -80,6 +80,7 @@ export default function ProfilePage() {
     try {
       await fetchApi('/password', {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ current_password: currentPassword, password: newPassword, password_confirmation: confirmPassword })
       });
       showMessage('Password berhasil diubah', 'success');
@@ -100,7 +101,11 @@ export default function ProfilePage() {
       async (pos) => {
         try {
           const payload = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
-          await fetchApi('/location', { method: 'PUT', body: JSON.stringify(payload) });
+          await fetchApi('/location', { 
+            method: 'PUT', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) 
+          });
           setLocData({ lat: pos.coords.latitude.toString(), lng: pos.coords.longitude.toString() });
           await refreshUser();
           showMessage('Lokasi berhasil disinkronkan', 'success');
