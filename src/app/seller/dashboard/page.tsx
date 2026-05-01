@@ -103,7 +103,7 @@ export default function SellerDashboard() {
       <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem' }}>Aksi Cepat</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
         
-        <Link href="/seller/products/create" className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit', background: 'var(--primary)', color: 'white', transition: 'transform 0.2s' }}
+        <Link href="/seller/products/create" className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--primary)', color: 'white', transition: 'transform 0.2s' }}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
           <span style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>➕</span>

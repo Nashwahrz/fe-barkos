@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
-  const { user, loading: authLoading, checkAuth } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const router = useRouter();
   
   const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'location'>('profile');
@@ -35,8 +35,8 @@ export default function ProfilePage() {
       setName(user.name || '');
       setPhone(user.phone || '');
       setAsalKampus(user.asal_kampus || '');
-      setAvatarUrl(user.avatar_url || '');
-      setLocData({ lat: user.latitude || '', lng: user.longitude || '' });
+      setAvatarUrl(user.avatar || '');
+      setLocData({ lat: user.latitude?.toString() || '', lng: user.longitude?.toString() || '' });
     }
   }, [user, authLoading, router]);
 
@@ -59,9 +59,9 @@ export default function ProfilePage() {
       await fetchApi('/profile', {
         method: 'POST', // Sent as POST with _method PUT because of FormData
         body: formData,
-      }, true);
+      });
       
-      await checkAuth(); // Refresh user state
+      await refreshUser(); // Refresh user state
       showMessage('Profil berhasil diperbarui', 'success');
       setAvatarFile(null);
     } catch (err: any) {
@@ -102,7 +102,7 @@ export default function ProfilePage() {
           const payload = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
           await fetchApi('/location', { method: 'PUT', body: JSON.stringify(payload) });
           setLocData({ lat: pos.coords.latitude.toString(), lng: pos.coords.longitude.toString() });
-          await checkAuth();
+          await refreshUser();
           showMessage('Lokasi berhasil disinkronkan', 'success');
         } catch (err) {
           showMessage('Gagal menyimpan lokasi ke server', 'error');

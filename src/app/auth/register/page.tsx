@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 
-export default function Register() {
+function RegisterForm() {
   const { user, login, refreshUser, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -240,5 +240,13 @@ export default function Register() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
