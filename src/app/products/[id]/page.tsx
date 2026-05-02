@@ -223,7 +223,23 @@ export default function ProductDetail() {
             </div>
             
             <div className="flex gap-4" style={{ marginTop: '1.5rem' }}>
-              <button className="btn btn-primary flex-1" style={{ height: '55px', fontSize: '1.1rem' }}>Chat Penjual</button>
+              <button 
+                onClick={() => {
+                  if (!user) {
+                    router.push('/auth/login');
+                    return;
+                  }
+                  if (user.id === product.user_id) {
+                    alert('Ini adalah barang Anda sendiri.');
+                    return;
+                  }
+                  router.push(`/chat/${product.id}/${product.user_id}`);
+                }}
+                className="btn btn-primary flex-1" 
+                style={{ height: '55px', fontSize: '1.1rem' }}
+              >
+                Chat Penjual
+              </button>
               <button 
                 onClick={() => user ? setIsReportModalOpen(true) : router.push('/auth/login')}
                 className="btn" 

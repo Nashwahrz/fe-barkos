@@ -2,30 +2,42 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider';
 import { fetchApi } from '@/lib/api';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [activities, setActivities] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [statsData, activitiesData] = await Promise.all([
-          fetchApi('/admin/stats'),
-          fetchApi('/admin/recent-activities')
-        ]);
-        setStats(statsData.stats);
-        setActivities(activitiesData);
-      } catch (err) {
-        console.error('Gagal mengambil data dashboard:', err);
-      } finally {
-        setLoading(false);
+    if (!authLoading) {
+      if (!user || user.role !== 'super_admin') {
+        router.replace('/');
+        return;
       }
+      loadData();
     }
-    loadData();
-  }, []);
+  }, [user, authLoading, router]);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+      const [statsData, activitiesData] = await Promise.all([
+        fetchApi('/admin/stats'),
+        fetchApi('/admin/recent-activities')
+      ]);
+      setStats(statsData.stats);
+      setActivities(activitiesData);
+    } catch (err) {
+      console.error('Gagal mengambil data dashboard:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) return (
     <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 70px)' }}>

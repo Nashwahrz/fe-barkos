@@ -5,7 +5,7 @@ import { APP_NAME, USER_ROLES } from '@/lib/constants';
 import { useAuth } from '@/components/AuthProvider';
 
 export default function Navbar() {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, unreadCount } = useAuth();
 
   return (
     <nav className="glass" style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)' }}>
@@ -31,6 +31,27 @@ export default function Navbar() {
                       🏪 Lapak Saya
                     </Link>
                   )}
+                  
+                  <Link href="/chat" className="btn" style={{ position: 'relative', padding: '10px' }}>
+                    💬 Pesan
+                    {unreadCount > 0 && (
+                      <span style={{ 
+                        position: 'absolute', 
+                        top: '-5px', 
+                        right: '-5px', 
+                        background: '#ef4444', 
+                        color: 'white', 
+                        fontSize: '0.65rem', 
+                        padding: '2px 6px', 
+                        borderRadius: '10px', 
+                        fontWeight: 800,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                      }}>
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Link>
+
                   <div className="flex items-center gap-2">
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
                       {user.name.charAt(0).toUpperCase()}

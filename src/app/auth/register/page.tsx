@@ -222,7 +222,10 @@ export default function Register() {
         </div>
 
         <button 
-          onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/auth/google`}
+          onClick={() => {
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+            window.location.href = `${baseUrl}/auth/google`;
+          }}
           className="btn" 
           style={{ width: '100%', border: '1px solid var(--border)', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}
         >

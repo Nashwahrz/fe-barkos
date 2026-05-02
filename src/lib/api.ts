@@ -1,5 +1,14 @@
 import { API_BASE_URL } from './constants';
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
   
@@ -30,7 +39,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(data.message || `Error: ${response.status} ${response.statusText}`);
+    throw new ApiError(data.message || `Error: ${response.status} ${response.statusText}`, response.status);
   }
 
   return data;

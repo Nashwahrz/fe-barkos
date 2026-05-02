@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, ApiError } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -15,6 +15,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  unreadCount: number;
   login: (token: string, userData: User) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -25,11 +26,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     refreshUser();
   }, []);
+
+  // Polling for notifications
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchUnread = async () => {
+      try {
+        const data = await fetchApi('/notifications/unread-count');
+        setUnreadCount(data.count || 0);
+      } catch (err) {
+        console.error('Failed to fetch notifications', err);
+      }
+    };
+
+    fetchUnread(); // Initial fetch
+    const interval = setInterval(fetchUnread, 10000); // Every 10 seconds
+    return () => clearInterval(interval);
+  }, [user]);
 
   async function refreshUser() {
     const token = localStorage.getItem('auth_token');
@@ -42,8 +62,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await fetchApi('/me');
       setUser(data.data || data); // Handle both resource wrapper or flat object
-    } catch (err) {
-      console.error('Failed to fetch user:', err);
+    } catch (err: any) {
+      // 401 = token expired/invalid — expected scenario, clear silently.
+      // Any other error (network down, 500, etc.) gets logged for debugging.
+      if (!(err instanceof ApiError && err.status === 401)) {
+        console.error('Unexpected error fetching user:', err);
+      }
       localStorage.removeItem('auth_token');
       setUser(null);
     } finally {
@@ -59,11 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   function logout() {
     localStorage.removeItem('auth_token');
     setUser(null);
+    setUnreadCount(0);
     router.push('/auth/login');
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, unreadCount, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

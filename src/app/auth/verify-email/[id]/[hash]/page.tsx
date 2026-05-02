@@ -1,21 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, ApiError } from '@/lib/api';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 
 export default function VerifyEmailProcess() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const hasCalled = useRef(false);
   
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'already_verified' | 'error'>('loading');
   const [message, setMessage] = useState('Sedang memverifikasi email Anda...');
 
   useEffect(() => {
+    // Guard: only run once even in React StrictMode
+    if (hasCalled.current) return;
+    hasCalled.current = true;
+
     async function verify() {
       const { id, hash } = params;
       const expires = searchParams.get('expires');
@@ -28,42 +33,55 @@ export default function VerifyEmailProcess() {
       }
 
       try {
-        // Laravel's verification route expects a GET request to the signed URL
-        // In SPA, we proxy this call to the API
-        await fetchApi(`/email/verify/${id}/${hash}?expires=${expires}&signature=${signature}`);
-        
-        setStatus('success');
-        setMessage('Email Anda berhasil diverifikasi! Mengalihkan ke beranda...');
-        
-        // Redirect based on login status and role
-        if (user && user.role === 'penjual') {
-          router.replace('/seller/products');
-        } else if (user && user.role === 'super_admin') {
-          router.replace('/admin/dashboard');
+        const data = await fetchApi(
+          `/email/verify/${id}/${hash}?expires=${expires}&signature=${signature}`
+        );
+
+        // Refresh user state so the app knows it's now verified
+        await refreshUser();
+
+        if (data.status === 'already_verified') {
+          setStatus('already_verified');
+          setMessage('Email Anda sudah terverifikasi sebelumnya.');
         } else {
-          router.replace('/');
+          setStatus('success');
+          setMessage('Email Anda berhasil diverifikasi!');
         }
       } catch (err: any) {
+        const isExpired =
+          err instanceof ApiError && (err.status === 403 || err.status === 401);
         setStatus('error');
-        setMessage(err.message || 'Gagal memverifikasi email. Link mungkin sudah kedaluwarsa.');
+        setMessage(
+          isExpired
+            ? 'Link verifikasi tidak valid atau sudah kedaluwarsa. Silakan minta link baru.'
+            : err.message || 'Gagal memverifikasi email. Silakan coba lagi.'
+        );
       }
     }
 
     verify();
-  }, [params, searchParams, router]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const getRedirectPath = () => {
+    if (!user) return '/';
+    if (user.role === 'penjual') return '/seller/products';
+    if (user.role === 'super_admin') return '/admin/dashboard';
+    return '/';
+  };
 
   return (
     <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', padding: '2rem' }}>
       <div className="card" style={{ width: '100%', maxWidth: '500px', textAlign: 'center' }}>
         <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>
           {status === 'loading' && '⏳'}
-          {status === 'success' && '✅'}
+          {(status === 'success' || status === 'already_verified') && '✅'}
           {status === 'error' && '❌'}
         </div>
         
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '1rem' }}>
           {status === 'loading' && 'Memproses Verifikasi'}
           {status === 'success' && 'Email Terverifikasi!'}
+          {status === 'already_verified' && 'Sudah Terverifikasi'}
           {status === 'error' && 'Verifikasi Gagal'}
         </h1>
         
@@ -72,15 +90,23 @@ export default function VerifyEmailProcess() {
         </p>
 
         <div className="flex-col gap-3">
-          {status === 'success' ? (
-            <Link href={user ? (user.role === 'penjual' ? '/seller/products' : (user.role === 'super_admin' ? '/admin/dashboard' : '/')) : '/'} className="btn btn-primary" style={{ width: '100%' }}>
-              Pergi ke Dashboard
+          {(status === 'success' || status === 'already_verified') ? (
+            <Link
+              href={getRedirectPath()}
+              className="btn btn-primary"
+              style={{ width: '100%' }}
+            >
+              Pergi ke Beranda
             </Link>
-          ) : (
-            <Link href="/auth/verify-email" className="btn" style={{ width: '100%', border: '1px solid var(--border)' }}>
-              Kembali ke Halaman Verifikasi
+          ) : status === 'error' ? (
+            <Link
+              href="/auth/verify-email"
+              className="btn"
+              style={{ width: '100%', border: '1px solid var(--border)' }}
+            >
+              Kirim Ulang Link Verifikasi
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
