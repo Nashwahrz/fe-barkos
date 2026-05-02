@@ -27,9 +27,14 @@ export default function Navbar() {
                     </Link>
                   )}
                   {user.role === USER_ROLES.PENJUAL && (
-                    <Link href="/seller/products" className="btn" style={{ fontWeight: 600, color: 'var(--primary)' }}>
-                      🏪 Lapak Saya
-                    </Link>
+                    <>
+                      <Link href="/seller/products" className="btn" style={{ fontWeight: 600, color: 'var(--primary)' }}>
+                        🏪 Lapak Saya
+                      </Link>
+                      <Link href="/seller/promotions" className="btn" style={{ fontWeight: 600, color: '#f59e0b' }}>
+                        🔥 Boost
+                      </Link>
+                    </>
                   )}
                   
                   {/* Chat Icon with Unread Badge */}
