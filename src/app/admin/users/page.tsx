@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminUsers() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authLoading) {
@@ -35,48 +35,40 @@ export default function AdminUsers() {
     }
   }
 
-  async function handleDelete(id: number) {
-    if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data terkait (produk, laporan) akan ikut terhapus.')) return;
+  async function handleToggleStatus(id: number) {
+    if (!confirm('Ubah status pengguna ini?')) return;
     
-    setDeleting(id);
+    setActionLoading(id);
+    try {
+      await fetchApi(`/users/${id}/status`, { method: 'PATCH' });
+      await loadUsers();
+    } catch (err) {
+      alert('Gagal mengubah status.');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleDelete(id: number) {
+    if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data terkait akan dihapus permanen.')) return;
+    
+    setActionLoading(id);
     try {
       await fetchApi(`/users/${id}`, { method: 'DELETE' });
       await loadUsers();
     } catch (err) {
       alert('Gagal menghapus user.');
     } finally {
-      setDeleting(null);
+      setActionLoading(null);
     }
   }
 
-  if (loading || authLoading) return (
-    <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 70px)' }}>
-      <div style={{ fontSize: '1.2rem', fontWeight: 600, opacity: 0.5 }}>Memuat data pengguna...</div>
-    </div>
-  );
+  if (loading || authLoading) return <div className="p-8 text-center">Memuat data...</div>;
 
   return (
     <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
-      {/* Sidebar */}
-      <aside style={{ width: '280px', borderRight: '1px solid var(--border)', padding: '2rem' }}>
-        <div className="flex-col gap-6">
-          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu Utama</div>
-          <Link href="/admin/dashboard" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            📊 Dashboard
-          </Link>
-          <Link href="/admin/reports" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            🚩 Laporan Pengguna
-          </Link>
-          <Link href="/admin/users" style={{ fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            👥 Manajemen User
-          </Link>
-          <Link href="/admin/settings" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            ⚙️ Pengaturan
-          </Link>
-        </div>
-      </aside>
+      <AdminSidebar currentPath="/admin/users" />
 
-      {/* Main Content */}
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>
         <div className="container" style={{ maxWidth: '1000px' }}>
           <header style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -95,8 +87,7 @@ export default function AdminUsers() {
                 <tr>
                   <th style={{ padding: '1rem 1.5rem' }}>USER</th>
                   <th style={{ padding: '1rem' }}>ROLE</th>
-                  <th style={{ padding: '1rem' }}>KAMPUS</th>
-                  <th style={{ padding: '1rem' }}>TANGGAL DAFTAR</th>
+                  <th style={{ padding: '1rem' }}>STATUS</th>
                   <th style={{ padding: '1rem' }}>AKSI</th>
                 </tr>
               </thead>
@@ -116,27 +107,38 @@ export default function AdminUsers() {
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        fontSize: '0.75rem', 
-                        fontWeight: 700,
+                        padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700,
                         background: u.role === 'super_admin' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(0,0,0,0.05)',
                         color: u.role === 'super_admin' ? 'var(--accent)' : 'inherit'
                       }}>
                         {u.role.toUpperCase()}
                       </span>
                     </td>
-                    <td style={{ padding: '1rem', opacity: 0.7 }}>{u.asal_kampus}</td>
-                    <td style={{ padding: '1rem', opacity: 0.6 }}>{new Date(u.created_at).toLocaleDateString('id-ID')}</td>
+                    <td style={{ padding: '1rem' }}>
+                      {u.is_active ? (
+                        <span style={{ color: 'var(--success)', fontWeight: 600 }}>Aktif</span>
+                      ) : (
+                        <span style={{ color: '#ef4444', fontWeight: 600 }}>Dinonaktifkan</span>
+                      )}
+                    </td>
                     <td style={{ padding: '1rem' }}>
                       {u.role !== 'super_admin' && (
-                        <button 
-                          onClick={() => handleDelete(u.id)}
-                          disabled={deleting === u.id}
-                          style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}
-                        >
-                          {deleting === u.id ? '...' : 'Hapus'}
-                        </button>
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => handleToggleStatus(u.id)}
+                            disabled={actionLoading === u.id}
+                            style={{ color: u.is_active ? '#f59e0b' : 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}
+                          >
+                            {actionLoading === u.id ? '...' : (u.is_active ? 'Nonaktifkan' : 'Aktifkan')}
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(u.id)}
+                            disabled={actionLoading === u.id}
+                            style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}
+                          >
+                            Hapus
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
