@@ -84,99 +84,121 @@ export default function SellerPromotions() {
   if (loading || authLoading) return <div className="p-8 text-center">Memuat data promosi...</div>;
 
   return (
-    <div className="container" style={{ padding: '40px 1rem', maxWidth: '1000px' }}>
-      <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '2rem' }}>Pusat Promosi (Boost Produk)</h1>
-      <p style={{ opacity: 0.8, marginBottom: '2rem' }}>
-        Tingkatkan visibilitas barang daganganmu agar selalu tampil di urutan paling atas dan lebih cepat laku.
-      </p>
+    <div className="container" style={{ padding: '60px 1rem', maxWidth: '1100px' }}>
+      <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#111827' }}>🚀 Pusat Promosi</h1>
+        <p style={{ opacity: 0.7, maxWidth: '650px', margin: '0 auto', fontSize: '1.05rem', lineHeight: 1.6 }}>
+          Tingkatkan visibilitas produk Anda agar selalu tampil di urutan teratas. <br/>Dapatkan lebih banyak calon pembeli dengan fitur <strong>Boost</strong>.
+        </p>
+      </header>
 
       {message && (
         <div style={{
-          padding: '1rem', borderRadius: 'var(--radius)', marginBottom: '2rem',
-          background: message.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-          color: message.type === 'success' ? '#10b981' : '#ef4444',
-          fontWeight: 600
+          padding: '1.25rem', borderRadius: '10px', marginBottom: '2.5rem',
+          background: message.type === 'success' ? 'rgba(22, 163, 74, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          color: message.type === 'success' ? '#16a34a' : '#ef4444',
+          fontWeight: 700, textAlign: 'center', border: message.type === 'success' ? '1px solid rgba(22, 163, 74, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)'
         }}>
-          {message.text}
+          {message.type === 'success' ? '✅ ' : '❌ '}{message.text}
         </div>
       )}
 
-      <div className="flex gap-8 flex-wrap items-start">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
         
         {/* Form Beli Promosi */}
-        <div className="card" style={{ flex: '1 1 400px', padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Beli Paket Promosi</h2>
+        <div className="card" style={{ padding: '2.5rem', height: 'fit-content' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
+            🛒 Beli Paket Promosi
+          </h2>
           
-          <form onSubmit={handlePurchase} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <form onSubmit={handlePurchase} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 600 }}>1. Pilih Produk</label>
-              <select className="input-field" value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)} required>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>1. Pilih Produk</label>
+              <select className="input-field" style={{ height: '48px', borderRadius: '8px' }} value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)} required>
                 <option value="">-- Pilih Produk Aktif --</option>
                 {myProducts.map(p => (
                   <option key={p.id} value={p.id}>
-                    {p.nama_barang} {p.is_promoted ? '(Sedang Dipromosikan)' : ''}
+                    {p.nama_barang} {p.is_promoted ? '🔥' : ''}
                   </option>
                 ))}
               </select>
-              {myProducts.length === 0 && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.5rem' }}>Kamu belum memiliki produk aktif untuk dipromosikan.</p>}
+              {myProducts.length === 0 && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.6rem' }}>Kamu belum memiliki produk aktif untuk dipromosikan.</p>}
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 600 }}>2. Pilih Paket</label>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>2. Pilih Paket Durasi</label>
               <div style={{ display: 'grid', gap: '1rem' }}>
-                {packages.map(pkg => (
-                  <div key={pkg.id} 
-                    onClick={() => setSelectedPackage(pkg.id.toString())}
-                    style={{ 
-                      padding: '1rem', border: `2px solid ${selectedPackage === pkg.id.toString() ? 'var(--primary)' : 'var(--border)'}`, 
-                      borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'all 0.2s'
-                    }}>
-                    <div className="flex justify-between items-center mb-1">
-                      <div style={{ fontWeight: 800 }}>{pkg.name}</div>
-                      <div style={{ color: 'var(--primary)', fontWeight: 800 }}>Rp {Number(pkg.price).toLocaleString('id-ID')}</div>
+                {packages.map(pkg => {
+                  const isSelected = selectedPackage === pkg.id.toString();
+                  return (
+                    <div key={pkg.id} 
+                      onClick={() => setSelectedPackage(pkg.id.toString())}
+                      style={{ 
+                        padding: '1.25rem', 
+                        border: '2.5px solid',
+                        borderColor: isSelected ? 'var(--primary)' : 'var(--border)', 
+                        background: isSelected ? 'var(--primary-light)' : 'white',
+                        borderRadius: '10px', 
+                        cursor: 'pointer', 
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        boxShadow: isSelected ? '0 10px 15px -3px rgba(0, 0, 0, 0.05)' : 'none'
+                      }}>
+                      <div className="flex justify-between items-center" style={{ marginBottom: '0.4rem' }}>
+                        <div style={{ fontWeight: 800, color: isSelected ? 'var(--primary)' : '#111827', fontSize: '1rem' }}>{pkg.name}</div>
+                        <div style={{ color: 'var(--primary)', fontWeight: 900, fontSize: '1.1rem' }}>Rp {Number(pkg.price).toLocaleString('id-ID')}</div>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 500 }}>Durasi Aktif: {pkg.duration_days} Hari</div>
                     </div>
-                    <div style={{ fontSize: '0.85rem', opacity: 0.7 }}>Durasi: {pkg.duration_days} Hari</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem' }} disabled={actionLoading || myProducts.length === 0}>
-              {actionLoading ? 'Memproses...' : 'Bayar & Aktifkan'}
+            <button type="submit" className="btn btn-primary" style={{ padding: '1.125rem', fontWeight: 800, fontSize: '1.05rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)', marginTop: '0.5rem' }} disabled={actionLoading || myProducts.length === 0}>
+              {actionLoading ? '⏳ Memproses...' : '🔥 Aktifkan Boost Sekarang'}
             </button>
           </form>
         </div>
 
         {/* Riwayat Promosi */}
-        <div className="card" style={{ flex: '1 1 500px', padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>Riwayat & Status Promosi</h2>
+        <div className="card" style={{ padding: '2.5rem', background: '#ffffff', height: 'fit-content' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
+            📜 Riwayat Boost
+          </h2>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {myPromotions.length === 0 ? (
-              <p style={{ opacity: 0.6, textAlign: 'center', padding: '2rem 0' }}>Belum ada riwayat promosi.</p>
+              <div style={{ opacity: 0.6, textAlign: 'center', padding: '4rem 0', background: 'var(--background)', borderRadius: '10px', border: '1px dashed var(--border)' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🍃</div>
+                <p style={{ fontWeight: 500 }}>Belum ada riwayat promosi.</p>
+              </div>
             ) : (
               myPromotions.map(promo => {
                 const isActive = promo.status === 'active' && new Date(promo.end_at) > new Date();
                 return (
-                  <div key={promo.id} style={{ padding: '1rem', border: '1px solid var(--border)', borderRadius: 'var(--radius)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '4px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0 }}>
-                       {promo.product?.foto && (
+                  <div key={promo.id} style={{ padding: '1.25rem', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', gap: '1.25rem', alignItems: 'center', background: isActive ? 'white' : '#f9fafb' }}>
+                    <div style={{ width: '70px', height: '70px', borderRadius: '8px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
+                       {promo.product?.foto ? (
                          // eslint-disable-next-line @next/next/no-img-element
                          <img src={getStorageUrl(promo.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                       )}
+                       ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>📦</div>}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 800 }}>{promo.product?.nama_barang}</div>
-                      <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '0.25rem' }}>{promo.package?.name}</div>
-                      <div style={{ fontSize: '0.8rem' }}>
-                        Hingga: {new Date(promo.end_at).toLocaleDateString('id-ID')} {new Date(promo.end_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}
+                      <div style={{ fontWeight: 800, color: '#111827', marginBottom: '0.2rem', fontSize: '1rem' }}>{promo.product?.nama_barang || 'Produk dihapus'}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: 600, marginBottom: '0.4rem' }}>{promo.package?.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#9ca3af', fontWeight: 500 }}>
+                        Sampai: {new Date(promo.end_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </div>
                     </div>
                     <div>
                       {isActive ? (
-                        <span style={{ padding: '4px 8px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontSize: '0.75rem', fontWeight: 800 }}>AKTIF</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>AKTIF</span>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>🔥</span>
+                        </div>
                       ) : (
-                        <span style={{ padding: '4px 8px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.75rem', fontWeight: 800 }}>BERAKHIR</span>
+                        <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(107, 114, 128, 0.08)', color: '#6b7280', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.05em' }}>EXPIRED</span>
                       )}
                     </div>
                   </div>

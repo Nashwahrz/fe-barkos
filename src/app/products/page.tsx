@@ -203,15 +203,15 @@ export default function ProductCatalog() {
                     <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : '📦'}
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>{product.nama_barang}</div>
-                <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {product.harga.toLocaleString('id-ID')}</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.nama_barang}</div>
+                <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.75rem' }}>Rp {Number(product.harga).toLocaleString('id-ID')}</div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                    <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
-                    <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus || 'UB - Malang'}</span>
+                  <div className="flex items-center gap-2" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                    <span style={{ padding: '3px 10px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
+                    <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus?.split(' ').slice(-1)[0] || 'Kampus'}</span>
                   </div>
                   {product.distance_km != null && (
-                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>📍 {product.distance_km} km</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>📍 {product.distance_km} km</span>
                   )}
                 </div>
               </Link>
