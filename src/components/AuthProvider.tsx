@@ -9,7 +9,13 @@ interface User {
   name: string;
   email: string;
   role: string;
-  asal_kampus: string;
+  asal_kampus: string | null;
+  phone: string | null;
+  avatar: string | null;
+  is_active: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  email_verified_at: string | null;
 }
 
 interface AuthContextType {
