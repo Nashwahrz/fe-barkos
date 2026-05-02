@@ -4,14 +4,55 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { USER_ROLES } from "@/lib/constants";
+import { fetchApi, getStorageUrl } from "@/lib/api";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const { user } = useAuth();
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [locationStatus, setLocationStatus] = useState<string>('');
 
   useEffect(() => {
     setMounted(true);
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async (lat?: number, lng?: number) => {
+    try {
+      setLoading(true);
+      let endpoint = '/products';
+      if (lat && lng) {
+        endpoint += `?lat=${lat}&lng=${lng}&radius=5000`; // 5km default
+      }
+      const data = await fetchApi(endpoint);
+      setProducts(data.data || data);
+    } catch (err) {
+      console.error('Failed to load products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('Geolocation tidak didukung di browser ini.');
+      return;
+    }
+    
+    setLocationStatus('Mencari lokasi Anda...');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationStatus('Lokasi ditemukan. Menampilkan produk terdekat.');
+        fetchProducts(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setLocationStatus('Akses lokasi ditolak. Menampilkan produk terbaru.');
+        fetchProducts(); // fallback to latest
+      }
+    );
+  };
 
   if (!mounted) return null;
 
@@ -30,14 +71,17 @@ export default function Home() {
           <p style={{ fontSize: '1.25rem', color: 'var(--card-foreground)', opacity: 0.8, maxWidth: '700px', margin: '0 auto 2.5rem' }}>
             Satu platform untuk jual beli barang bekas keperluan kos mahasiswa. Transaksi aman, COD mudah sesuai jarak terdekat kampusmu.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link href="/products" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-              Lihat Produk
-            </Link>
-            <Link href={user && user.role === USER_ROLES.PENJUAL ? "/seller/products" : "/auth/register?role=penjual"} className="btn" style={{ padding: '1rem 2rem', fontSize: '1.1rem', border: '1px solid var(--border)' }}>
-              {user && user.role === USER_ROLES.PENJUAL ? "Kelola Jualan" : "Mulai Menjual"}
+          <div className="flex justify-center gap-4 flex-wrap">
+            <button onClick={requestLocation} className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+              📍 Cari Sekitar Saya
+            </button>
+            <Link href="/products" className="btn" style={{ padding: '1rem 2rem', fontSize: '1.1rem', border: '1px solid var(--border)' }}>
+              Semua Katalog
             </Link>
           </div>
+          {locationStatus && (
+            <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--primary)' }}>{locationStatus}</p>
+          )}
         </div>
       </section>
 
@@ -61,53 +105,71 @@ export default function Home() {
       {/* Categories / Highlights */}
       <section style={{ padding: '80px 0' }}>
         <div className="container">
-          <div className="flex justify-between items-center" style={{ marginBottom: '3rem' }}>
+          <div className="flex justify-between items-center flex-wrap gap-4" style={{ marginBottom: '3rem' }}>
             <div>
-              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Barang Terbaru</h2>
-              <p style={{ opacity: 0.6 }}>Lihat apa yang baru saja ditambahkan oleh teman-temanmu.</p>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Barang Terbaru & Terdekat</h2>
+              <p style={{ opacity: 0.6 }}>Temukan produk yang kamu butuhkan dengan cepat.</p>
             </div>
             <Link href="/products" style={{ color: 'var(--primary)', fontWeight: 600 }}>Lihat Semua &rarr;</Link>
           </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-            gap: '2rem' 
-          }}>
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div key={item} className="card" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} 
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                }} 
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow)';
-                }}>
-                <div style={{ 
-                  height: '240px', 
-                  background: 'var(--input)', 
-                  borderRadius: 'calc(var(--radius) - 4px)', 
-                  marginBottom: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--border)',
-                  fontSize: '3rem'
-                }}>
-                  📦
-                </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>Produk Barkos #{item}</div>
-                <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {(Math.floor(Math.random() * 9) + 1) * 100}.000</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                    <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>Bekas</span>
-                    <span style={{ opacity: 0.5 }}>UB - Malang</span>
+          {loading ? (
+             <div className="flex justify-center" style={{ padding: '3rem' }}>Memuat produk...</div>
+          ) : (
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '2rem' 
+            }}>
+              {products.slice(0, 6).map((product) => (
+                <Link href={`/products/${product.id}`} key={product.id} className="card" style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} 
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  }} 
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow)';
+                  }}>
+                  {product.is_promoted && (
+                    <div style={{ position: 'absolute', top: 10, right: 10, background: 'var(--primary)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', zIndex: 10 }}>
+                      🔥 Promoted
+                    </div>
+                  )}
+                  <div style={{ 
+                    height: '240px', 
+                    background: 'var(--input)', 
+                    borderRadius: 'calc(var(--radius) - 4px)', 
+                    marginBottom: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--border)',
+                    fontSize: '3rem',
+                    overflow: 'hidden'
+                  }}>
+                    {product.foto ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : '📦'}
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--foreground)' }}>{product.nama_barang}</div>
+                  <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>Rp {Number(product.harga).toLocaleString('id-ID')}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
+                      <span style={{ padding: '4px 10px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', borderRadius: '20px' }}>{product.kondisi || 'Bekas'}</span>
+                      <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus || 'Kampus'}</span>
+                    </div>
+                    {product.distance_km !== undefined && product.distance_km !== null && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>
+                        📍 {product.distance_km} km
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
