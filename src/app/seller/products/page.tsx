@@ -56,13 +56,13 @@ export default function SellerProductsDashboard() {
 
   return (
     <div className="container" style={{ padding: '60px 1rem' }}>
-      <header className="flex flex-col md-flex-row justify-between items-start md-items-center gap-4" style={{ marginBottom: '3rem' }}>
+      <header className="flex flex-col md-flex-row justify-between items-start md-items-center gap-4" style={{ marginBottom: '3.5rem', background: 'white', padding: '2rem', borderRadius: '12px', border: '1px solid var(--border)', boxShadow: 'var(--shadow)' }}>
         <div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Dashboard Penjual</h1>
-          <p style={{ opacity: 0.6 }}>Kelola lapak barang bekas Anda, tambahkan produk baru, atau perbarui informasi.</p>
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '0.4rem', color: '#111827' }}>🏪 Dashboard Penjual</h1>
+          <p style={{ opacity: 0.7, fontSize: '0.95rem' }}>Kelola lapak barang bekas Anda, pantau status, dan promosikan produk.</p>
         </div>
-        <Link href="/seller/products/create" className="btn btn-primary" style={{ padding: '12px 24px', fontWeight: 700 }}>
-          + Jual Barang Anda
+        <Link href="/seller/products/create" className="btn btn-primary" style={{ padding: '14px 28px', fontWeight: 700, borderRadius: '8px', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)' }}>
+          + Jual Barang Baru
         </Link>
       </header>
 
@@ -116,15 +116,15 @@ export default function SellerProductsDashboard() {
                 </p>
 
                 <div className="flex gap-2" style={{ marginTop: '1rem' }}>
-                  <Link href={`/seller/products/${p.id}/edit`} className="btn flex-1" style={{ border: '1px solid var(--border)' }}>
+                  <Link href={`/seller/products/${p.id}/edit`} className="btn flex-1" style={{ border: '1.5px solid var(--border)', fontSize: '0.875rem', fontWeight: 600 }}>
                     Edit
                   </Link>
                   {!p.status_terjual && (
-                    <Link href="/seller/promotions" className="btn" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 700, border: '1px solid #f59e0b' }}>
-                      🔥
+                    <Link href="/seller/promotions" className="btn" title="Boost Produk" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontWeight: 800, border: '1.5px solid rgba(245, 158, 11, 0.3)' }}>
+                      🚀
                     </Link>
                   )}
-                  <button onClick={() => handleDelete(p.id)} className="btn" style={{ background: '#fef2f2', color: '#ef4444', fontWeight: 600 }}>
+                  <button onClick={() => handleDelete(p.id)} className="btn" style={{ background: '#fff1f1', color: '#ef4444', fontWeight: 600, border: '1.5px solid #fee2e2' }}>
                     Hapus
                   </button>
                 </div>

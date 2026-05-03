@@ -135,54 +135,66 @@ export default function ChatDetailPage() {
   }
 
   return (
-    <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#efeae2' }}>
+    <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
       
       {/* Chat Header */}
-      <div style={{ padding: '0.75rem 1rem', background: 'var(--card)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10 }}>
-        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.2rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ padding: '0.8rem 1.5rem', background: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
           ⬅️
         </button>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem' }}>
+        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           {otherUser?.name?.charAt(0).toUpperCase() || '?'}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: '1.05rem', lineHeight: '1.2' }}>{otherUser?.name || 'Memuat pengguna...'}</div>
+          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2' }}>{otherUser?.name || 'Memuat...'}</div>
           {product && (
-            <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none', display: 'block', marginTop: '2px' }}>
-              📦 {product.nama_barang}
+            <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
+              <span style={{ fontSize: '0.9rem' }}>📦</span> {product.nama_barang}
             </Link>
           )}
         </div>
       </div>
 
       {/* Messages Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {loading || authLoading ? (
-          <div style={{ margin: 'auto', opacity: 0.5 }}>Memuat pesan...</div>
+          <div style={{ margin: 'auto', opacity: 0.5, fontWeight: 600 }}>Memuat percakapan...</div>
         ) : messages.length === 0 ? (
-          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.5, background: 'rgba(255,255,255,0.8)', padding: '1rem 2rem', borderRadius: '1rem' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👋</div>
-            <p>Mulai percakapan dengan {otherUser?.name || 'pengguna ini'}</p>
+          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.6, background: 'white', padding: '2rem 3rem', borderRadius: '1.5rem', boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+            <h3 style={{ fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>Say Hello!</h3>
+            <p style={{ fontSize: '0.9rem' }}>Mulai obrolan dengan {otherUser?.name || 'penjual'}</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === user?.id;
             return (
-              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '85%', display: 'flex', flexDirection: 'column' }}>
+              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ 
-                  background: isMe ? '#dcf8c6' : '#ffffff', 
-                  color: '#000000',
-                  padding: '0.5rem 0.75rem', 
-                  borderRadius: '0.75rem',
-                  borderTopRightRadius: isMe ? '0' : '0.75rem',
-                  borderTopLeftRadius: !isMe ? '0' : '0.75rem',
-                  boxShadow: '0 1px 1px rgba(0,0,0,0.1)',
-                  position: 'relative'
+                  background: isMe ? 'var(--primary)' : 'white', 
+                  color: isMe ? 'white' : '#111827',
+                  padding: '0.7rem 1rem', 
+                  borderRadius: '1.25rem',
+                  borderTopRightRadius: isMe ? '4px' : '1.25rem',
+                  borderTopLeftRadius: !isMe ? '4px' : '1.25rem',
+                  boxShadow: isMe ? '0 4px 12px rgba(22, 163, 74, 0.15)' : '0 2px 4px rgba(0,0,0,0.05)',
+                  position: 'relative',
+                  border: isMe ? 'none' : '1px solid var(--border)'
                 }}>
-                  <div style={{ fontSize: '0.95rem', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{msg.message}</div>
-                  <div style={{ fontSize: '0.65rem', opacity: 0.6, textAlign: 'right', marginTop: '0.2rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '4px' }}>
+                  <div style={{ fontSize: '0.95rem', wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{msg.message}</div>
+                  <div style={{ 
+                    fontSize: '0.65rem', 
+                    opacity: 0.8, 
+                    textAlign: 'right', 
+                    marginTop: '0.4rem', 
+                    display: 'flex', 
+                    justifyContent: 'flex-end', 
+                    alignItems: 'center', 
+                    gap: '4px',
+                    color: isMe ? 'rgba(255,255,255,0.9)' : '#9ca3af'
+                  }}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {isMe && <span style={{ color: msg.is_read ? '#53bdeb' : '#999' }}>✓✓</span>}
+                    {isMe && <span style={{ color: msg.is_read ? '#4ade80' : 'rgba(255,255,255,0.5)', fontSize: '0.8rem', fontWeight: 900 }}>✓✓</span>}
                   </div>
                 </div>
               </div>
@@ -193,13 +205,13 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Input Area */}
-      <div style={{ background: 'var(--card)', padding: '0.75rem', borderTop: '1px solid var(--border)' }}>
-        <form onSubmit={handleSendMessage} className="container flex gap-2" style={{ maxWidth: '800px', margin: '0 auto', padding: 0 }}>
+      <div style={{ background: 'white', padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
+        <form onSubmit={handleSendMessage} className="container flex gap-3" style={{ maxWidth: '900px', margin: '0 auto', padding: 0 }}>
           <input 
             type="text" 
             className="input-field" 
-            style={{ flex: 1, borderRadius: '24px', padding: '0.75rem 1.25rem', background: 'var(--input)', border: 'none', outline: 'none' }} 
-            placeholder="Ketik pesan..." 
+            style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: '#f3f4f6', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }} 
+            placeholder="Tulis pesan Anda di sini..." 
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
             disabled={sending}
@@ -208,10 +220,10 @@ export default function ChatDetailPage() {
           <button 
             type="submit" 
             className="btn btn-primary" 
-            style={{ borderRadius: '50%', width: '45px', height: '45px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s', transform: sending ? 'scale(0.9)' : 'scale(1)' }}
+            style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', transform: sending ? 'scale(0.9)' : 'scale(1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
             disabled={sending || !newMessage.trim()}
           >
-            ➤
+            <span style={{ fontSize: '1.2rem' }}>✈️</span>
           </button>
         </form>
       </div>

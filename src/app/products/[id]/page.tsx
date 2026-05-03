@@ -144,33 +144,44 @@ export default function ProductDetail() {
         {/* Product Info */}
         <div className="flex-col gap-6">
           <header>
-            <div className="flex items-center justify-between" style={{ marginBottom: '1rem' }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
                 <div className="flex items-center gap-2">
-                    <span style={{ padding: '4px 12px', background: 'var(--primary)', color: 'white', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>{product.category?.name || 'Kategori'}</span>
+                    {product.is_promoted && (
+                      <span style={{ 
+                        padding: '4px 12px', 
+                        background: 'linear-gradient(135deg, #f59e0b, #ef4444)', 
+                        color: 'white', 
+                        borderRadius: '20px', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 800,
+                        boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+                      }}>🔥 PROMOSI</span>
+                    )}
+                    <span style={{ padding: '4px 12px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>{product.category?.name || 'Kategori'}</span>
                     <span style={{ opacity: 0.5, fontSize: '0.85rem' }}>Dilihat 120 kali</span>
                 </div>
                 {user?.role === 'super_admin' && (
                     <button onClick={handleDeleteProduct} style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.85rem' }}>🗑️ Hapus Produk</button>
                 )}
             </div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.75rem', lineHeight: 1.1 }}>{product.nama_barang}</h1>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>Rp {product.harga.toLocaleString('id-ID')}</div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.5rem', lineHeight: 1.1, color: '#111827' }}>{product.nama_barang}</h1>
+            <div style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '-0.02em' }}>Rp {Number(product.harga).toLocaleString('id-ID')}</div>
           </header>
 
-          <div style={{ padding: '1.5rem', background: 'var(--input)', borderRadius: 'var(--radius)', marginTop: '1rem' }}>
-            <h3 style={{ fontWeight: 700, marginBottom: '0.75rem' }}>Deskripsi</h3>
-            <p style={{ lineHeight: 1.6, opacity: 0.8, whiteSpace: 'pre-wrap' }}>{product.deskripsi}</p>
+          <div style={{ padding: '1.5rem', background: 'white', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginTop: '0.5rem' }}>
+            <h3 style={{ fontWeight: 800, marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>Deskripsi Barang</h3>
+            <p style={{ lineHeight: 1.7, color: '#4b5563', whiteSpace: 'pre-wrap', fontSize: '0.95rem' }}>{product.deskripsi}</p>
           </div>
 
           {/* Location Area */}
-          <div style={{ padding: '1.5rem', background: 'var(--input)', borderRadius: 'var(--radius)', marginTop: '1rem' }}>
-            <h3 style={{ fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>📍</span> Lokasi COD & Radius Jarak
+          <div style={{ padding: '1.5rem', background: 'white', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginTop: '1rem' }}>
+            <h3 style={{ fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.1rem', color: '#111827' }}>
+              <span style={{ fontSize: '1.25rem' }}>📍</span> Lokasi & Radius COD
             </h3>
             
             {product.latitude && product.longitude ? (
               <div className="flex-col gap-4">
-                <div style={{ width: '100%', height: '250px', borderRadius: 'calc(var(--radius) - 4px)', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                <div style={{ width: '100%', height: '280px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border)' }}>
                   <iframe 
                     width="100%" 
                     height="100%" 
@@ -184,13 +195,13 @@ export default function ProductDetail() {
                 </div>
 
                 {!distanceInfo ? (
-                  <button onClick={calculateDistance} disabled={calculating} className="btn" style={{ background: 'white', color: 'var(--primary)', border: '1px solid var(--primary)', width: '100%', fontWeight: 700 }}>
-                    {calculating ? '🧭 Menghitung Orbit Satelit...' : '📍 Berapa Jarak COD Saya ke Penjual?'}
+                  <button onClick={calculateDistance} disabled={calculating} className="btn" style={{ background: 'white', color: 'var(--primary)', border: '1.5px solid var(--primary)', width: '100%', fontWeight: 700, borderRadius: '8px' }}>
+                    {calculating ? '🧭 Menghitung Orbit Satelit...' : '📍 Hitung Jarak dari Lokasi Saya'}
                   </button>
                 ) : (
-                  <div style={{ padding: '1.25rem', background: 'rgba(34, 197, 94, 0.08)', color: '#15803d', borderRadius: 'var(--radius)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.25rem' }}>✅ Hitungan Radius Berhasil!</div>
-                    <p style={{ opacity: 0.9, marginBottom: '1rem' }}>{distanceInfo}</p>
+                  <div style={{ padding: '1.25rem', background: 'rgba(22, 163, 74, 0.05)', color: '#15803d', borderRadius: 'var(--radius)', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+                    <div style={{ fontWeight: 800, fontSize: '1.05rem', marginBottom: '0.25rem' }}>✅ Lokasi Teridentifikasi</div>
+                    <p style={{ opacity: 0.9, marginBottom: '1.25rem', fontSize: '0.9rem' }}>{distanceInfo}</p>
                     
                     {buyerLocation && (
                       <a 
@@ -198,31 +209,32 @@ export default function ProductDetail() {
                         target="_blank" 
                         rel="noreferrer"
                         className="btn btn-primary" 
-                        style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '0.6rem', fontWeight: 700, borderRadius: '8px' }}
                       >
-                        🧭 Buka Rute & Navigasi di Google Maps
+                        🧭 Buka Navigasi Google Maps
                       </a>
                     )}
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ padding: '2rem 1rem', textAlign: 'center', opacity: 0.6, border: '1px dashed var(--border)', borderRadius: 'var(--radius)' }}>
-                Lokasi spesifik belum diatur oleh penjual. Anda bisa menanyakan langsung via chat.
+              <div style={{ padding: '2.5rem 1rem', textAlign: 'center', opacity: 0.6, border: '1px dashed var(--border)', borderRadius: 'var(--radius)', background: 'var(--background)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📍</div>
+                <p style={{ fontSize: '0.9rem' }}>Penjual belum menandai lokasi spesifik.<br/>Silakan tanyakan langsung via chat.</p>
               </div>
             )}
           </div>
 
-          <div className="flex-col gap-4" style={{ marginTop: '1rem' }}>
-            <div className="flex items-center gap-3">
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{product.user?.name.charAt(0)}</div>
+          <div className="card" style={{ marginTop: '1.5rem', background: 'white', border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <div className="flex items-center gap-3" style={{ marginBottom: '1.5rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem' }}>{product.user?.name.charAt(0).toUpperCase()}</div>
               <div>
-                <div style={{ fontWeight: 700 }}>{product.user?.name}</div>
-                <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{product.user?.asal_kampus}</div>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#111827' }}>{product.user?.name}</div>
+                <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
               </div>
             </div>
             
-            <div className="flex gap-4" style={{ marginTop: '1.5rem' }}>
+            <div className="flex gap-3">
               <button onClick={() => {
                 if (!user) {
                   router.push('/auth/login');
@@ -238,11 +250,12 @@ export default function ProductDetail() {
                   return;
                 }
                 router.push(`/chat/${product.id}/${sellerId}`);
-              }} className="btn btn-primary flex-1" style={{ height: '55px', fontSize: '1.1rem' }}>Chat Penjual</button>
+              }} className="btn btn-primary flex-1" style={{ height: '52px', fontSize: '1rem', fontWeight: 700, borderRadius: '8px' }}>💬 Chat Penjual</button>
+              
               <button 
                 onClick={() => user ? setIsReportModalOpen(true) : router.push('/auth/login')}
                 className="btn" 
-                style={{ border: '1px solid #ef4444', color: '#ef4444', fontWeight: 700 }}
+                style={{ border: '1.5px solid #fecaca', color: '#ef4444', fontWeight: 700, background: '#fff1f1', borderRadius: '8px' }}
               >
                 🚩 Laporkan
               </button>
@@ -253,17 +266,18 @@ export default function ProductDetail() {
 
       {/* Report Modal */}
       {isReportModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '500px' }}>
-            <h2 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Laporkan Produk</h2>
-            <p style={{ opacity: 0.6, marginBottom: '1.5rem' }}>Mengapa Anda melaporkan produk ini?</p>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '480px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', padding: '2rem' }}>
+            <h2 style={{ fontWeight: 900, marginBottom: '0.5rem', color: '#111827', fontSize: '1.5rem' }}>Laporkan Produk</h2>
+            <p style={{ color: '#6b7280', marginBottom: '2rem', fontSize: '0.95rem' }}>Bantu kami menjaga keamanan komunitas Lapak Kos.</p>
             
-            <form onSubmit={handleReport} className="flex-col gap-4">
+            <form onSubmit={handleReport} className="flex-col gap-5">
               <div className="flex-col gap-2">
-                <label style={{ fontSize: '0.9rem', fontWeight: 600 }}>Alasan Utama</label>
+                <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#374151' }}>Alasan Pelaporan</label>
                 <select 
                   className="input-field" 
                   required
+                  style={{ height: '48px', borderRadius: '8px' }}
                   value={reportData.reason}
                   onChange={(e) => setReportData({ ...reportData, reason: e.target.value })}
                 >
@@ -277,19 +291,20 @@ export default function ProductDetail() {
               </div>
               
               <div className="flex-col gap-2">
-                <label style={{ fontSize: '0.9rem', fontWeight: 600 }}>Detail (Opsional)</label>
+                <label style={{ fontSize: '0.875rem', fontWeight: 700, color: '#374151' }}>Deskripsi Tambahan</label>
                 <textarea 
                   className="input-field" 
                   rows={4} 
-                  placeholder="Berikan bukti atau penjelasan detail..."
+                  style={{ borderRadius: '8px', padding: '12px' }}
+                  placeholder="Berikan bukti atau penjelasan singkat..."
                   value={reportData.description}
                   onChange={(e) => setReportData({ ...reportData, description: e.target.value })}
                 />
               </div>
 
-              <div className="flex gap-3" style={{ marginTop: '1rem' }}>
-                <button type="button" onClick={() => setIsReportModalOpen(false)} className="btn flex-1" style={{ border: '1px solid var(--border)' }}>Batal</button>
-                <button type="submit" disabled={reportLoading} className="btn btn-primary flex-2" style={{ background: '#ef4444' }}>
+              <div className="flex gap-3" style={{ marginTop: '0.5rem' }}>
+                <button type="button" onClick={() => setIsReportModalOpen(false)} className="btn flex-1" style={{ border: '1.5px solid #e5e7eb', borderRadius: '8px', fontWeight: 600 }}>Batal</button>
+                <button type="submit" disabled={reportLoading} className="btn btn-primary flex-2" style={{ background: '#ef4444', borderRadius: '8px', fontWeight: 700 }}>
                   {reportLoading ? 'Mengirim...' : 'Kirim Laporan'}
                 </button>
               </div>
