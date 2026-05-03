@@ -40,7 +40,7 @@ export default function AdminPromotions() {
   const expiredCount = promotions.length - activeCount;
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)', background: '#f8faf9' }}>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: '#f8faf9' }}>
       <AdminSidebar currentPath="/admin/promotions" />
 
       <main style={{ flex: 1, padding: '2.5rem' }}>

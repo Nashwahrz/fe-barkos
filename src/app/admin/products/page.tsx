@@ -6,6 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
 import AdminSidebar from '@/components/AdminSidebar';
+import { Icons } from '@/components/Icons';
 
 export default function AdminProducts() {
   const { user, loading: authLoading } = useAuth();
@@ -52,7 +53,7 @@ export default function AdminProducts() {
   if (loading || authLoading) return <div className="p-8 text-center">Memuat data...</div>;
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)' }}>
       <AdminSidebar currentPath="/admin/products" />
 
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>
@@ -87,7 +88,7 @@ export default function AdminProducts() {
                            {p.foto ? (
                              // eslint-disable-next-line @next/next/no-img-element
                              <img src={getStorageUrl(p.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                           ) : <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>📦</div>}
+                           ) : <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}><Icons.Package size={20} color="#d1d5db" /></div>}
                         </div>
                         <div className="flex-col">
                           <div style={{ fontWeight: 700 }}>{p.nama_barang}</div>
@@ -108,9 +109,10 @@ export default function AdminProducts() {
                       <button 
                         onClick={() => handleDelete(p.id)}
                         disabled={actionLoading === p.id}
-                        style={{ color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#ef4444', fontWeight: 600, fontSize: '0.85rem' }}
                       >
-                        {actionLoading === p.id ? '...' : 'Hapus'}
+                        <Icons.Trash2 size={14} color="#ef4444" />
+                        {actionLoading === p.id ? 'Menghapus...' : 'Hapus'}
                       </button>
                     </td>
                   </tr>

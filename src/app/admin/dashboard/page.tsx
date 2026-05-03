@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -34,25 +35,8 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
-      {/* Sidebar */}
-      <aside style={{ width: '280px', borderRight: '1px solid var(--border)', padding: '2rem' }}>
-        <div className="flex-col gap-6">
-          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu Utama</div>
-          <Link href="/admin/dashboard" style={{ fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            Dashboard
-          </Link>
-          <Link href="/admin/reports" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            Laporan Pengguna
-          </Link>
-          <Link href="/admin/users" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            Manajemen User
-          </Link>
-          <Link href="/admin/settings" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            Pengaturan
-          </Link>
-        </div>
-      </aside>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <AdminSidebar currentPath="/admin/dashboard" />
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>
@@ -80,9 +64,9 @@ export default function AdminDashboard() {
               <div style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Dari total {stats?.reports?.total} laporan</div>
             </div>
             <div className="card">
-              <div style={{ fontSize: '0.9rem', fontWeight: 600, opacity: 0.5, marginBottom: '0.5rem' }}>Total Chat</div>
-              <div style={{ fontSize: '2rem', fontWeight: 800 }}>{stats?.activities?.chats}</div>
-              <div style={{ fontSize: '0.8rem', marginTop: '0.5rem', color: 'var(--accent)' }}>Interaksi antar user</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, opacity: 0.5, marginBottom: '0.5rem' }}>Transaksi Selesai</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800 }}>{stats?.transactions?.completed || 0}</div>
+              <div style={{ fontSize: '0.8rem', marginTop: '0.5rem', color: 'var(--accent)' }}>Total keberhasilan COD/Transfer</div>
             </div>
           </div>
 
@@ -92,7 +76,7 @@ export default function AdminDashboard() {
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
                 <h3 style={{ fontWeight: 800 }}>Laporan Terbaru</h3>
-                <Link href="/admin/reports" style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Lihat Semua &rarr;</Link>
+                <Link className="admin-sidebar-link" href="/admin/reports" style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Lihat Semua &rarr;</Link>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead style={{ background: 'rgba(0,0,0,0.03)', textAlign: 'left', fontSize: '0.85rem', color: 'rgba(0,0,0,0.4)' }}>

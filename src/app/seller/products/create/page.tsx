@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
+import { Icons } from '@/components/Icons';
 
 const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
@@ -228,8 +229,8 @@ export default function CreateProduct() {
                  required
                  value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
               />
-              <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap' }}>
-                📍 Gunakan GPS Saya
+              <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Icons.Compass size={15} color="white" /> Gunakan GPS Saya
               </button>
             </div>
 
@@ -252,8 +253,8 @@ export default function CreateProduct() {
           </div>
 
           <div style={{ marginTop: '1.5rem' }}>
-            <button type="submit" disabled={loading || !formData.latitude} className="btn btn-primary" style={{ width: '100%', padding: '15px' }}>
-              {loading ? 'Menyimpan Barang...' : 'Hosting Barang Bekas 🚀'}
+            <button type="submit" disabled={loading || !formData.latitude} className="btn btn-primary" style={{ width: '100%', padding: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {loading ? <><Icons.Loader size={18} color="white" /> Menyimpan Barang...</> : <>Hosting Barang Bekas <Icons.Upload size={18} color="white" /></>}
             </button>
           </div>
         </form>

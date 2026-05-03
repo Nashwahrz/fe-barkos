@@ -48,7 +48,7 @@ export default function AdminTransactions() {
   if (loading || authLoading) return <div className="p-8 text-center">Memuat data...</div>;
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)' }}>
       <AdminSidebar currentPath="/admin/transactions" />
 
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>

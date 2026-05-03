@@ -5,6 +5,7 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
+import { Icons } from '@/components/Icons';
 
 export default function SellerPromotions() {
   const { user, loading: authLoading } = useAuth();
@@ -86,7 +87,9 @@ export default function SellerPromotions() {
   return (
     <div className="container" style={{ padding: '60px 1rem', maxWidth: '1100px' }}>
       <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#111827' }}>🚀 Pusat Promosi</h1>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#111827', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
+          <Icons.Zap size={36} color="#f59e0b" /> Pusat Promosi
+        </h1>
         <p style={{ opacity: 0.7, maxWidth: '650px', margin: '0 auto', fontSize: '1.05rem', lineHeight: 1.6 }}>
           Tingkatkan visibilitas produk Anda agar selalu tampil di urutan teratas. <br/>Dapatkan lebih banyak calon pembeli dengan fitur <strong>Boost</strong>.
         </p>
@@ -99,7 +102,10 @@ export default function SellerPromotions() {
           color: message.type === 'success' ? '#16a34a' : '#ef4444',
           fontWeight: 700, textAlign: 'center', border: message.type === 'success' ? '1px solid rgba(22, 163, 74, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)'
         }}>
-          {message.type === 'success' ? '✅ ' : '❌ '}{message.text}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+            {message.type === 'success' ? <Icons.CheckCircle size={20} color="#16a34a" /> : <Icons.X size={20} color="#ef4444" />}
+            {message.text}
+          </span>
         </div>
       )}
 
@@ -108,7 +114,7 @@ export default function SellerPromotions() {
         {/* Form Beli Promosi */}
         <div className="card" style={{ padding: '2.5rem', height: 'fit-content' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
-            🛒 Beli Paket Promosi
+            <Icons.ShoppingBag size={24} color="#111827" /> Beli Paket Promosi
           </h2>
           
           <form onSubmit={handlePurchase} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
@@ -118,7 +124,7 @@ export default function SellerPromotions() {
                 <option value="">-- Pilih Produk Aktif --</option>
                 {myProducts.map(p => (
                   <option key={p.id} value={p.id}>
-                    {p.nama_barang} {p.is_promoted ? '🔥' : ''}
+                    {p.nama_barang} {p.is_promoted ? '(Sedang Promo)' : ''}
                   </option>
                 ))}
               </select>
@@ -155,8 +161,8 @@ export default function SellerPromotions() {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ padding: '1.125rem', fontWeight: 800, fontSize: '1.05rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)', marginTop: '0.5rem' }} disabled={actionLoading || myProducts.length === 0}>
-              {actionLoading ? '⏳ Memproses...' : '🔥 Aktifkan Boost Sekarang'}
+            <button type="submit" className="btn btn-primary" style={{ padding: '1.125rem', fontWeight: 800, fontSize: '1.05rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)', marginTop: '0.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }} disabled={actionLoading || myProducts.length === 0}>
+              {actionLoading ? <><Icons.Loader size={20} color="white" /> Memproses...</> : <><Icons.Zap size={20} color="white" /> Aktifkan Boost Sekarang</>}
             </button>
           </form>
         </div>
@@ -164,13 +170,13 @@ export default function SellerPromotions() {
         {/* Riwayat Promosi */}
         <div className="card" style={{ padding: '2.5rem', background: '#ffffff', height: 'fit-content' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
-            📜 Riwayat Boost
+            <Icons.Clock size={24} color="#111827" /> Riwayat Boost
           </h2>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {myPromotions.length === 0 ? (
-              <div style={{ opacity: 0.6, textAlign: 'center', padding: '4rem 0', background: 'var(--background)', borderRadius: '10px', border: '1px dashed var(--border)' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🍃</div>
+              <div style={{ opacity: 0.6, textAlign: 'center', padding: '4rem 0', background: 'var(--background)', borderRadius: '10px', border: '1px dashed var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <Icons.Folder size={48} color="#9ca3af" />
                 <p style={{ fontWeight: 500 }}>Belum ada riwayat promosi.</p>
               </div>
             ) : (
@@ -182,7 +188,7 @@ export default function SellerPromotions() {
                        {promo.product?.foto ? (
                          // eslint-disable-next-line @next/next/no-img-element
                          <img src={getStorageUrl(promo.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                       ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>📦</div>}
+                       ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={28} color="#d1d5db" /></div>}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 800, color: '#111827', marginBottom: '0.2rem', fontSize: '1rem' }}>{promo.product?.nama_barang || 'Produk dihapus'}</div>
@@ -194,8 +200,7 @@ export default function SellerPromotions() {
                     <div>
                       {isActive ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>AKTIF</span>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 800 }}>🔥</span>
+                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>AKTIF <Icons.Zap size={12} color="#16a34a" /></span>
                         </div>
                       ) : (
                         <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(107, 114, 128, 0.08)', color: '#6b7280', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.05em' }}>EXPIRED</span>

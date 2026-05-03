@@ -6,6 +6,7 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
+import { Icons } from '@/components/Icons';
 
 export default function SellerOrderDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -102,9 +103,12 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
         <p><strong>Catatan Pembeli:</strong> {order.notes || '-'}</p>
         
         {order.status !== 'cancelled' && (
-          <div style={{ marginTop: '1rem' }}>
-            <a href={`https://wa.me/${order.buyer?.phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" className="btn btn-primary" style={{ display: 'inline-block' }}>
-              Hubungi Pembeli (WhatsApp)
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button onClick={() => { if (order.product?.id && order.buyer?.id) { window.location.href = `/chat/${order.product.id}/${order.buyer.id}`; } }} className="btn" style={{ width: '100%', border: '2px solid var(--primary)', background: 'white', color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 700 }}>
+              <Icons.MessageCircle size={18} color="var(--primary)" /> Chat Pembeli (Aplikasi)
+            </button>
+            <a href={`https://wa.me/${order.buyer?.phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" className="btn btn-primary" style={{ display: 'inline-flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#25D366', border: 'none' }}>
+              <Icons.Phone size={18} color="white" /> Hubungi via WhatsApp
             </a>
           </div>
         )}

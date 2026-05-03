@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
+import { Icons } from '@/components/Icons';
 
 export default function ProductCatalog() {
   const [products, setProducts] = useState<any[]>([]);
@@ -85,7 +86,7 @@ export default function ProductCatalog() {
       (pos) => {
         setLat(pos.coords.latitude);
         setLng(pos.coords.longitude);
-        setLocStatus('Lokasi aktif 📍');
+        setLocStatus('Lokasi aktif');
       },
       (err) => {
         console.error(err);
@@ -146,8 +147,9 @@ export default function ProductCatalog() {
           <div style={{ flex: '1 1 250px' }}>
             <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 600 }}>
               <span>Lokasi & Jarak</span>
-              <span style={{ color: 'var(--primary)', cursor: 'pointer', fontSize: '0.8rem' }} onClick={requestLocation}>
-                {locStatus || '📍 Izinkan Lokasi'}
+              <span style={{ color: 'var(--primary)', cursor: 'pointer', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }} onClick={requestLocation}>
+                <Icons.MapPin size={13} color="var(--primary)" />
+                {locStatus || 'Izinkan Lokasi'}
               </span>
             </label>
             <select className="input-field" value={radius} onChange={e => setRadius(e.target.value)} disabled={!lat}>
@@ -162,7 +164,7 @@ export default function ProductCatalog() {
 
       {loading ? (
         <div style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>⌛</div>
+          <div style={{ width: '56px', height: '56px', background: '#f3f4f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Icons.Loader size={28} color="#16a34a" /></div>
           <h2 style={{ fontWeight: 800 }}>Memuat katalog produk...</h2>
         </div>
       ) : (
@@ -201,7 +203,7 @@ export default function ProductCatalog() {
                   {product.foto ? (
                      // eslint-disable-next-line @next/next/no-img-element
                     <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : '📦'}
+                  ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={48} color="#d1d5db" /></div>}
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.nama_barang}</div>
                 <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.75rem' }}>Rp {Number(product.harga).toLocaleString('id-ID')}</div>
@@ -211,7 +213,9 @@ export default function ProductCatalog() {
                     <span style={{ opacity: 0.5 }}>{product.user?.asal_kampus?.split(' ').slice(-1)[0] || 'Kampus'}</span>
                   </div>
                   {product.distance_km != null && (
-                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>📍 {product.distance_km} km</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>
+                      <Icons.MapPin size={12} color="var(--primary)" /> {product.distance_km} km
+                    </span>
                   )}
                 </div>
               </Link>
@@ -220,7 +224,7 @@ export default function ProductCatalog() {
 
           {products.length === 0 && (
             <div style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
-              <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🔍</div>
+              <div style={{ width: '56px', height: '56px', background: '#f3f4f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}><Icons.Search size={28} color="#9ca3af" /></div>
               <h2 style={{ fontWeight: 800 }}>Tidak ada produk ditemukan</h2>
               <p>Coba sesuaikan filter atau gunakan kata kunci pencarian yang lain.</p>
             </div>
