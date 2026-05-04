@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminReports() {
   const [reports, setReports] = useState<any[]>([]);
@@ -47,25 +48,8 @@ export default function AdminReports() {
   );
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
-      {/* Sidebar - Same as dashboard */}
-      <aside style={{ width: '280px', borderRight: '1px solid var(--border)', padding: '2rem' }}>
-        <div className="flex-col gap-6">
-          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu Utama</div>
-          <Link href="/admin/dashboard" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            📊 Dashboard
-          </Link>
-          <Link href="/admin/reports" style={{ fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            🚩 Laporan Pengguna
-          </Link>
-          <Link href="/admin/users" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            👥 Manajemen User
-          </Link>
-          <Link href="/admin/settings" style={{ fontWeight: 500, opacity: 0.7, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            ⚙️ Pengaturan
-          </Link>
-        </div>
-      </aside>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <AdminSidebar currentPath="/admin/reports" />
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>

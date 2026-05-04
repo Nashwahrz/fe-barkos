@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
@@ -66,7 +66,7 @@ export default function AdminUsers() {
   if (loading || authLoading) return <div className="p-8 text-center">Memuat data...</div>;
 
   return (
-    <div className="flex" style={{ minHeight: 'calc(100vh - 70px)' }}>
+    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)' }}>
       <AdminSidebar currentPath="/admin/users" />
 
       <main style={{ flex: 1, padding: '2rem', background: 'rgba(0,0,0,0.02)' }}>
@@ -96,8 +96,12 @@ export default function AdminUsers() {
                   <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '1rem 1.5rem' }}>
                       <div className="flex items-center gap-3">
-                        <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700 }}>
-                          {u.name.charAt(0).toUpperCase()}
+                        <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, overflow: 'hidden' }}>
+                          {u.foto ? (
+                            <img src={getStorageUrl(u.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            u.name.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div className="flex-col">
                           <div style={{ fontWeight: 700 }}>{u.name}</div>

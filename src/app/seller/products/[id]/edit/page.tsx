@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
+import { Icons } from '@/components/Icons';
 
 const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
@@ -162,7 +163,7 @@ export default function EditProduct() {
 
   if (error && error.includes('ditemukan')) return (
     <div className="container" style={{ padding: '60px 1rem', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️ Ops!</h1>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><Icons.X size={32} color="#ef4444" /> Ops!</h1>
       <p>{error}</p>
       <Link href="/seller/products" className="btn btn-primary" style={{ marginTop: '2rem' }}>Kembali ke Dashboard</Link>
     </div>
@@ -280,8 +281,8 @@ export default function EditProduct() {
                  required
                  value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
               />
-              <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap' }}>
-                📍 Gunakan GPS Saya
+              <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Icons.Compass size={15} color="white" /> Gunakan GPS Saya
               </button>
             </div>
 
@@ -311,8 +312,8 @@ export default function EditProduct() {
           </div>
 
           <div style={{ marginTop: '1.5rem' }}>
-            <button type="submit" disabled={saving || !formData.latitude} className="btn btn-primary" style={{ width: '100%', padding: '15px' }}>
-              {saving ? 'Menyimpan Perubahan...' : 'Simpan Perubahan ✅'}
+            <button type="submit" disabled={saving || !formData.latitude} className="btn btn-primary" style={{ width: '100%', padding: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {saving ? <><Icons.Loader size={18} color="white" /> Menyimpan Perubahan...</> : <>Simpan Perubahan <Icons.Check size={18} color="white" /></>}
             </button>
           </div>
         </form>

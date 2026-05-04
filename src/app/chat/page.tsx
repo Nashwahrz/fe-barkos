@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 
@@ -57,7 +57,7 @@ export default function ChatListPage() {
           <Link href="/products" className="btn btn-primary" style={{ marginTop: '2rem', padding: '12px 30px', fontWeight: 700 }}>Jelajahi Katalog</Link>
         </div>
       ) : (
-        <div className="flex-col gap-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {conversations.map((conv, idx) => {
             const lastMsg = conv.last_message;
             const otherUser = conv.other_user || { id: 0, name: 'Pengguna' };
@@ -78,8 +78,12 @@ export default function ChatListPage() {
                 }}
               >
                 <div className="flex items-center gap-5">
-                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                    {otherUser?.name?.charAt(0).toUpperCase()}
+                  <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.5rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                    {otherUser?.foto ? (
+                      <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      otherUser?.name?.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <div>
                     <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#111827', marginBottom: '0.2rem' }}>{otherUser?.name}</div>
@@ -87,7 +91,16 @@ export default function ChatListPage() {
                       <span style={{ fontSize: '1rem' }}>📦</span> {product?.nama_barang}
                     </div>
                     <div style={{ fontSize: '0.95rem', color: unreadCount > 0 ? '#111827' : '#6b7280', fontWeight: unreadCount > 0 ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '350px' }}>
-                      {lastMsg?.sender?.id === user?.id ? 'Anda: ' : ''}{lastMsg?.message}
+                      {lastMsg?.sender?.id === user?.id ? 'Anda: ' : ''}
+                      {(() => {
+                        const m = lastMsg?.message;
+                        if (!m) return '';
+                        if (m.startsWith('[LOCATION:')) return '📍 Mengirim lokasi';
+                        if (m === '[REQUEST_PHONE]') return '📞 Meminta Nomor WA';
+                        if (m.startsWith('[PHONE:')) return '📞 Membagikan Nomor WA';
+                        if (m.startsWith('[ORDER_INFO:')) return '📦 Info Pesanan: #' + m.split(':')[1].split(',')[0];
+                        return m;
+                      })()}
                     </div>
                   </div>
                 </div>

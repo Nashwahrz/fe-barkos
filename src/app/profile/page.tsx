@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+import { Icons } from '@/components/Icons';
 
 export default function ProfilePage() {
   const { user, loading: authLoading, refreshUser } = useAuth();
@@ -167,7 +168,7 @@ export default function ProfilePage() {
                 ) : avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={avatarUrl.startsWith('http') ? avatarUrl : `http://localhost:8000/storage/${avatarUrl}`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : '👤'}
+                ) : <Icons.User size={48} color="#9ca3af" />}
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 600 }}>Foto Profil</label>
@@ -237,7 +238,7 @@ export default function ProfilePage() {
           </div>
 
           <button onClick={handleUpdateLocation} className="btn btn-primary" disabled={loading} style={{ padding: '0.75rem 2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            📍 {loading ? 'Menyinkronkan...' : 'Sinkronkan Lokasi Saat Ini'}
+            <Icons.Compass size={18} color="white" /> {loading ? 'Menyinkronkan...' : 'Sinkronkan Lokasi Saat Ini'}
           </button>
         </div>
       )}

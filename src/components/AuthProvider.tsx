@@ -12,6 +12,7 @@ interface User {
   asal_kampus: string | null;
   phone: string | null;
   avatar: string | null;
+  foto: string | null;
   is_active: boolean;
   latitude: number | null;
   longitude: number | null;

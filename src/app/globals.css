@@ -119,3 +119,41 @@ input, textarea, select {
 .input-field:focus {
   border-color: var(--primary);
 }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.flex-wrap { flex-wrap: wrap; }
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .md-flex-col {
+    flex-direction: column !important;
+  }
+  .md-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding: 1rem !important;
+  }
+  .admin-sidebar-menu {
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+  }
+  .admin-sidebar-link {
+    white-space: nowrap;
+  }
+}
