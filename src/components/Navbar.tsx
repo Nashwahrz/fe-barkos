@@ -37,7 +37,7 @@ export default function Navbar() {
         </Link>
 
         {/* Center Nav Links */}
-        {!pathname.startsWith('/admin') && (
+        {user && !pathname.startsWith('/admin') && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             {[
               { label: 'Beranda', href: '/' },

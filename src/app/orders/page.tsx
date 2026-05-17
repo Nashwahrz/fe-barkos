@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { fetchApi, getStorageUrl } from '@/lib/api';
+import { getStorageUrl, swrFetcher } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/Icons';
+import useSWR from 'swr';
+import { OrderItemSkeleton } from '@/components/Skeleton';
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
   pending:   { label: 'Menunggu Konfirmasi', bg: '#FEF3C7', color: '#92400E' },
@@ -15,20 +17,12 @@ const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> =
 };
 
 export default function BuyerOrdersPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
 
-  useEffect(() => {
-    if (user === null) return;
-    if (!user) { router.push('/auth/login'); return; }
-    fetchApi('/transactions')
-      .then(d => setOrders(d.data || d))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [user, router]);
+  const { data, isLoading } = useSWR(user ? '/transactions' : null, swrFetcher);
+  const orders: any[] = data?.data || data || [];
 
   const tabs = [
     { key: 'all',       label: 'Semua' },
@@ -40,11 +34,11 @@ export default function BuyerOrdersPage() {
 
   const filtered = activeTab === 'all' ? orders : orders.filter(o => o.status === activeTab);
 
-  if (loading) return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-16)', textAlign: 'center', opacity: 0.5 }}>
-      Memuat pesanan...
-    </div>
-  );
+  if (authLoading) return null;
+  if (user === null) {
+    router.push('/auth/login');
+    return null;
+  }
 
   return (
     <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '860px' }}>
@@ -73,7 +67,11 @@ export default function BuyerOrdersPage() {
       </div>
 
       {/* Order List */}
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {Array.from({ length: 3 }).map((_, i) => <OrderItemSkeleton key={i} />)}
+        </div>
+      ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '5rem 0', opacity: 0.6 }}>
           <div style={{ width: '56px', height: '56px', background: '#f3f4f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
             <Icons.ShoppingBag size={24} color="#9ca3af" />
@@ -132,3 +130,4 @@ export default function BuyerOrdersPage() {
     </div>
   );
 }
+

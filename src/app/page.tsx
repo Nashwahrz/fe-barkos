@@ -4,40 +4,26 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { USER_ROLES } from "@/lib/constants";
-import { fetchApi, getStorageUrl } from "@/lib/api";
+import { getStorageUrl, swrFetcher } from "@/lib/api";
 import { Icons } from "@/components/Icons";
+import useSWR from "swr";
+import { ProductCardSkeleton } from "@/components/Skeleton";
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
   const { user } = useAuth();
-  const [products, setProducts] = useState<any[]>([]);
-  const [promotedProducts, setPromotedProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [coords, setCoords] = useState<{lat?: number, lng?: number}>({});
   const [locationStatus, setLocationStatus] = useState<string>('');
   const [locating, setLocating] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    fetchProducts();
-  }, []);
+  const endpoint = coords.lat && coords.lng 
+    ? `/products?lat=${coords.lat}&lng=${coords.lng}&radius=5000`
+    : '/products';
 
-  const fetchProducts = async (lat?: number, lng?: number) => {
-    try {
-      setLoading(true);
-      let endpoint = '/products';
-      if (lat && lng) {
-        endpoint += `?lat=${lat}&lng=${lng}&radius=5000`;
-      }
-      const data = await fetchApi(endpoint);
-      const all: any[] = data.data || data;
-      setPromotedProducts(all.filter((p: any) => p.is_promoted));
-      setProducts(all.filter((p: any) => !p.is_promoted));
-    } catch (err) {
-      console.error('Failed to load products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading } = useSWR(endpoint, swrFetcher);
+  
+  const allProducts: any[] = data?.data || data || [];
+  const promotedProducts = allProducts.filter((p: any) => p.is_promoted);
+  const products = allProducts.filter((p: any) => !p.is_promoted);
 
   const requestLocation = () => {
     if (!navigator.geolocation) {
@@ -50,23 +36,18 @@ export default function Home() {
       (position) => {
         setLocationStatus('Lokasi ditemukan. Menampilkan produk terdekat.');
         setLocating(false);
-        fetchProducts(position.coords.latitude, position.coords.longitude);
+        setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
       },
       () => {
         setLocationStatus('Akses lokasi ditolak. Menampilkan produk terbaru.');
         setLocating(false);
-        fetchProducts();
+        setCoords({});
       }
     );
   };
 
-  if (!mounted) return null;
-
-
-
   return (
-    <div style={{ background: '#f8faf9' }}>
-
+    <div style={{ background: '#f8faf9', minHeight: '100vh' }}>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section style={{
         padding: '100px 0 100px',
@@ -155,53 +136,55 @@ export default function Home() {
         </div>
       </section>
 
-
-
       {/* ── Featured Promoted Products ─────────────────────────── */}
-      {!loading && promotedProducts.length > 0 && (
-        <section style={{ padding: '60px 0', position: 'relative', zIndex: 5 }}>
-          <div className="container">
-            <div style={{ 
-              background: 'white', 
-              borderRadius: '24px', 
-              padding: '2.5rem', 
-              boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-              border: '1px solid rgba(22,163,74,0.1)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ 
-                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)', 
-                    color: 'white', padding: '8px 16px', borderRadius: '12px',
-                    fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                  }}>
-                    <Icons.Zap size={16} color="white" />
-                    PILIHAN TERBAIK MINGGU INI
-                  </div>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#111827', margin: 0 }}>Rekomendasi Unggulan</h2>
+      <section style={{ padding: '60px 0', position: 'relative', zIndex: 5 }}>
+        <div className="container">
+          <div style={{ 
+            background: 'white', 
+            borderRadius: '24px', 
+            padding: '2.5rem', 
+            boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
+            border: '1px solid rgba(22,163,74,0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ 
+                  background: 'linear-gradient(135deg, #f59e0b, #ef4444)', 
+                  color: 'white', padding: '8px 16px', borderRadius: '12px',
+                  fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                }}>
+                  <Icons.Zap size={16} color="white" />
+                  PILIHAN TERBAIK MINGGU INI
                 </div>
-                <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}>
-                  Lihat Semua Unggulan →
-                </Link>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#111827', margin: 0 }}>Rekomendasi Unggulan</h2>
               </div>
+              <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}>
+                Lihat Semua Unggulan →
+              </Link>
+            </div>
 
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-                gap: '1.5rem' 
-              }}>
-                {promotedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} promoted />
-                ))}
-              </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '1.5rem' 
+            }}>
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              ) : promotedProducts.length > 0 ? (
+                promotedProducts.map((p) => <ProductCard key={p.id} product={p} promoted />)
+              ) : (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                  Tidak ada produk unggulan saat ini.
+                </div>
+              )}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ── Latest Products ─────────────────────────────────── */}
-      <section style={{ padding: promotedProducts.length > 0 ? '20px 0 72px' : '48px 0 72px' }}>
+      <section style={{ padding: '20px 0 72px' }}>
         <div className="container">
           <div style={{
             display: 'flex', justifyContent: 'space-between',
@@ -225,33 +208,27 @@ export default function Home() {
             </Link>
           </div>
 
-          {loading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ borderRadius: '10px', background: '#f3f4f6', height: '300px', animation: 'pulse 2s infinite' }} />
-              ))}
-            </div>
-          ) : products.length === 0 && promotedProducts.length === 0 ? (
-            <div style={{
-              textAlign: 'center', padding: '4rem 1rem', background: 'white',
-              borderRadius: '12px', border: '1px solid #e5e7eb'
-            }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+            {isLoading ? (
+              Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
+            ) : products.length === 0 ? (
               <div style={{
-                width: '56px', height: '56px', background: '#f3f4f6',
-                borderRadius: '50%', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', margin: '0 auto 1rem'
+                gridColumn: '1/-1', textAlign: 'center', padding: '4rem 1rem', background: 'white',
+                borderRadius: '12px', border: '1px solid #e5e7eb'
               }}>
-                <Icons.Search size={24} color="#9ca3af" />
+                <div style={{
+                  width: '56px', height: '56px', background: '#f3f4f6',
+                  borderRadius: '50%', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', margin: '0 auto 1rem'
+                }}>
+                  <Icons.Search size={24} color="#9ca3af" />
+                </div>
+                <p style={{ color: '#6b7280', fontWeight: 500 }}>Belum ada produk tersedia.</p>
               </div>
-              <p style={{ color: '#6b7280', fontWeight: 500 }}>Belum ada produk tersedia.</p>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
-              {products.slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          )}
+            ) : (
+              products.slice(0, 8).map((p) => <ProductCard key={p.id} product={p} />)
+            )}
+          </div>
         </div>
       </section>
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/components/AuthProvider";
 
+import { RouteGuard } from "@/components/RouteGuard";
+
 const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-inter' });
 
 export const metadata: Metadata = {
@@ -21,8 +23,10 @@ export default function RootLayout({
     <html lang="id">
       <body className={`${inter.className} ${inter.variable}`}>
         <AuthProvider>
-          <Navbar />
-          {children}
+          <RouteGuard>
+            <Navbar />
+            {children}
+          </RouteGuard>
         </AuthProvider>
       </body>
     </html>
