@@ -39,6 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setToken(localStorage.getItem('auth_token'));
     setIsInitializing(false);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.error('Service Worker registration failed:', err);
+      });
+    }
   }, []);
 
   const { data, error, isLoading, mutate: refresh } = useSWR(

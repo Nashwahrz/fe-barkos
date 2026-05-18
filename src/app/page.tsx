@@ -1,7 +1,8 @@
 'use client';
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { USER_ROLES } from "@/lib/constants";
 import { getStorageUrl, swrFetcher } from "@/lib/api";
@@ -10,255 +11,376 @@ import useSWR from "swr";
 import { ProductCardSkeleton } from "@/components/Skeleton";
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useAuth();
-  const [coords, setCoords] = useState<{lat?: number, lng?: number}>({});
-  const [locationStatus, setLocationStatus] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [locating, setLocating] = useState(false);
 
-  const endpoint = coords.lat && coords.lng 
-    ? `/products?lat=${coords.lat}&lng=${coords.lng}&radius=5000`
-    : '/products';
+  const { data, isLoading } = useSWR('/products', swrFetcher);
+  const { data: catData } = useSWR('/categories', swrFetcher);
+  const { data: bannerData } = useSWR('/promotions/banners', swrFetcher);
 
-  const { data, isLoading } = useSWR(endpoint, swrFetcher);
-  
   const allProducts: any[] = data?.data || data || [];
   const promotedProducts = allProducts.filter((p: any) => p.is_promoted);
   const products = allProducts.filter((p: any) => !p.is_promoted);
+  const banners: any[] = bannerData?.data || [];
 
-  const requestLocation = () => {
+  const dbCategories: any[] = catData?.data || catData || [];
+
+  // Banner carousel state
+  const [bannerIdx, setBannerIdx] = useState(0);
+  const bannerTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (banners.length > 1) {
+      bannerTimer.current = setInterval(() => {
+        setBannerIdx(i => (i + 1) % banners.length);
+      }, 5000);
+    }
+    return () => { if (bannerTimer.current) clearInterval(bannerTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [banners.length]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+    } else {
+      router.push(`/products`);
+    }
+  };
+
+  const requestLocationAndSearch = () => {
     if (!navigator.geolocation) {
-      setLocationStatus('Geolocation tidak didukung di browser ini.');
+      alert('Geolocation tidak didukung di browser ini.');
       return;
     }
     setLocating(true);
-    setLocationStatus('Mencari lokasi Anda...');
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLocationStatus('Lokasi ditemukan. Menampilkan produk terdekat.');
         setLocating(false);
-        setCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
+        router.push(`/products?lat=${position.coords.latitude}&lng=${position.coords.longitude}&radius=5000`);
       },
       () => {
-        setLocationStatus('Akses lokasi ditolak. Menampilkan produk terbaru.');
         setLocating(false);
-        setCoords({});
+        alert('Akses lokasi ditolak.');
       }
     );
   };
 
+  const getCategoryIcon = (name: string) => {
+    const n = name.toLowerCase();
+    if (n.includes('elektronik') || n.includes('gadget')) return <Icons.Cpu size={24} color="var(--primary)" />;
+    if (n.includes('furniture') || n.includes('perabotan')) return <Icons.Sofa size={24} color="var(--primary)" />;
+    if (n.includes('kasur') || n.includes('tidur')) return <Icons.Bed size={24} color="var(--primary)" />;
+    if (n.includes('mandi') || n.includes('cuci')) return <Icons.Droplets size={24} color="var(--primary)" />;
+    if (n.includes('masak') || n.includes('makan')) return <Icons.UtensilsCrossed size={24} color="var(--primary)" />;
+    if (n.includes('buku') || n.includes('tulis')) return <Icons.BookOpen size={24} color="var(--primary)" />;
+    if (n.includes('kendaraan') || n.includes('aksesoris')) return <Icons.Bike size={24} color="var(--primary)" />;
+    if (n.includes('pakaian') || n.includes('fashion')) return <Icons.Shirt size={24} color="var(--primary)" />;
+    return <Icons.LayoutGrid size={24} color="var(--primary)" />;
+  };
+
   return (
-    <div style={{ background: '#f8faf9', minHeight: '100vh' }}>
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section style={{
-        padding: '100px 0 100px',
-        background: 'linear-gradient(165deg, #ffffff 0%, #f0fdf4 50%, #dcfce7 100%)',
-        position: 'relative',
-        overflow: 'hidden',
-        borderBottom: '1px solid rgba(22,163,74,0.05)'
-      }}>
-        {/* Decorative elements */}
-        <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(22,163,74,0.03)', zIndex: 0 }} />
-        <div style={{ position: 'absolute', bottom: '-50px', left: '-50px', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(22,163,74,0.03)', zIndex: 0 }} />
-
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            background: 'white',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
-            color: '#15803d', fontWeight: 800, fontSize: '0.75rem',
-            padding: '8px 16px', borderRadius: '24px', marginBottom: '2rem',
-            letterSpacing: '0.05em', border: '1px solid rgba(22,163,74,0.1)'
-          }}>
-            <Icons.GraduationCap size={16} color="#16a34a" />
-            MARKETPLACE KHUSUS MAHASISWA
-          </div>
-
-          <h1 style={{
-            fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 900,
-            color: '#111827', lineHeight: 1.1, marginBottom: '1.5rem',
-            letterSpacing: '-0.04em'
-          }}>
-            Jual Beli Kebutuhan Kos<br />
-            <span style={{ 
-              background: 'linear-gradient(90deg, #16a34a, #15803d)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>Makin Mudah & Aman</span>
-          </h1>
-
-          <p style={{
-            fontSize: '1.15rem', color: '#4b5563',
-            maxWidth: '600px', margin: '0 auto 3rem', lineHeight: 1.8,
-            fontWeight: 500
-          }}>
-            Platform terpercaya untuk mahasiswa mencari dan menjual barang bekas berkualitas di sekitar kampus.
-          </p>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <button
-              onClick={requestLocation}
-              disabled={locating}
-              className="btn btn-primary"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '10px',
-                padding: '1rem 2rem', fontSize: '1rem', fontWeight: 700,
-                borderRadius: '12px', boxShadow: '0 10px 25px rgba(22,163,74,0.25)',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <Icons.MapPin size={18} color="white" />
-              {locating ? 'Mencari Lokasi...' : 'Cari Barang Terdekat'}
-            </button>
-            <Link
-              href="/products"
-              className="btn"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '10px',
-                padding: '1rem 2rem', fontSize: '1rem',
-                border: '1.5px solid #e5e7eb', background: 'white',
-                fontWeight: 700, borderRadius: '12px', color: '#374151',
-                textDecoration: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
-              }}
-            >
-              <Icons.LayoutGrid size={18} color="#374151" />
-              Jelajahi Katalog
-            </Link>
-          </div>
-
-          {locationStatus && (
+    <div style={{ background: 'var(--background)', minHeight: '100vh', color: 'var(--foreground)' }}>
+      
+      {/* ── Search Header (Carousell Style) ──────────────────────── */}
+      <section style={{ background: 'var(--card)', padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
+        <div className="container">
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <div style={{ 
-              marginTop: '1.5rem', fontSize: '0.9rem', color: '#16a34a', 
-              fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' 
+              flex: '1 1 300px', display: 'flex', alignItems: 'center', 
+              background: 'var(--input)', borderRadius: '8px', padding: '0 12px' 
             }}>
-              <Icons.CheckCircle size={16} color="#16a34a" /> {locationStatus}
+              <span style={{ opacity: 0.5, display: 'flex' }}><Icons.Search size={18} color="var(--foreground)" /></span>
+              <input 
+                type="text" 
+                placeholder="Cari produk..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ 
+                  width: '100%', background: 'transparent', border: 'none', color: 'var(--foreground)', 
+                  padding: '12px', outline: 'none' 
+                }} 
+              />
+            </div>
+            
+            <button
+              type="button"
+              onClick={requestLocationAndSearch}
+              disabled={locating}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'var(--input)', color: 'var(--foreground)', border: 'none',
+                padding: '0 16px', borderRadius: '8px', cursor: 'pointer',
+                fontWeight: 600, minWidth: '160px', justifyContent: 'center'
+              }}
+            >
+              <Icons.MapPin size={18} color="#16a34a" />
+              {locating ? 'Mencari...' : 'Cari Terdekat'}
+            </button>
+
+            <button type="submit" style={{
+              background: '#16a34a', color: 'white', border: 'none',
+              padding: '0 24px', borderRadius: '8px', cursor: 'pointer',
+              fontWeight: 700
+            }}>
+              Cari
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* ── Iklan / Banner Section ────────────────────────────────── */}
+      <section style={{ padding: '24px 0', background: 'var(--banner-bg)' }}>
+        <div className="container">
+          {banners.length > 0 ? (
+            /* ── Dynamic Iklan Carousel ─────────────────────────── */
+            <div style={{ position: 'relative' }}>
+              <div style={{ borderRadius: '14px', overflow: 'hidden', position: 'relative', background: '#000', minHeight: '200px' }}>
+                {banners.map((banner, idx) => (
+                  <Link
+                    key={banner.id}
+                    href={`/products/${banner.product_id}`}
+                    style={{
+                      display: idx === bannerIdx ? 'block' : 'none',
+                      position: 'relative', textDecoration: 'none',
+                    }}
+                  >
+                    {banner.ad_type === 'video' ? (
+                      <video
+                        src={banner.ad_media_url}
+                        autoPlay muted loop playsInline
+                        style={{ width: '100%', maxHeight: '340px', objectFit: 'cover', display: 'block' }}
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={banner.ad_media_url}
+                        alt={banner.ad_title || banner.product_name || 'Iklan'}
+                        style={{ width: '100%', maxHeight: '340px', objectFit: 'cover', display: 'block' }}
+                      />
+                    )}
+                    {/* Overlay info */}
+                    <div style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)',
+                      padding: '32px 24px 20px',
+                      display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px'
+                    }}>
+                      <div>
+                        {banner.ad_title && (
+                          <div style={{ color: 'white', fontWeight: 800, fontSize: '1.2rem', marginBottom: '4px', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                            {banner.ad_title}
+                          </div>
+                        )}
+                        {banner.product_name && (
+                          <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', fontWeight: 600 }}>
+                            {banner.product_name}{banner.product_price ? ` · Rp ${Number(banner.product_price).toLocaleString('id-ID')}` : ''}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{
+                        background: 'white', color: '#111827', padding: '8px 18px',
+                        borderRadius: '8px', fontWeight: 800, fontSize: '0.85rem', whiteSpace: 'nowrap', flexShrink: 0
+                      }}>
+                        Lihat Produk →
+                      </div>
+                    </div>
+                    {/* Ad badge */}
+                    <div style={{
+                      position: 'absolute', top: '12px', left: '12px',
+                      background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+                      color: 'white', fontSize: '0.65rem', fontWeight: 700,
+                      padding: '3px 8px', borderRadius: '4px', letterSpacing: '0.06em'
+                    }}>
+                      {banner.ad_type === 'video' ? '🎬 IKLAN VIDEO' : '🖼️ IKLAN'}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Dots */}
+              {banners.length > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
+                  {banners.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setBannerIdx(idx)}
+                      style={{
+                        width: idx === bannerIdx ? '24px' : '8px',
+                        height: '8px', borderRadius: '999px', border: 'none',
+                        background: idx === bannerIdx ? '#16a34a' : 'var(--border)',
+                        cursor: 'pointer', transition: 'all 0.25s', padding: 0
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Arrows */}
+              {banners.length > 1 && (
+                <>
+                  <button onClick={() => setBannerIdx(i => (i - 1 + banners.length) % banners.length)}
+                    style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.45)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >‹</button>
+                  <button onClick={() => setBannerIdx(i => (i + 1) % banners.length)}
+                    style={{ position: 'absolute', top: '50%', right: '12px', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.45)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >›</button>
+                </>
+              )}
+            </div>
+          ) : (
+            /* ── Static fallback banners ────────────────────────── */
+            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div style={{ flex: '1 0 50%', minWidth: '320px', background: 'linear-gradient(135deg, #b91c1c, #991b1b)', borderRadius: '12px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px', maxWidth: '70%' }}>Saatnya barang kamu lebih kelihatan</h2>
+                <p style={{ opacity: 0.9, marginBottom: '16px', maxWidth: '70%' }}>Naikin exposure dan buka peluang laku lebih cepat.</p>
+                <Link href="/seller/promotions" style={{ background: 'var(--card)', color: 'var(--foreground)', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block', border: '1px solid var(--border)' }}>Pelajari lebih lanjut</Link>
+              </div>
+              <div style={{ flex: '1 0 50%', minWidth: '320px', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '12px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px', maxWidth: '70%' }}>Bukan cuma HP, di sini jual semuanya!</h2>
+                <p style={{ opacity: 0.9, marginBottom: '16px', maxWidth: '70%' }}>Buku, kipas angin, meja, semuanya bisa diuangkan.</p>
+                <Link href="/seller/products/create" style={{ background: 'white', color: '#15803d', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Mulai Jual</Link>
+              </div>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Featured Promoted Products ─────────────────────────── */}
-      <section style={{ padding: '60px 0', position: 'relative', zIndex: 5 }}>
+      {/* ── Categories ─────────────────────────────────────────────── */}
+      <section style={{ padding: '24px 0', borderBottom: '1px solid var(--border)', background: 'var(--background)' }}>
         <div className="container">
           <div style={{ 
-            background: 'white', 
-            borderRadius: '24px', 
-            padding: '2.5rem', 
-            boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(22,163,74,0.1)'
+            display: 'flex', gap: '8px', justifyContent: 'center', 
+            flexWrap: 'wrap', padding: '0 8px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  background: 'linear-gradient(135deg, #f59e0b, #ef4444)', 
-                  color: 'white', padding: '8px 16px', borderRadius: '12px',
-                  fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px',
-                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                }}>
-                  <Icons.Zap size={16} color="white" />
-                  PILIHAN TERBAIK MINGGU INI
-                </div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#111827', margin: 0 }}>Rekomendasi Unggulan</h2>
-              </div>
-              <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}>
-                Lihat Semua Unggulan →
+            {dbCategories.length === 0
+              ? Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                    width: '96px', padding: '8px'
+                  }}>
+                    <div style={{
+                      width: '64px', height: '64px', borderRadius: '16px',
+                      background: 'var(--input)'
+                    }} />
+                    <div style={{ width: '56px', height: '12px', borderRadius: '4px', background: 'var(--input)' }} />
+                  </div>
+                ))
+              : [
+                  ...dbCategories.slice(0, 6).map((cat: any) => ({ type: 'cat', cat })),
+                  { type: 'all' }
+                ].map((item: any, i) => {
+                  if (item.type === 'all') {
+                    return (
+                      <Link key="all" href="/products" style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                        width: '96px', padding: '8px', textDecoration: 'none', flexShrink: 0
+                      }}>
+                        <div style={{
+                          width: '64px', height: '64px', borderRadius: '16px',
+                          background: 'var(--primary-light)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '1.5px dashed var(--primary)', boxShadow: 'var(--shadow)',
+                          transition: 'transform 0.15s, box-shadow 0.15s'
+                        }}
+                          onMouseEnter={e => {
+                            (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+                            (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-lg)';
+                          }}
+                          onMouseLeave={e => {
+                            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                            (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow)';
+                          }}
+                        >
+                          <Icons.LayoutGrid size={26} color="var(--primary)" />
+                        </div>
+                        <span style={{
+                          fontSize: '0.78rem', fontWeight: 700, color: 'var(--primary)',
+                          textAlign: 'center', lineHeight: 1.3
+                        }}>Lihat Semua</span>
+                      </Link>
+                    );
+                  }
+                  return (
+                    <Link key={item.cat.id} href={`/products?category_id=${item.cat.id}`} style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                      width: '96px', padding: '8px', textDecoration: 'none', flexShrink: 0
+                    }}>
+                      <div style={{
+                        width: '64px', height: '64px', borderRadius: '16px', background: 'var(--card)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        border: '1.5px solid var(--border)', boxShadow: 'var(--shadow)',
+                        transition: 'transform 0.15s, box-shadow 0.15s'
+                      }}
+                        onMouseEnter={e => {
+                          (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+                          (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-lg)';
+                        }}
+                        onMouseLeave={e => {
+                          (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                          (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow)';
+                        }}
+                      >
+                        {getCategoryIcon(item.cat.name)}
+                      </div>
+                      <span style={{
+                        fontSize: '0.78rem', fontWeight: 600, color: 'var(--foreground)',
+                        textAlign: 'center', lineHeight: 1.3, maxWidth: '88px'
+                      }}>{item.cat.name}</span>
+                    </Link>
+                  );
+                })
+            }
+          </div>
+        </div>
+      </section>
+
+      <div style={{ background: 'var(--banner-bg)', minHeight: '50vh', padding: '32px 0' }}>
+        {/* ── Promoted Products ──────────────────────────────────────── */}
+        <section style={{ marginBottom: '40px' }}>
+          <div className="container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--foreground)' }}>Rekomendasi Unggulan</h3>
+              <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+                Lihat Semua &gt;
               </Link>
             </div>
-
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-              gap: '1.5rem' 
-            }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
               {isLoading ? (
-                Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)
+                Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : promotedProducts.length > 0 ? (
                 promotedProducts.map((p) => <ProductCard key={p.id} product={p} promoted />)
               ) : (
-                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
-                  Tidak ada produk unggulan saat ini.
-                </div>
+                <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem' }}>Belum ada produk unggulan.</div>
               )}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Latest Products ─────────────────────────────────── */}
-      <section style={{ padding: '20px 0 72px' }}>
-        <div className="container">
-          <div style={{
-            display: 'flex', justifyContent: 'space-between',
-            alignItems: 'center', marginBottom: '1.25rem',
-            flexWrap: 'wrap', gap: '1rem'
-          }}>
-            <div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#111827' }}>
-                {locationStatus.includes('ditemukan') ? 'Produk Terdekat' : 'Produk Terbaru'}
-              </h2>
-              <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '2px' }}>
-                Temukan barang yang kamu butuhkan
-              </p>
+        {/* ── Sepertinya Kamu Bakal Suka Ini (Latest Products) ───────── */}
+        <section style={{ paddingBottom: '40px' }}>
+          <div className="container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--foreground)' }}>Sepertinya kamu bakal suka ini</h3>
+              <Link href="/products" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+                Lihat Semua &gt;
+              </Link>
             </div>
-            <Link href="/products" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '4px',
-              color: '#16a34a', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none'
-            }}>
-              Lihat Semua
-              <Icons.ArrowRight size={15} color="#16a34a" />
-            </Link>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
+              {isLoading ? (
+                Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              ) : products.length > 0 ? (
+                products.slice(0, 15).map((p) => <ProductCard key={p.id} product={p} />)
+              ) : (
+                <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem' }}>Belum ada produk.</div>
+              )}
+            </div>
           </div>
+        </section>
+      </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
-            {isLoading ? (
-              Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
-            ) : products.length === 0 ? (
-              <div style={{
-                gridColumn: '1/-1', textAlign: 'center', padding: '4rem 1rem', background: 'white',
-                borderRadius: '12px', border: '1px solid #e5e7eb'
-              }}>
-                <div style={{
-                  width: '56px', height: '56px', background: '#f3f4f6',
-                  borderRadius: '50%', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', margin: '0 auto 1rem'
-                }}>
-                  <Icons.Search size={24} color="#9ca3af" />
-                </div>
-                <p style={{ color: '#6b7280', fontWeight: 500 }}>Belum ada produk tersedia.</p>
-              </div>
-            ) : (
-              products.slice(0, 8).map((p) => <ProductCard key={p.id} product={p} />)
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA Banner ─────────────────────────────────────── */}
-      <section style={{
-        background: 'linear-gradient(135deg, #15803d, #16a34a)',
-        padding: '64px 0', color: 'white', textAlign: 'center'
-      }}>
-        <div className="container">
-          <h2 style={{ fontSize: '1.875rem', fontWeight: 800, marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
-            Punya Barang Tak Terpakai?
-          </h2>
-          <p style={{ fontSize: '1rem', opacity: 0.9, maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
-            Daftarkan barangmu dan temukan pembeli dari mahasiswa sekampus dalam hitungan menit.
-          </p>
-          <Link
-            href={user && user.role === USER_ROLES.PENJUAL ? "/seller/products/create" : "/auth/register?role=penjual"}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: 'white', color: '#16a34a',
-              padding: '0.875rem 2rem', borderRadius: '8px',
-              fontWeight: 700, fontSize: '0.95rem',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.15)', textDecoration: 'none'
-            }}
-          >
-            <Icons.Store size={18} color="#16a34a" />
-            {user && user.role === USER_ROLES.PENJUAL ? "Pasang Barang Baru" : "Mulai Jual Sekarang"}
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }
@@ -270,24 +392,24 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
       href={`/products/${product.id}`}
       style={{
         display: 'block',
-        background: 'white',
-        borderRadius: '10px',
-        border: promoted ? '1.5px solid #f59e0b' : '1px solid #e5e7eb',
+        background: 'var(--card)',
+        borderRadius: '8px',
+        border: promoted ? '1px solid #f59e0b' : '1px solid var(--border)',
         overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.07)',
         transition: 'all 0.2s ease',
         cursor: 'pointer',
         position: 'relative',
         textDecoration: 'none',
-        color: 'inherit'
+        color: 'inherit',
+        boxShadow: 'var(--shadow)'
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
-        (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 25px rgba(0,0,0,0.11)';
+        (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-lg)';
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-        (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.07)';
+        (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow)';
       }}
     >
       {/* Promo Badge */}
@@ -295,9 +417,9 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
         <div style={{
           position: 'absolute', top: '10px', left: '10px', zIndex: 2,
           display: 'flex', alignItems: 'center', gap: '4px',
-          background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+          background: '#b91c1c',
           color: 'white', fontWeight: 700, fontSize: '0.65rem',
-          padding: '3px 9px', borderRadius: '20px'
+          padding: '3px 8px', borderRadius: '4px'
         }}>
           <Icons.Zap size={10} color="white" />
           Promosi
@@ -306,7 +428,7 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
 
       {/* Image */}
       <div style={{
-        height: '190px', background: '#f3f4f6',
+        height: '200px', background: 'var(--input)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden'
       }}>
@@ -315,38 +437,55 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
           <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-            <Icons.Package size={48} color="#d1d5db" />
+            <Icons.Package size={48} color="var(--border)" />
           </div>
         )}
       </div>
 
       {/* Info */}
-      <div style={{ padding: '0.875rem 1rem' }}>
+      <div style={{ padding: '12px' }}>
         <div style={{
-          fontSize: '0.9rem', fontWeight: 700, color: '#111827',
-          marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+          fontSize: '0.95rem', fontWeight: 400, color: 'var(--foreground)', opacity: 0.9,
+          marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
         }}>
           {product.nama_barang}
         </div>
-        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a', marginBottom: '8px' }}>
+        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>
           Rp {Number(product.harga).toLocaleString('id-ID')}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
           <span style={{
-            fontSize: '0.7rem', fontWeight: 600,
-            background: 'rgba(22,163,74,0.08)', color: '#15803d',
-            padding: '3px 9px', borderRadius: '20px'
+            fontSize: '0.75rem', fontWeight: 500,
+            background: 'var(--input)', color: 'var(--foreground)',
+            padding: '2px 6px', borderRadius: '4px'
           }}>
             {product.kondisi || 'Bekas'}
           </span>
-          <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.7 }}>
+          <div style={{
+            width: '20px', height: '20px', borderRadius: '50%', background: 'var(--input)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
+          }}>
+            {product.user?.foto ? (
+              <img src={getStorageUrl(product.user.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <Icons.User size={12} color="var(--foreground)" />
+            )}
+          </div>
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+            {product.user?.name || 'Penjual'}
+          </span>
+          <span style={{ marginLeft: 'auto' }}>
             {product.user?.asal_kampus?.split(' ').slice(-1)[0] || 'Kampus'}
           </span>
         </div>
+
         {product.distance_km != null && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: '4px',
-            fontSize: '0.72rem', color: '#16a34a', marginTop: '6px', fontWeight: 500
+            fontSize: '0.75rem', color: '#16a34a', marginTop: '8px', fontWeight: 500
           }}>
             <Icons.MapPin size={11} color="#16a34a" />
             {product.distance_km} km dari sini

@@ -144,11 +144,23 @@ export default function ChatDetailPage() {
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if (!newMessage.trim()) return;
 
     const tempMessage = newMessage;
     setNewMessage('');
-    setSending(true);
+
+    // Optimistic Update
+    const optimisticMsg = {
+      id: 'temp-' + Date.now(),
+      message: tempMessage,
+      sender: user,
+      created_at: new Date().toISOString(),
+      is_read: false,
+      is_optimistic: true
+    };
+    
+    setMessages(prev => [...prev, optimisticMsg]);
+    setTimeout(scrollToBottom, 50);
 
     try {
       await fetchApi(`/products/${productId}/chats`, {
@@ -162,18 +174,27 @@ export default function ChatDetailPage() {
       
       await loadMessages(false);
       markAsRead();
-      setTimeout(scrollToBottom, 100);
     } catch (err: any) {
       alert(err.message || 'Gagal mengirim pesan');
       setNewMessage(tempMessage); // Restore on fail
-    } finally {
-      setSending(false);
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
     }
   }
 
   async function sendTemplate(text: string) {
-    if (sending) return;
-    setSending(true);
+    // Optimistic Update
+    const optimisticMsg = {
+      id: 'temp-' + Date.now(),
+      message: text,
+      sender: user,
+      created_at: new Date().toISOString(),
+      is_read: false,
+      is_optimistic: true
+    };
+    
+    setMessages(prev => [...prev, optimisticMsg]);
+    setTimeout(scrollToBottom, 50);
+
     try {
       await fetchApi(`/products/${productId}/chats`, {
         method: 'POST',
@@ -185,11 +206,9 @@ export default function ChatDetailPage() {
       });
       await loadMessages(false);
       markAsRead();
-      setTimeout(scrollToBottom, 100);
     } catch (err: any) {
       alert('Gagal mengirim template');
-    } finally {
-      setSending(false);
+      setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
     }
   }
 
@@ -241,17 +260,37 @@ export default function ChatDetailPage() {
   }
 
   async function handleSharePhone() {
-    if (!user?.phone) {
-      alert('Anda belum mengatur nomor telepon di profil Anda.');
-      router.push('/profile');
-      return;
+    let phoneToShare = user?.phone;
+
+    if (!phoneToShare) {
+      const input = window.prompt('Anda belum mengatur nomor WA. Silakan masukkan nomor WA Anda (contoh: 0812...):');
+      if (!input || !input.trim()) return;
+      
+      phoneToShare = input.trim();
+      
+      try {
+        if (!user) return;
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('name', user.name);
+        formData.append('phone', phoneToShare);
+        if (user.asal_kampus) formData.append('asal_kampus', user.asal_kampus);
+
+        await fetchApi('/profile', {
+          method: 'POST',
+          body: formData,
+        });
+      } catch(err) {
+        console.error('Gagal menyimpan profil', err);
+      }
     }
+
     setSending(true);
     try {
       await fetchApi(`/products/${productId}/chats`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: `[PHONE:${user.phone}]`, receiver_id: otherUserId })
+        body: JSON.stringify({ message: `[PHONE:${phoneToShare}]`, receiver_id: otherUserId })
       });
       await loadMessages(false);
       setTimeout(scrollToBottom, 100);
@@ -289,7 +328,7 @@ export default function ChatDetailPage() {
       {/* Chat Header */}
       <div style={{ padding: '0.8rem 1.5rem', background: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
         <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
-          ⬅️
+          <Icons.ArrowLeft size={24} />
         </button>
         <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
           {otherUser?.foto ? (
@@ -302,7 +341,7 @@ export default function ChatDetailPage() {
           <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2' }}>{otherUser?.name || 'Memuat...'}</div>
           {product && (
             <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
-              <span style={{ fontSize: '0.9rem' }}>📦</span> {product.nama_barang}
+              <span style={{ display: 'flex', alignItems: 'center' }}><Icons.Package size={14} /></span> {product.nama_barang}
             </Link>
           )}
         </div>
@@ -314,7 +353,7 @@ export default function ChatDetailPage() {
           <div style={{ margin: 'auto', opacity: 0.5, fontWeight: 600 }}>Memuat percakapan...</div>
         ) : messages.length === 0 ? (
           <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.6, background: 'white', padding: '2rem 3rem', borderRadius: '1.5rem', boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}><Icons.MessageCircle size={48} color="var(--primary)" /></div>
             <h3 style={{ fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>Say Hello!</h3>
             <p style={{ fontSize: '0.9rem' }}>Mulai obrolan dengan {otherUser?.name || 'penjual'}</p>
           </div>
@@ -416,7 +455,8 @@ export default function ChatDetailPage() {
                     color: isMe ? 'rgba(255,255,255,0.9)' : '#9ca3af'
                   }}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    {isMe && <span style={{ color: msg.is_read ? '#4ade80' : 'rgba(255,255,255,0.5)', fontSize: '0.8rem', fontWeight: 900 }}>✓✓</span>}
+                    {isMe && !msg.is_optimistic && <span style={{ color: msg.is_read ? '#4ade80' : 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center' }}><Icons.CheckCheck size={14} /></span>}
+                    {isMe && msg.is_optimistic && <span style={{ color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center' }}><Icons.Clock size={12} /></span>}
                   </div>
                 </div>
               </div>
@@ -484,16 +524,15 @@ export default function ChatDetailPage() {
             placeholder="Tulis pesan Anda di sini..." 
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            disabled={sending}
             autoFocus
           />
           <button 
             type="submit" 
             className="btn btn-primary" 
-            style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', transform: sending ? 'scale(0.9)' : 'scale(1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
-            disabled={sending || !newMessage.trim()}
+            style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
+            disabled={!newMessage.trim()}
           >
-            <span style={{ fontSize: '1.2rem' }}>✈️</span>
+            <Icons.Send size={20} color="white" />
           </button>
         </form>
       </div>
