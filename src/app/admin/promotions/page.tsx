@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
@@ -191,14 +191,14 @@ export default function AdminPromotions() {
             <div style={{ background: '#000' }}>
               {previewBanner.ad_type === 'video' ? (
                 <video
-                  src={previewBanner.ad_media_url}
+                  src={getStorageUrl(previewBanner.ad_media_url) || ''}
                   controls autoPlay muted
                   style={{ width: '100%', maxHeight: '340px', display: 'block', objectFit: 'contain' }}
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={previewBanner.ad_media_url}
+                  src={getStorageUrl(previewBanner.ad_media_url) || ''}
                   alt={previewBanner.ad_title || 'iklan'}
                   style={{ width: '100%', maxHeight: '340px', display: 'block', objectFit: 'contain' }}
                 />

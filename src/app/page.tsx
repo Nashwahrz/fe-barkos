@@ -68,6 +68,13 @@ export default function Home() {
     );
   };
 
+  // Determine the correct sell destination based on user role
+  const sellLink = !user
+    ? '/auth/login?redirect=/seller/register'
+    : user.role === USER_ROLES.PENJUAL
+      ? '/seller/products/create'
+      : '/seller/register';
+
   const getCategoryIcon = (name: string) => {
     const n = name.toLowerCase();
     if (n.includes('elektronik') || n.includes('gadget')) return <Icons.Cpu size={24} color="var(--primary)" />;
@@ -84,46 +91,53 @@ export default function Home() {
   return (
     <div style={{ background: 'var(--background)', minHeight: '100vh', color: 'var(--foreground)' }}>
       
-      {/* ── Search Header (Carousell Style) ──────────────────────── */}
-      <section style={{ background: 'var(--card)', padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
+      {/* ── Search Header ──────────────────────────────────────── */}
+      <section style={{ background: 'var(--card)', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <div style={{ 
-              flex: '1 1 300px', display: 'flex', alignItems: 'center', 
-              background: 'var(--input)', borderRadius: '8px', padding: '0 12px' 
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
+            {/* Search input — full width */}
+            <div style={{
+              flex: 1, display: 'flex', alignItems: 'center',
+              background: 'var(--input)', borderRadius: '8px', padding: '0 12px',
+              minWidth: 0
             }}>
-              <span style={{ opacity: 0.5, display: 'flex' }}><Icons.Search size={18} color="var(--foreground)" /></span>
-              <input 
-                type="text" 
-                placeholder="Cari produk..." 
+              <span style={{ opacity: 0.5, display: 'flex', flexShrink: 0 }}>
+                <Icons.Search size={18} color="var(--foreground)" />
+              </span>
+              <input
+                type="text"
+                placeholder="Cari produk..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ 
-                  width: '100%', background: 'transparent', border: 'none', color: 'var(--foreground)', 
-                  padding: '12px', outline: 'none' 
-                }} 
+                style={{
+                  width: '100%', background: 'transparent', border: 'none',
+                  color: 'var(--foreground)', padding: '11px 8px', outline: 'none',
+                  fontSize: '1rem'
+                }}
               />
             </div>
-            
+
+            {/* Location button — icon only on mobile */}
             <button
               type="button"
               onClick={requestLocationAndSearch}
               disabled={locating}
+              title="Cari Terdekat"
               style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
+                display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
                 background: 'var(--input)', color: 'var(--foreground)', border: 'none',
-                padding: '0 16px', borderRadius: '8px', cursor: 'pointer',
-                fontWeight: 600, minWidth: '160px', justifyContent: 'center'
+                padding: '0 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600,
+                whiteSpace: 'nowrap'
               }}
             >
               <Icons.MapPin size={18} color="#16a34a" />
-              {locating ? 'Mencari...' : 'Cari Terdekat'}
+              <span className="hide-mobile">{locating ? 'Mencari...' : 'Cari Terdekat'}</span>
             </button>
 
+            {/* Submit */}
             <button type="submit" style={{
-              background: '#16a34a', color: 'white', border: 'none',
-              padding: '0 24px', borderRadius: '8px', cursor: 'pointer',
-              fontWeight: 700
+              background: '#16a34a', color: 'white', border: 'none', flexShrink: 0,
+              padding: '0 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700
             }}>
               Cari
             </button>
@@ -149,14 +163,14 @@ export default function Home() {
                   >
                     {banner.ad_type === 'video' ? (
                       <video
-                        src={banner.ad_media_url}
+                        src={getStorageUrl(banner.ad_media_url) || ''}
                         autoPlay muted loop playsInline
                         style={{ width: '100%', maxHeight: '340px', objectFit: 'cover', display: 'block' }}
                       />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={banner.ad_media_url}
+                        src={getStorageUrl(banner.ad_media_url) || ''}
                         alt={banner.ad_title || banner.product_name || 'Iklan'}
                         style={{ width: '100%', maxHeight: '340px', objectFit: 'cover', display: 'block' }}
                       />
@@ -241,7 +255,7 @@ export default function Home() {
               <div style={{ flex: '1 0 50%', minWidth: '320px', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '12px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
                 <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px', maxWidth: '70%' }}>Bukan cuma HP, di sini jual semuanya!</h2>
                 <p style={{ opacity: 0.9, marginBottom: '16px', maxWidth: '70%' }}>Buku, kipas angin, meja, semuanya bisa diuangkan.</p>
-                <Link href="/seller/products/create" style={{ background: 'white', color: '#15803d', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Mulai Jual</Link>
+                <Link href={sellLink} style={{ background: 'white', color: '#15803d', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Mulai Jual</Link>
               </div>
             </div>
           )}
@@ -252,8 +266,12 @@ export default function Home() {
       <section style={{ padding: '24px 0', borderBottom: '1px solid var(--border)', background: 'var(--background)' }}>
         <div className="container">
           <div style={{ 
-            display: 'flex', gap: '8px', justifyContent: 'center', 
-            flexWrap: 'wrap', padding: '0 8px'
+            display: 'flex', gap: '4px',
+            overflowX: 'auto', overflowY: 'hidden',
+            scrollbarWidth: 'none', msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            padding: '4px 0 8px 0',
+            justifyContent: 'safe center'
           }}>
             {dbCategories.length === 0
               ? Array.from({ length: 7 }).map((_, i) => (
@@ -342,12 +360,12 @@ export default function Home() {
         <section style={{ marginBottom: '40px' }}>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--foreground)' }}>Rekomendasi Unggulan</h3>
-              <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)' }}>Rekomendasi Unggulan</h3>
+              <Link href="/products?promoted=true" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
                 Lihat Semua &gt;
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
+            <div className="product-grid">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : promotedProducts.length > 0 ? (
@@ -363,12 +381,12 @@ export default function Home() {
         <section style={{ paddingBottom: '40px' }}>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--foreground)' }}>Sepertinya kamu bakal suka ini</h3>
-              <Link href="/products" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)' }}>Sepertinya kamu bakal suka ini</h3>
+              <Link href="/products" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
                 Lihat Semua &gt;
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
+            <div className="product-grid">
               {isLoading ? (
                 Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : products.length > 0 ? (
@@ -428,7 +446,7 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
 
       {/* Image */}
       <div style={{
-        height: '200px', background: 'var(--input)',
+        height: '160px', background: 'var(--input)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden'
       }}>

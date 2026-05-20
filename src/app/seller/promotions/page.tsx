@@ -28,6 +28,29 @@ export default function SellerPromotions() {
   const [adTitle, setAdTitle] = useState('');
   const [previewError, setPreviewError] = useState(false);
 
+  // File Upload states
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mediaSource, setMediaSource] = useState<'file' | 'url'>('file');
+  const [adMediaFile, setAdMediaFile] = useState<File | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string>('');
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAdMediaFile(file);
+      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+      const url = URL.createObjectURL(file);
+      setFilePreviewUrl(url);
+      setPreviewError(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+    };
+  }, [filePreviewUrl]);
+
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -66,27 +89,42 @@ export default function SellerPromotions() {
   const handlePurchase = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct || !selectedPackage) return showMessage('Pilih produk dan paket terlebih dahulu', 'error');
-    if (adType !== 'none' && !adMediaUrl.trim()) return showMessage('Masukkan URL media iklan', 'error');
+    if (adType !== 'none') {
+      if (mediaSource === 'file' && !adMediaFile) return showMessage('Pilih file media iklan terlebih dahulu', 'error');
+      if (mediaSource === 'url' && !adMediaUrl.trim()) return showMessage('Masukkan URL media iklan', 'error');
+    }
 
     if (!confirm('Simulasi Pembayaran: Apakah Anda yakin ingin mengaktifkan paket promosi ini? (Anggap pembayaran berhasil)')) return;
 
     setActionLoading(true);
     try {
+      const formData = new FormData();
+      formData.append('product_id', selectedProduct);
+      formData.append('package_id', selectedPackage);
+      formData.append('ad_type', adType);
+      if (adTitle.trim()) {
+        formData.append('ad_title', adTitle.trim());
+      }
+      
+      if (adType !== 'none') {
+        if (mediaSource === 'file' && adMediaFile) {
+          formData.append('ad_media_file', adMediaFile);
+        } else if (mediaSource === 'url' && adMediaUrl.trim()) {
+          formData.append('ad_media_url', adMediaUrl.trim());
+        }
+      }
+
       await fetchApi('/promotions', {
         method: 'POST',
-        body: JSON.stringify({
-          product_id: selectedProduct,
-          package_id: selectedPackage,
-          ad_type: adType,
-          ad_media_url: adType !== 'none' ? adMediaUrl.trim() : null,
-          ad_title: adTitle.trim() || null,
-        })
+        body: formData
       });
       showMessage('Promosi berhasil diaktifkan!', 'success');
       setSelectedProduct('');
       setSelectedPackage('');
       setAdType('none');
       setAdMediaUrl('');
+      setAdMediaFile(null);
+      setFilePreviewUrl('');
       setAdTitle('');
       setPreviewError(false);
       await loadData();
@@ -215,24 +253,104 @@ export default function SellerPromotions() {
               <p style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: '1rem', fontStyle: 'italic' }}>
                 {adTypeOptions.find(o => o.value === adType)?.desc}
               </p>
-
-              {/* URL input & preview — only shown if image or video */}
+              {/* URL or File upload choice & preview — only shown if image or video */}
               {adType !== 'none' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>
-                      {adType === 'image' ? 'URL Gambar Iklan' : 'URL Video Iklan'}
-                      <span style={{ color: '#ef4444' }}> *</span>
-                    </label>
-                    <input
-                      type="url"
-                      className="input-field"
-                      placeholder={adType === 'image' ? 'https://example.com/iklan.jpg' : 'https://example.com/iklan.mp4'}
-                      value={adMediaUrl}
-                      onChange={e => { setAdMediaUrl(e.target.value); setPreviewError(false); }}
-                      style={{ height: '44px', borderRadius: '8px', fontSize: '0.875rem' }}
-                    />
+                  
+                  {/* Media Source Tab Selection */}
+                  <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => { setMediaSource('file'); setPreviewError(false); }}
+                      style={{
+                        padding: '6px 12px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '6px',
+                        background: mediaSource === 'file' ? 'var(--primary-light)' : 'transparent',
+                        color: mediaSource === 'file' ? 'var(--primary)' : '#6b7280',
+                      }}
+                    >
+                      📁 Upload File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setMediaSource('url'); setPreviewError(false); }}
+                      style={{
+                        padding: '6px 12px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '6px',
+                        background: mediaSource === 'url' ? 'var(--primary-light)' : 'transparent',
+                        color: mediaSource === 'url' ? 'var(--primary)' : '#6b7280',
+                      }}
+                    >
+                      🔗 URL Publik
+                    </button>
                   </div>
+
+                  {mediaSource === 'file' ? (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.5rem' }}>
+                        Pilih {adType === 'image' ? 'Gambar' : 'Video'} dari Komputer Anda
+                        <span style={{ color: '#ef4444' }}> *</span>
+                      </label>
+                      
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{
+                          border: '2px dashed var(--border)',
+                          borderRadius: '8px',
+                          padding: '2rem 1rem',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          background: '#f9fafb',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseOver={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+                        onMouseOut={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                      >
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: 'none' }}
+                          accept={adType === 'image' ? 'image/*' : 'video/*'}
+                          onChange={handleFileChange}
+                        />
+                        <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+                          {adType === 'image' ? '🖼️' : '🎬'}
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#374151' }}>
+                          {adMediaFile ? adMediaFile.name : `Klik untuk memilih ${adType === 'image' ? 'gambar' : 'video'}`}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+                          Maksimal 25MB (PNG, JPG, MP4, MOV, dll.)
+                        </div>
+                      </div>
+
+                      {adMediaFile && (
+                        <button
+                          type="button"
+                          onClick={() => { setAdMediaFile(null); setFilePreviewUrl(''); }}
+                          style={{
+                            marginTop: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: '#ef4444',
+                            display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', background: 'none', border: 'none'
+                          }}
+                        >
+                          ❌ Hapus File Terpilih
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>
+                        {adType === 'image' ? 'URL Gambar Iklan' : 'URL Video Iklan'}
+                        <span style={{ color: '#ef4444' }}> *</span>
+                      </label>
+                      <input
+                        type="url"
+                        className="input-field"
+                        placeholder={adType === 'image' ? 'https://example.com/iklan.jpg' : 'https://example.com/iklan.mp4'}
+                        value={adMediaUrl}
+                        onChange={e => { setAdMediaUrl(e.target.value); setPreviewError(false); }}
+                        style={{ height: '44px', borderRadius: '8px', fontSize: '0.875rem' }}
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>Judul Iklan (opsional)</label>
@@ -248,7 +366,7 @@ export default function SellerPromotions() {
                   </div>
 
                   {/* Media Preview */}
-                  {adMediaUrl && (
+                  {((mediaSource === 'file' && filePreviewUrl) || (mediaSource === 'url' && adMediaUrl)) && (
                     <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border)', background: '#000' }}>
                       <div style={{ padding: '8px 12px', background: '#f9fafb', borderBottom: '1px solid var(--border)', fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>
                         Preview Iklan
@@ -256,12 +374,12 @@ export default function SellerPromotions() {
                       {adType === 'image' ? (
                         previewError ? (
                           <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444', fontSize: '0.85rem' }}>
-                            ⚠️ URL gambar tidak valid atau tidak dapat dimuat.
+                            ⚠️ Media tidak dapat dimuat.
                           </div>
                         ) : (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={adMediaUrl}
+                            src={mediaSource === 'file' ? filePreviewUrl : adMediaUrl}
                             alt="Preview iklan"
                             onError={() => setPreviewError(true)}
                             style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', display: 'block' }}
@@ -270,19 +388,19 @@ export default function SellerPromotions() {
                       ) : (
                         <video
                           ref={videoRef}
-                          src={adMediaUrl}
+                          src={mediaSource === 'file' ? filePreviewUrl : adMediaUrl}
                           controls
                           onError={() => setPreviewError(true)}
                           style={{ width: '100%', maxHeight: '200px', display: 'block' }}
                         >
-                          {previewError && <p style={{ color: '#ef4444' }}>⚠️ URL video tidak valid.</p>}
+                          {previewError && <p style={{ color: '#ef4444' }}>⚠️ Media video tidak valid.</p>}
                         </video>
                       )}
                     </div>
                   )}
 
                   <div style={{ padding: '0.75rem 1rem', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '0.78rem', color: '#92400e' }}>
-                    <strong>💡 Tips:</strong> Gunakan URL publik yang dapat diakses siapa saja. Untuk gambar disarankan rasio 16:9 (misal 1280×720px). Untuk video, format MP4 paling kompatibel. Iklan ini akan tampil di halaman utama dan jika diklik akan mengarah ke detail produk Anda.
+                    <strong>💡 Tips:</strong> Anda dapat mengunggah file media dari perangkat Anda atau menggunakan URL eksternal. Untuk gambar disarankan rasio 16:9 (misal 1280×720px). Untuk video, format MP4 paling kompatibel. Iklan ini akan tampil di halaman utama.
                   </div>
                 </div>
               )}
@@ -360,9 +478,9 @@ export default function SellerPromotions() {
                         {/* Mini preview */}
                         {promo.ad_type === 'image' ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={promo.ad_media_url} alt="iklan" style={{ marginTop: '0.6rem', width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} />
+                          <img src={getStorageUrl(promo.ad_media_url) || ''} alt="iklan" style={{ marginTop: '0.6rem', width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} />
                         ) : (
-                          <video src={promo.ad_media_url} muted loop playsInline controls={false}
+                          <video src={getStorageUrl(promo.ad_media_url) || ''} muted loop playsInline controls={false}
                             onMouseEnter={e => (e.currentTarget as HTMLVideoElement).play()}
                             onMouseLeave={e => (e.currentTarget as HTMLVideoElement).pause()}
                             style={{ marginTop: '0.6rem', width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)', display: 'block' }}
