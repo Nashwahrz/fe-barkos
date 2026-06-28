@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Icons } from '@/components/Icons';
 
@@ -24,6 +24,9 @@ export default function ChatDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState<any>(null);
   const [isSeller, setIsSeller] = useState(false);
+  const searchParams = useSearchParams();
+  const templateParam = searchParams.get('template');
+  const [templateSent, setTemplateSent] = useState(false);
 
   const templates = {
     buyer: [
@@ -66,6 +69,14 @@ export default function ChatDetailPage() {
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, productId, otherUserId]);
+
+  useEffect(() => {
+    if (templateParam === 'transfer_check' && !templateSent && !loading) {
+      setTemplateSent(true);
+      router.replace(`/chat/${productId}/${otherUserId}`);
+      sendTemplate('[TRANSFER_CHECK]');
+    }
+  }, [templateParam, loading, templateSent]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -322,6 +333,28 @@ export default function ChatDetailPage() {
     }
   }
 
+  async function handleCreateTransferOrder() {
+    if (!product || !user) return;
+    setSending(true);
+    try {
+      const res = await fetchApi('/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product.id,
+          payment_method: 'bank_transfer',
+          agreed_price: product.harga, // If offer system exists, could use that, but default to product.harga
+        }),
+      });
+      alert('Pesanan berhasil dibuat!');
+      router.push(`/orders/${res.data.id}`);
+    } catch (err: any) {
+      alert(err.message || 'Gagal membuat pesanan');
+    } finally {
+      setSending(false);
+    }
+  }
+
   return (
     <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
       
@@ -438,6 +471,45 @@ export default function ChatDetailPage() {
                           }}>
                             Lihat Pesanan →
                           </Link>
+                        </div>
+                      );
+                    } else if (content === '[TRANSFER_CHECK]') {
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '0.2rem' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Saya ingin membeli ini dengan metode transfer bank, apakah stok barang masih ada?</div>
+                          {!isMe && (
+                             <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                <button onClick={() => sendTemplate("[TRANSFER_AVAILABLE]")} className="btn btn-primary" style={{ flex: 1, fontSize: '0.75rem', padding: '6px 10px', borderRadius: '6px' }}>Ada</button>
+                                <button onClick={() => sendTemplate("Maaf, stok barang sedang kosong.")} className="btn btn-secondary" style={{ flex: 1, fontSize: '0.75rem', padding: '6px 10px', borderRadius: '6px' }}>Tidak Ada</button>
+                             </div>
+                          )}
+                        </div>
+                      );
+                    } else if (content === '[TRANSFER_AVAILABLE]') {
+                      const bankAccounts = isMe ? user?.bank_accounts : otherUser?.bank_accounts;
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '0.2rem' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Barang masih ada! Silakan lakukan pemesanan dan transfer ke rekening berikut:</div>
+                          
+                          {bankAccounts && bankAccounts.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                              {bankAccounts.map((acc: any) => (
+                                <div key={acc.id} style={{ background: isMe ? 'rgba(255,255,255,0.1)' : '#f9fafb', padding: '8px', borderRadius: '6px', border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid #e5e7eb' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.8rem' }}>{acc.bank_name}</div>
+                                  <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', fontWeight: 700 }}>{acc.account_number}</div>
+                                  <div style={{ fontSize: '0.7rem', opacity: 0.8 }}>a.n. {acc.account_name}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.8 }}>[Penjual belum mendaftarkan rekening]</div>
+                          )}
+
+                          {!isMe && !activeOrder && (
+                             <button onClick={handleCreateTransferOrder} disabled={sending} className="btn btn-primary" style={{ marginTop: '8px', width: '100%', fontSize: '0.8rem', padding: '8px 12px', display: 'flex', justifyContent: 'center' }}>
+                                Buat Pesanan Sekarang
+                             </button>
+                          )}
                         </div>
                       );
                     }

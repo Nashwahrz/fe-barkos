@@ -294,7 +294,7 @@ export default function EditProduct() {
           </div>
 
           <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Ubah Foto Barang (Max 2MB)</label>
+            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Ubah Foto Barang (Max 20MB)</label>
             {currentFoto && (
               <div style={{ marginBottom: '0.5rem', width: '150px', height: '100px', borderRadius: 'var(--radius)', overflow: 'hidden', background: '#f5f5f5' }}>
                  {/* eslint-disable-next-line @next/next/no-img-element */}

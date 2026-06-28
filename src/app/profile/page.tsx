@@ -140,6 +140,18 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* Quick Links */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+        <button onClick={() => router.push('/orders')} className="btn btn-secondary" style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+          <Icons.ShoppingBag size={24} color="var(--primary)" />
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--foreground)' }}>Pesanan Saya</span>
+        </button>
+        <button onClick={() => router.push('/offers')} className="btn btn-secondary" style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+          <Icons.Zap size={24} color="var(--primary)" />
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--foreground)' }}>Penawaran Saya</span>
+        </button>
+      </div>
+
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)' }}>
         {['profile', 'password', 'location'].map(tab => (
           <button 

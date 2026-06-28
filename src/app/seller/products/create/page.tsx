@@ -242,7 +242,7 @@ export default function CreateProduct() {
           </div>
 
           <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Foto Barang Utama - Max 2MB</label>
+            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Foto Barang Utama - Max 20MB</label>
             <input 
                type="file" 
                accept="image/*" 

@@ -318,7 +318,7 @@ export default function SellerPromotions() {
                           {adMediaFile ? adMediaFile.name : `Klik untuk memilih ${adType === 'image' ? 'gambar' : 'video'}`}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
-                          Maksimal 25MB (PNG, JPG, MP4, MOV, dll.)
+                          Maksimal 500MB (PNG, JPG, MP4, MOV, dll.)
                         </div>
                       </div>
 

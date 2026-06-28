@@ -125,6 +125,13 @@ export default function SellerDashboard() {
           <span style={{ fontWeight: 800, fontSize: '1rem' }}>Kelola Katalog Produk</span>
         </Link>
 
+        <Link href="/seller/offers" className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit', border: '1px solid var(--border)', transition: 'transform 0.2s', gap: '0.75rem' }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+          <div style={{ width: '44px', height: '44px', background: 'rgba(236,72,153,0.08)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Zap size={24} color="#ec4899" /></div>
+          <span style={{ fontWeight: 800, fontSize: '1rem' }}>Penawaran Masuk</span>
+        </Link>
+
         <Link href="/profile" className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit', border: '1px solid var(--border)', transition: 'transform 0.2s', gap: '0.75rem' }}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>

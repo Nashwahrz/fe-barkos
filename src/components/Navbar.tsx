@@ -7,12 +7,21 @@ import { useAuth } from '@/components/AuthProvider';
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/Icons';
 import { getStorageUrl } from '@/lib/api';
+import { notificationApi } from '@/services/api/notification.api';
+import { AppNotification } from '@/types/notification';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [theme, setTheme] = useState('light');
+  
+  // Notifications state
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotif, setShowNotif] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -26,6 +35,56 @@ export default function Navbar() {
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  // Fetch notifications
+  useEffect(() => {
+    if (user && !pathname.startsWith('/admin')) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 3000); // refresh every 3 seconds
+      return () => clearInterval(interval);
+    }
+  }, [user, pathname]);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await notificationApi.getAll();
+      setNotifications(res.data || []);
+      setUnreadCount(res.unread_count || 0);
+    } catch (err) {
+      console.error('Failed to fetch notifications', err);
+    }
+  };
+
+  const handleNotifClick = async (notif: AppNotification) => {
+    setShowNotif(false);
+    if (!notif.read_at) {
+      try {
+        await notificationApi.markAsRead(notif.id);
+        setUnreadCount(prev => Math.max(0, prev - 1));
+        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    
+    // Routing based on type
+    const t = notif.data.type;
+    if (t === 'new_offer') router.push('/seller/offers');
+    else if (t === 'offer_accepted' || t === 'offer_rejected') router.push('/offers');
+    else if (t === 'new_order' || t === 'payment_uploaded' || t === 'order_cancelled') router.push(`/seller/orders`);
+    else if (t === 'order_confirmed' || t === 'order_rejected' || t === 'order_completed') router.push(`/orders`);
+    else router.push('/');
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationApi.markAllAsRead();
+      setUnreadCount(0);
+      setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleInstallClick = () => {
     if (deferredPrompt) {
@@ -114,6 +173,94 @@ export default function Navbar() {
             >
               {theme === 'light' ? <Icons.Moon size={17} /> : <Icons.Sun size={17} />}
             </button>
+            
+            {/* Notification Bell */}
+            {user && !pathname.startsWith('/admin') && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setShowNotif(!showNotif)}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '50%',
+                    background: 'var(--input)', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', flexShrink: 0, cursor: 'pointer', border: 'none',
+                    color: 'var(--foreground)'
+                  }}
+                >
+                  <Icons.Bell size={17} />
+                  {unreadCount > 0 && (
+                    <span style={{
+                      position: 'absolute', top: '-2px', right: '-2px',
+                      background: '#ef4444', color: 'white', fontSize: '0.65rem',
+                      fontWeight: 800, width: '18px', height: '18px', borderRadius: '50%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      border: '2px solid var(--card)'
+                    }}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Dropdown Notifikasi */}
+                {showNotif && (
+                  <>
+                    <div 
+                      style={{ position: 'fixed', inset: 0, zIndex: 90 }} 
+                      onClick={() => setShowNotif(false)}
+                    />
+                    <div style={{
+                      position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                      width: '320px', maxHeight: '400px', overflowY: 'auto',
+                      background: 'var(--card)', border: '1px solid var(--border)',
+                      borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                      zIndex: 100, display: 'flex', flexDirection: 'column'
+                    }}>
+                      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'var(--card)', zIndex: 2 }}>
+                        <h3 style={{ fontSize: '0.95rem', fontWeight: 800 }}>Notifikasi</h3>
+                        {unreadCount > 0 && (
+                          <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                            Tandai semua dibaca
+                          </button>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {notifications.length === 0 ? (
+                          <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280', fontSize: '0.85rem' }}>
+                            Belum ada notifikasi.
+                          </div>
+                        ) : (
+                          notifications.map(notif => (
+                            <button
+                              key={notif.id}
+                              onClick={() => handleNotifClick(notif)}
+                              style={{
+                                display: 'flex', gap: '12px', padding: '12px 16px',
+                                borderBottom: '1px solid var(--border)', background: notif.read_at ? 'transparent' : 'rgba(22,163,74,0.05)',
+                                textAlign: 'left', borderLeft: 'none', borderRight: 'none', borderTop: 'none',
+                                cursor: 'pointer', transition: 'background 0.15s'
+                              }}
+                            >
+                              <div style={{
+                                width: '8px', height: '8px', borderRadius: '50%',
+                                background: notif.read_at ? 'transparent' : 'var(--primary)',
+                                marginTop: '6px', flexShrink: 0
+                              }} />
+                              <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--foreground)', lineHeight: 1.4, margin: 0, fontWeight: notif.read_at ? 400 : 600 }}>
+                                  {notif.data.message}
+                                </p>
+                                <span style={{ fontSize: '0.7rem', color: '#9ca3af', marginTop: '4px', display: 'block' }}>
+                                  {new Date(notif.created_at).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* PWA Install — hide on mobile to save space */}
             {deferredPrompt && (
@@ -140,34 +287,42 @@ export default function Navbar() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {user.role === USER_ROLES.SUPER_ADMIN && !pathname.startsWith('/admin') && (
                       <Link href="/admin/dashboard" className="hide-mobile" style={{
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem',
-                        fontWeight: 700, color: '#7c3aed',
-                        background: 'rgba(124,58,237,0.08)', textDecoration: 'none'
-                      }}>
-                        <Icons.Shield size={14} color="#7c3aed" />
-                        Admin
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        background: 'rgba(124,58,237,0.08)', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
+                      }} title="Admin">
+                        <Icons.Shield size={17} color="#7c3aed" />
                       </Link>
                     )}
                     {user.role === USER_ROLES.PENJUAL ? (
                       <div className="hide-mobile" style={{ display: 'flex', gap: '6px' }}>
                         <Link href="/seller/products" style={{
-                          display: 'flex', alignItems: 'center', gap: '6px',
-                          padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem',
-                          fontWeight: 700, color: '#16a34a', background: 'rgba(22,163,74,0.08)',
-                          textDecoration: 'none'
-                        }}>
-                          <Icons.Store size={14} color="#16a34a" />
-                          Lapak Saya
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          background: 'rgba(22,163,74,0.08)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
+                        }} title="Lapak Saya">
+                          <Icons.Store size={17} color="#16a34a" />
+                        </Link>
+                        <Link href="/seller/offers" style={{
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          background: 'rgba(236,72,153,0.08)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
+                        }} title="Penawaran">
+                          <Icons.Zap size={17} color="#ec4899" />
                         </Link>
                         <Link href="/seller/promotions" style={{
-                          display: 'flex', alignItems: 'center', gap: '6px',
-                          padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem',
-                          fontWeight: 700, color: '#d97706', background: 'rgba(217,119,6,0.08)',
-                          textDecoration: 'none'
-                        }}>
-                          <Icons.Zap size={14} color="#d97706" />
-                          Boost
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          background: 'rgba(217,119,6,0.08)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
+                        }} title="Boost">
+                          <Icons.Zap size={17} color="#d97706" />
+                        </Link>
+                        <Link href="/seller/bank-accounts" style={{
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          background: 'rgba(37,99,235,0.08)', display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
+                        }} title="Rekening">
+                          <Icons.CreditCard size={17} color="#2563eb" />
                         </Link>
                       </div>
                     ) : (

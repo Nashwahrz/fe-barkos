@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, use } from 'react';
 import Link from 'next/link';
-import { fetchApi, getStorageUrl } from '@/lib/api';
+import useSWR from 'swr';
+import { fetchApi, getStorageUrl, swrFetcher } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/Icons';
@@ -16,10 +17,12 @@ const STATUS_MAP: Record<string, { label: string; bg: string; color: string; Ico
 
 export default function BuyerOrderDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [order, setOrder] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+
+  const { data: orderData, isLoading: loading, error, mutate: loadOrder } = useSWR(user ? `/transactions/${resolvedParams.id}` : null, swrFetcher);
+  const order = orderData?.data || orderData;
+
   const [actionLoading, setActionLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -27,22 +30,12 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
   const [proofPreview, setProofPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user === null) return;
-    if (!user) { router.push('/auth/login'); return; }
-    loadOrder();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, resolvedParams.id]);
+    if (!authLoading && !user) { router.push('/auth/login'); }
+  }, [user, authLoading, router]);
 
-  async function loadOrder() {
-    try {
-      const data = await fetchApi(`/transactions/${resolvedParams.id}`);
-      setOrder(data.data || data);
-    } catch {
-      router.push('/orders');
-    } finally {
-      setLoading(false);
-    }
-  }
+  useEffect(() => {
+    if (error) router.push('/orders');
+  }, [error, router]);
 
   const showToast = (text: string, type: 'success' | 'error') => {
     setToast({ text, type });
@@ -201,6 +194,25 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
         </div>
       </div>
 
+      {/* ── Rekening Penjual ──────────────────────────── */}
+      {order.payment_method === 'bank_transfer' && order.status === 'confirmed' && order.seller?.bank_accounts && order.seller.bank_accounts.length > 0 && (
+        <div style={{ padding: '1.5rem', background: '#eff6ff', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid #bfdbfe' }}>
+          <h3 style={{ fontWeight: 800, marginBottom: '1rem', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icons.CreditCard size={20} /> Rekening Tujuan Transfer
+          </h3>
+          <p style={{ color: '#3b82f6', fontSize: '0.875rem', marginBottom: '1rem' }}>Silakan transfer sesuai dengan total tagihan ke salah satu rekening berikut:</p>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            {order.seller.bank_accounts.map((acc: any) => (
+              <div key={acc.id} style={{ background: 'white', padding: '1.25rem', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                <div style={{ fontWeight: 900, color: '#111827', fontSize: '1.1rem', marginBottom: '0.2rem' }}>{acc.bank_name}</div>
+                <div style={{ fontFamily: 'monospace', fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 800 }}>{acc.account_number}</div>
+                <div style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: 600 }}>a.n. {acc.account_name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Upload Bukti Bayar ────────────────────────── */}
       {order.payment_method === 'bank_transfer' && order.status === 'confirmed' && (
         <div style={{ padding: '1.5rem', background: 'var(--card)', borderRadius: '16px', marginBottom: '1.5rem' }}>
@@ -224,7 +236,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px', cursor: 'pointer', padding: '2.5rem 1.5rem', border: '2px dashed var(--border)', borderRadius: '16px', textAlign: 'center', background: '#fff', transition: 'border-color 0.2s', ...(!proofPreview ? { ':hover': { borderColor: 'var(--primary)' } } : {}) as React.CSSProperties }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}><Icons.Upload size={32} color={proofPreview ? 'var(--primary)' : '#6b7280'} /></div>
               <span style={{ fontWeight: 800, fontSize: '0.95rem', color: proofPreview ? 'var(--primary)' : 'var(--foreground)' }}>{proofPreview ? 'File siap diunggah ✓' : 'Pilih gambar bukti transfer'}</span>
-              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Format: JPG, PNG — Maks. 5 MB</span>
+              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Format: JPG, PNG — Maks. 10 MB</span>
               <input
                 type="file"
                 ref={fileInputRef}

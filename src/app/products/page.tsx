@@ -179,11 +179,59 @@ function ProductCatalogContent() {
       if (lat && lng) {
         params.append('lat', lat.toString());
         params.append('lng', lng.toString());
-        params.append('radius', radius);
+        // Pass a larger radius to backend (buffer 1.5x) since straight-line is always shorter than driving route
+        params.append('radius', (parseInt(radius) * 1.5).toString());
       }
       const data = await fetchApi('/products?' + params.toString());
       let fetched = data.data || data;
       if (isPromoted) fetched = fetched.filter((p: any) => p.is_promoted);
+
+      // OSRM Table API integration & Filter
+      if (lat && lng && fetched.length > 0) {
+        try {
+          const coords = [`${lng},${lat}`];
+          const validProducts: any[] = [];
+          
+          fetched.forEach((p: any) => {
+            if (p.latitude && p.longitude) {
+              coords.push(`${p.longitude},${p.latitude}`);
+              validProducts.push(p);
+            }
+            // fallback raw distance based on backend haversine
+            p.raw_distance = (p.distance_km || 0) * 1000; 
+          });
+
+          if (validProducts.length > 0) {
+            await Promise.all(validProducts.map(async (p) => {
+              try {
+                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${p.longitude},${p.latitude}?overview=false`;
+                const res = await fetch(osrmUrl);
+                const data = await res.json();
+                
+                if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                  const distMeters = data.routes[0].distance;
+                  p.distance_km = (distMeters / 1000).toFixed(1);
+                  p.is_driving = true;
+                  p.raw_distance = distMeters;
+                }
+              } catch (err) {
+                // Ignore individual failures, raw_distance will fallback to haversine
+              }
+            }));
+          }
+          
+          // Filter out products whose actual driving route distance exceeds the requested radius
+          const radNum = parseInt(radius);
+          fetched = fetched.filter((p: any) => p.raw_distance <= radNum);
+          
+        } catch (err) {
+          console.error('OSRM table error:', err);
+          // If OSRM fails, fallback to strict haversine filtering
+          const radNum = parseInt(radius);
+          fetched = fetched.filter((p: any) => p.raw_distance <= radNum);
+        }
+      }
+
       setProducts(fetched);
     } catch (err) {
       console.error('Failed to load products:', err);
@@ -364,8 +412,8 @@ function ProductCatalogContent() {
                       {product.kondisi || 'Bekas'}
                     </span>
                     {product.distance_km != null && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 600 }}>
-                        <Icons.MapPin size={11} color="var(--primary)" /> {product.distance_km} km
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 600 }} title={product.is_driving ? "Jarak rute berkendara" : "Jarak garis lurus"}>
+                        <Icons.MapPin size={11} color="var(--primary)" /> {product.distance_km} km {product.is_driving ? '(jalan)' : '(lurus)'}
                       </span>
                     )}
                   </div>
