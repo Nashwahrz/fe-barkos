@@ -66,7 +66,9 @@ export default function BuyerOffers() {
                 {offer.product?.foto ? (
                   <img src={getStorageUrl(offer.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <Icons.Package size={40} color="#d1d5db" style={{ margin: '20px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <Icons.Package size={40} color="#d1d5db" />
+                  </div>
                 )}
               </div>
               <div style={{ flex: 1, minWidth: '200px' }}>

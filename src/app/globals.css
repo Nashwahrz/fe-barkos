@@ -1,34 +1,36 @@
 :root {
-  --primary: #16a34a;
-  --primary-hover: #15803d;
-  --primary-light: rgba(22, 163, 74, 0.08);
-  --secondary: #059669;
-  --accent: #0d9488;
-  --background: #f8faf9;
-  --foreground: #111827;
+  --primary: #00AA5B;
+  --primary-hover: #008f4c;
+  --primary-light: rgba(0, 170, 91, 0.08);
+  --secondary: #0d9488;
+  --accent: #14b8a6;
+  --background: #F3F4F5;
+  --foreground: #212121;
   --card: #ffffff;
-  --card-foreground: #1f2937;
-  --border: #e5e7eb;
-  --input: #f3f4f6;
-  --ring: rgba(22, 163, 74, 0.2);
-  --radius: 10px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-lg: 0 8px 25px rgba(0,0,0,0.1), 0 3px 8px rgba(0,0,0,0.06);
-  --success: #16a34a;
-  --banner-bg: #f0fdf4;
+  --card-foreground: #31353B;
+  --border: #E5E7E9;
+  --input: #FFFFFF;
+  --input-border: #E5E7E9;
+  --ring: rgba(0, 170, 91, 0.2);
+  --radius: 12px;
+  --shadow: 0 1px 6px 0 rgba(49,53,59,0.12);
+  --shadow-lg: 0 4px 12px 0 rgba(49,53,59,0.15);
+  --success: #00AA5B;
+  --banner-bg: #FFFFFF;
 }
 
 [data-theme='dark'] {
-  --background: #030712;
-  --foreground: #f8faf9;
-  --card: #1f2937;
-  --card-foreground: #f3f4f6;
-  --border: #374151;
-  --input: #374151;
-  --primary-light: rgba(22, 163, 74, 0.15);
-  --banner-bg: #030712;
-  --shadow: 0 1px 3px rgba(0,0,0,0.5);
-  --shadow-lg: 0 8px 25px rgba(0,0,0,0.6);
+  --background: #121212;
+  --foreground: #E4E4E4;
+  --card: #1E1E1E;
+  --card-foreground: #E4E4E4;
+  --border: #31353B;
+  --input: #2C2C2C;
+  --input-border: #31353B;
+  --primary-light: rgba(0, 170, 91, 0.15);
+  --banner-bg: #121212;
+  --shadow: 0 1px 6px 0 rgba(0,0,0,0.5);
+  --shadow-lg: 0 4px 12px 0 rgba(0,0,0,0.6);
 }
 
 * {
@@ -127,15 +129,16 @@ input, textarea, select {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--input-border);
   background: var(--input);
   color: var(--foreground);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   font-size: 1rem;
 }
 
 .input-field:focus {
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
 @keyframes spin {
@@ -146,6 +149,26 @@ input, textarea, select {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.5; }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseAI {
+  0% { box-shadow: 0 0 0 0 rgba(0, 170, 91, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 170, 91, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 170, 91, 0); }
+}
+
+.typing-dot {
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
 
 .flex-wrap { flex-wrap: wrap; }

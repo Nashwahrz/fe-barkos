@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/components/AuthProvider";
 
 import { RouteGuard } from "@/components/RouteGuard";
+import AIChatbot from "@/components/AIChatbot";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-inter' });
 
@@ -26,6 +27,7 @@ export default function RootLayout({
           <RouteGuard>
             <Navbar />
             {children}
+            <AIChatbot />
           </RouteGuard>
         </AuthProvider>
       </body>

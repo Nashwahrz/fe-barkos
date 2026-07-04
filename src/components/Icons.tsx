@@ -341,5 +341,15 @@ export const Icons = {
       <line x1="14" y1="11" x2="14" y2="17"/>
     </svg>
   ),
+  Sparkles: ({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v18M3 12h18"/>
+      <path d="m8.5 8.5 7 7M15.5 8.5l-7 7"/>
+      <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+      <path d="M14.5 9.5a2.12 2.12 0 0 0-2.83 0 2.12 2.12 0 0 0 0 2.83 2.12 2.12 0 0 0 2.83 0 2.12 2.12 0 0 0 0-2.83Z" />
+      <path d="m9.2 14.8-1.4 1.4M14.8 14.8l1.4 1.4M9.2 9.2 7.8 7.8M14.8 9.2l1.4-1.4"/>
+      <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+      <path d="m9 12-2 2M15 12l2-2" />
+    </svg>
+  )
 };
-

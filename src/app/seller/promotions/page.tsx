@@ -481,7 +481,12 @@ export default function SellerPromotions() {
                           <img src={getStorageUrl(promo.ad_media_url) || ''} alt="iklan" style={{ marginTop: '0.6rem', width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)' }} />
                         ) : (
                           <video src={getStorageUrl(promo.ad_media_url) || ''} muted loop playsInline controls={false}
-                            onMouseEnter={e => (e.currentTarget as HTMLVideoElement).play()}
+                            onMouseEnter={e => {
+                              const playPromise = (e.currentTarget as HTMLVideoElement).play();
+                              if (playPromise !== undefined) {
+                                playPromise.catch(() => {});
+                              }
+                            }}
                             onMouseLeave={e => (e.currentTarget as HTMLVideoElement).pause()}
                             style={{ marginTop: '0.6rem', width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border)', display: 'block' }}
                           />

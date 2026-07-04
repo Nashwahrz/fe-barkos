@@ -92,27 +92,27 @@ export default function Home() {
     <div style={{ background: 'var(--background)', minHeight: '100vh', color: 'var(--foreground)' }}>
       
       {/* ── Search Header ──────────────────────────────────────── */}
-      <section style={{ background: 'var(--card)', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
+      <section style={{ background: 'var(--card)', padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px' }}>
+          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '12px' }}>
             {/* Search input — full width */}
             <div style={{
               flex: 1, display: 'flex', alignItems: 'center',
-              background: 'var(--input)', borderRadius: '8px', padding: '0 12px',
-              minWidth: 0
+              background: 'var(--background)', borderRadius: '12px', padding: '0 16px',
+              minWidth: 0, border: '1px solid var(--border)', transition: 'border-color 0.2s'
             }}>
               <span style={{ opacity: 0.5, display: 'flex', flexShrink: 0 }}>
-                <Icons.Search size={18} color="var(--foreground)" />
+                <Icons.Search size={20} color="var(--foreground)" />
               </span>
               <input
                 type="text"
-                placeholder="Cari produk..."
+                placeholder="Cari di Lapak Kos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%', background: 'transparent', border: 'none',
-                  color: 'var(--foreground)', padding: '11px 8px', outline: 'none',
-                  fontSize: '1rem'
+                  color: 'var(--foreground)', padding: '12px 10px', outline: 'none',
+                  fontSize: '0.95rem'
                 }}
               />
             </div>
@@ -125,19 +125,20 @@ export default function Home() {
               title="Cari Terdekat"
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
-                background: 'var(--input)', color: 'var(--foreground)', border: 'none',
-                padding: '0 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600,
-                whiteSpace: 'nowrap'
+                background: 'var(--background)', color: 'var(--foreground)', border: '1px solid var(--border)',
+                padding: '0 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 600,
+                whiteSpace: 'nowrap', transition: 'all 0.2s'
               }}
             >
-              <Icons.MapPin size={18} color="#16a34a" />
-              <span className="hide-mobile">{locating ? 'Mencari...' : 'Cari Terdekat'}</span>
+              <Icons.MapPin size={18} color="var(--primary)" />
+              <span className="hide-mobile">{locating ? 'Mencari...' : 'Terdekat'}</span>
             </button>
 
             {/* Submit */}
             <button type="submit" style={{
-              background: '#16a34a', color: 'white', border: 'none', flexShrink: 0,
-              padding: '0 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 700
+              background: 'var(--primary)', color: 'white', border: 'none', flexShrink: 0,
+              padding: '0 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700,
+              transition: 'background 0.2s'
             }}>
               Cari
             </button>
@@ -164,7 +165,17 @@ export default function Home() {
                     {banner.ad_type === 'video' ? (
                       <video
                         src={getStorageUrl(banner.ad_media_url) || ''}
-                        autoPlay muted loop playsInline
+                        muted loop playsInline
+                        ref={el => {
+                          if (el) {
+                            if (idx === bannerIdx) {
+                              const p = el.play();
+                              if (p !== undefined) p.catch(() => {});
+                            } else {
+                              el.pause();
+                            }
+                          }
+                        }}
                         style={{ width: '100%', maxHeight: '340px', objectFit: 'cover', display: 'block' }}
                       />
                     ) : (
@@ -224,7 +235,7 @@ export default function Home() {
                       style={{
                         width: idx === bannerIdx ? '24px' : '8px',
                         height: '8px', borderRadius: '999px', border: 'none',
-                        background: idx === bannerIdx ? '#16a34a' : 'var(--border)',
+                        background: idx === bannerIdx ? 'var(--primary)' : 'rgba(255,255,255,0.6)',
                         cursor: 'pointer', transition: 'all 0.25s', padding: 0
                       }}
                     />
@@ -252,10 +263,10 @@ export default function Home() {
                 <p style={{ opacity: 0.9, marginBottom: '16px', maxWidth: '70%' }}>Naikin exposure dan buka peluang laku lebih cepat.</p>
                 <Link href="/seller/promotions" style={{ background: 'var(--card)', color: 'var(--foreground)', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block', border: '1px solid var(--border)' }}>Pelajari lebih lanjut</Link>
               </div>
-              <div style={{ flex: '1 0 50%', minWidth: '320px', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '12px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ flex: '1 0 50%', minWidth: '320px', background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', borderRadius: '16px', padding: '32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
                 <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px', maxWidth: '70%' }}>Bukan cuma HP, di sini jual semuanya!</h2>
                 <p style={{ opacity: 0.9, marginBottom: '16px', maxWidth: '70%' }}>Buku, kipas angin, meja, semuanya bisa diuangkan.</p>
-                <Link href={sellLink} style={{ background: 'white', color: '#15803d', padding: '10px 20px', borderRadius: '6px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Mulai Jual</Link>
+                <Link href={sellLink} style={{ background: 'white', color: 'var(--primary)', padding: '10px 20px', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', display: 'inline-block' }}>Mulai Jual</Link>
               </div>
             </div>
           )}
@@ -327,9 +338,9 @@ export default function Home() {
                       width: '96px', padding: '8px', textDecoration: 'none', flexShrink: 0
                     }}>
                       <div style={{
-                        width: '64px', height: '64px', borderRadius: '16px', background: 'var(--card)',
+                        width: '64px', height: '64px', borderRadius: '50%', background: 'var(--card)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        border: '1.5px solid var(--border)', boxShadow: 'var(--shadow)',
+                        border: '1px solid var(--border)', boxShadow: 'var(--shadow)',
                         transition: 'transform 0.15s, box-shadow 0.15s'
                       }}
                         onMouseEnter={e => {
@@ -360,8 +371,8 @@ export default function Home() {
         <section style={{ marginBottom: '40px' }}>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)' }}>Rekomendasi Unggulan</h3>
-              <Link href="/products?promoted=true" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--foreground)' }}>Rekomendasi Unggulan</h3>
+              <Link href="/products?promoted=true" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none' }}>
                 Lihat Semua &gt;
               </Link>
             </div>
@@ -381,8 +392,8 @@ export default function Home() {
         <section style={{ paddingBottom: '40px' }}>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--foreground)' }}>Sepertinya kamu bakal suka ini</h3>
-              <Link href="/products" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16a34a', textDecoration: 'none' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--foreground)' }}>Sepertinya kamu bakal suka ini</h3>
+              <Link href="/products" style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none' }}>
                 Lihat Semua &gt;
               </Link>
             </div>
@@ -409,9 +420,10 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
     <Link
       href={`/products/${product.id}`}
       style={{
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
         background: 'var(--card)',
-        borderRadius: '8px',
+        borderRadius: '12px',
         border: promoted ? '1px solid #f59e0b' : '1px solid var(--border)',
         overflow: 'hidden',
         transition: 'all 0.2s ease',
@@ -419,7 +431,8 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
         position: 'relative',
         textDecoration: 'none',
         color: 'inherit',
-        boxShadow: 'var(--shadow)'
+        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+        height: '100%'
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
@@ -446,13 +459,17 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
 
       {/* Image */}
       <div style={{
-        height: '160px', background: 'var(--input)',
+        aspectRatio: '1 / 1',
+        background: 'var(--input)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden'
       }}>
         {product.foto ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} 
+               onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
             <Icons.Package size={48} color="var(--border)" />
@@ -461,52 +478,35 @@ function ProductCard({ product, promoted = false }: { product: any; promoted?: b
       </div>
 
       {/* Info */}
-      <div style={{ padding: '12px' }}>
+      <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{
-          fontSize: '0.95rem', fontWeight: 400, color: 'var(--foreground)', opacity: 0.9,
-          marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+          fontSize: '0.9rem', fontWeight: 400, color: 'var(--foreground)',
+          marginBottom: '4px', overflow: 'hidden', display: '-webkit-box',
+          WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: '1.4'
         }}>
           {product.nama_barang}
         </div>
-        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>
+        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '8px' }}>
           Rp {Number(product.harga).toLocaleString('id-ID')}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{
-            fontSize: '0.75rem', fontWeight: 500,
-            background: 'var(--input)', color: 'var(--foreground)',
-            padding: '2px 6px', borderRadius: '4px'
-          }}>
-            {product.kondisi || 'Bekas'}
-          </span>
-        </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.7 }}>
-          <div style={{
-            width: '20px', height: '20px', borderRadius: '50%', background: 'var(--input)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
-          }}>
-            {product.user?.foto ? (
-              <img src={getStorageUrl(product.user.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <Icons.User size={12} color="var(--foreground)" />
-            )}
-          </div>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+        {/* Spacer to push store info to bottom */}
+        <div style={{ flex: 1 }}></div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.8 }}>
+          <Icons.Store size={12} color="var(--primary)" />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
             {product.user?.name || 'Penjual'}
-          </span>
-          <span style={{ marginLeft: 'auto' }}>
-            {product.user?.asal_kampus?.split(' ').slice(-1)[0] || 'Kampus'}
           </span>
         </div>
 
         {product.distance_km != null && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: '4px',
-            fontSize: '0.75rem', color: '#16a34a', marginTop: '8px', fontWeight: 500
+            fontSize: '0.7rem', color: 'var(--primary)', marginTop: '4px', fontWeight: 600
           }}>
-            <Icons.MapPin size={11} color="#16a34a" />
-            {product.distance_km} km dari sini
+            <Icons.MapPin size={10} color="var(--primary)" />
+            {product.distance_km} km
           </div>
         )}
       </div>
