@@ -114,14 +114,14 @@ export default function Navbar() {
         position: 'sticky', top: 0, zIndex: 100,
         background: 'var(--card)',
         borderBottom: '1px solid var(--border)',
-        boxShadow: 'var(--shadow)'
+        boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
       }}>
-        <div className="container flex items-center justify-between" style={{ height: '56px' }}>
+        <div className="container flex items-center justify-between" style={{ height: '64px', gap: '16px' }}>
 
           {/* Logo */}
           <Link href="/" style={{
-            fontSize: '1.15rem', fontWeight: 900, color: '#16a34a',
-            letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '8px',
+            fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)',
+            letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px',
             textDecoration: 'none'
           }}>
             <img
@@ -140,10 +140,10 @@ export default function Navbar() {
                 { label: 'Katalog', href: '/products' },
               ].map(item => (
                 <Link key={item.href} href={item.href} style={{
-                  padding: '6px 14px', borderRadius: '6px', fontWeight: 600,
-                  fontSize: '0.875rem', color: isActive(item.href) ? '#16a34a' : '#374151',
-                  background: isActive(item.href) ? 'rgba(22,163,74,0.08)' : 'transparent',
-                  transition: 'all 0.15s', textDecoration: 'none'
+                  padding: '8px 16px', borderRadius: '8px', fontWeight: 600,
+                  fontSize: '0.9rem', color: isActive(item.href) ? 'var(--primary)' : 'var(--foreground)',
+                  background: isActive(item.href) ? 'var(--primary-light)' : 'transparent',
+                  transition: 'all 0.2s', textDecoration: 'none'
                 }}>
                   {item.label}
                 </Link>
@@ -270,13 +270,13 @@ export default function Navbar() {
                 className="hide-mobile"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem',
-                  fontWeight: 700, color: '#16a34a',
-                  background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)',
-                  cursor: 'pointer', transition: 'all 0.15s'
+                  padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem',
+                  fontWeight: 700, color: 'var(--primary)',
+                  background: 'var(--primary-light)', border: '1px solid var(--ring)',
+                  cursor: 'pointer', transition: 'all 0.2s'
                 }}
               >
-                <Icons.Download size={14} color="#16a34a" />
+                <Icons.Download size={16} color="var(--primary)" />
                 Install
               </button>
             )}
@@ -298,10 +298,10 @@ export default function Navbar() {
                       <div className="hide-mobile" style={{ display: 'flex', gap: '6px' }}>
                         <Link href="/seller/products" style={{
                           width: '36px', height: '36px', borderRadius: '50%',
-                          background: 'rgba(22,163,74,0.08)', display: 'flex', alignItems: 'center',
+                          background: 'var(--primary-light)', display: 'flex', alignItems: 'center',
                           justifyContent: 'center', flexShrink: 0, textDecoration: 'none'
                         }} title="Lapak Saya">
-                          <Icons.Store size={17} color="#16a34a" />
+                          <Icons.Store size={17} color="var(--primary)" />
                         </Link>
                         <Link href="/seller/offers" style={{
                           width: '36px', height: '36px', borderRadius: '50%',
@@ -328,12 +328,12 @@ export default function Navbar() {
                     ) : (
                       <Link href="/seller/register" className="hide-mobile" style={{
                         display: 'flex', alignItems: 'center', gap: '6px',
-                        padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem',
-                        fontWeight: 700, color: '#16a34a', background: 'rgba(22,163,74,0.08)',
-                        border: '1px solid rgba(22,163,74,0.2)',
-                        textDecoration: 'none'
+                        padding: '8px 16px', borderRadius: '8px', fontSize: '0.85rem',
+                        fontWeight: 700, color: 'var(--primary)', background: 'var(--primary-light)',
+                        border: '1px solid var(--ring)',
+                        textDecoration: 'none', transition: 'all 0.2s'
                       }}>
-                        <Icons.Store size={14} color="#16a34a" />
+                        <Icons.Store size={16} color="var(--primary)" />
                         Mulai Jual
                       </Link>
                     )}
@@ -358,10 +358,10 @@ export default function Navbar() {
                       transition: 'border-color 0.15s', textDecoration: 'none'
                     }}>
                       <div style={{
-                        width: '26px', height: '26px', borderRadius: '50%',
-                        background: '#16a34a', color: 'white',
+                        width: '30px', height: '30px', borderRadius: '50%',
+                        background: 'var(--primary)', color: 'white',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, fontSize: '0.75rem', flexShrink: 0,
+                        fontWeight: 700, fontSize: '0.85rem', flexShrink: 0,
                         overflow: 'hidden'
                       }}>
                         {user.foto ? (
@@ -392,16 +392,17 @@ export default function Navbar() {
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Link href="/auth/login" style={{
-                      padding: '7px 14px', borderRadius: '7px', fontWeight: 600,
-                      fontSize: '0.875rem', border: '1.5px solid var(--border)', color: 'var(--foreground)',
-                      background: 'var(--card)', textDecoration: 'none'
+                      padding: '8px 16px', borderRadius: '8px', fontWeight: 600,
+                      fontSize: '0.9rem', border: '1px solid var(--primary)', color: 'var(--primary)',
+                      background: 'transparent', textDecoration: 'none', transition: 'all 0.2s'
                     }}>
                       Masuk
                     </Link>
-                    <Link href="/auth/register" className="btn btn-primary" style={{
-                      padding: '7px 14px', borderRadius: '7px', fontWeight: 600,
-                      fontSize: '0.875rem', boxShadow: '0 2px 8px rgba(22,163,74,0.25)',
-                      textDecoration: 'none'
+                    <Link href="/auth/register" style={{
+                      padding: '8px 16px', borderRadius: '8px', fontWeight: 600,
+                      fontSize: '0.9rem', color: 'white', background: 'var(--primary)',
+                      border: '1px solid var(--primary)', textDecoration: 'none', transition: 'all 0.2s',
+                      boxShadow: '0 2px 4px rgba(0,170,91,0.2)'
                     }}>
                       Daftar
                     </Link>

@@ -18,6 +18,7 @@ interface User {
   latitude: number | null;
   longitude: number | null;
   email_verified_at: string | null;
+  bank_accounts?: any[];
 }
 
 interface AuthContextType {

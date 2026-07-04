@@ -192,7 +192,13 @@ export default function AdminPromotions() {
               {previewBanner.ad_type === 'video' ? (
                 <video
                   src={getStorageUrl(previewBanner.ad_media_url) || ''}
-                  controls autoPlay muted
+                  controls muted
+                  ref={el => {
+                    if (el) {
+                      const p = el.play();
+                      if (p !== undefined) p.catch(() => {});
+                    }
+                  }}
                   style={{ width: '100%', maxHeight: '340px', display: 'block', objectFit: 'contain' }}
                 />
               ) : (

@@ -1,6 +1,3 @@
-import { Product } from './product';
-import { User } from './user';
-
 export interface Offer {
   id: number;
   product_id: number;
@@ -12,7 +9,7 @@ export interface Offer {
   updated_at: string;
   
   // Relations
-  product?: Product;
-  buyer?: User;
-  seller?: User;
+  product?: any;
+  buyer?: any;
+  seller?: any;
 }
