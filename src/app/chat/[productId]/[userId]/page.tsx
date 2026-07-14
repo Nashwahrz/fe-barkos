@@ -23,6 +23,12 @@ export default function ChatDetailPage() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState<any>(null);
+  
+  // Upload Proof State
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [createdTransaction, setCreatedTransaction] = useState<any>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const searchParams = useSearchParams();
   const templateParam = searchParams.get('template');
@@ -131,12 +137,15 @@ export default function ChatDetailPage() {
         return newMessages;
       });
 
-      // Try to extract otherUser from messages if product info failed
-      if (newMessages.length > 0 && !otherUser) {
-        const sampleMsg = newMessages[0];
-        if (sampleMsg.sender?.id?.toString() === otherUserId) setOtherUser(sampleMsg.sender);
-        else if (sampleMsg.receiver?.id?.toString() === otherUserId) setOtherUser(sampleMsg.receiver);
-      }
+      // Try to extract otherUser from messages if product info failed or we are the seller
+      setOtherUser(prev => {
+        if (!prev && newMessages.length > 0) {
+          const sampleMsg = newMessages[0];
+          if (sampleMsg.sender?.id?.toString() === otherUserId) return sampleMsg.sender;
+          if (sampleMsg.receiver?.id?.toString() === otherUserId) return sampleMsg.receiver;
+        }
+        return prev;
+      });
     } catch (err) {
       console.error('Failed to load messages', err);
     } finally {
@@ -343,17 +352,59 @@ export default function ChatDetailPage() {
         body: JSON.stringify({
           product_id: product.id,
           payment_method: 'bank_transfer',
-          agreed_price: product.harga, // If offer system exists, could use that, but default to product.harga
+          agreed_price: product.harga, 
         }),
       });
-      alert('Pesanan berhasil dibuat!');
-      router.push(`/orders/${res.data.id}`);
+      setCreatedTransaction(res.data);
+      setShowUploadModal(true);
     } catch (err: any) {
       alert(err.message || 'Gagal membuat pesanan');
     } finally {
       setSending(false);
     }
   }
+
+  const handleUploadProof = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!proofFile || !createdTransaction) return;
+    
+    setUploadLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('_method', 'PATCH');
+      formData.append('payment_proof', proofFile);
+
+      const token = localStorage.getItem('auth_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+      const res = await fetch(`${apiUrl}/transactions/${createdTransaction.id}/payment`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        body: formData,
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Upload gagal');
+      
+      alert('Bukti pembayaran berhasil diunggah! Penjual akan segera memverifikasi.');
+      setShowUploadModal(false);
+      loadProductInfo(); // Refresh active order
+      
+      // Optionally notify via chat
+      await fetchApi(`/products/${productId}/chats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Halo, saya sudah melakukan pembayaran dan mengunggah buktinya. Mohon segera dicek ya.',
+          receiver_id: otherUserId
+        })
+      });
+      loadMessages(false);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengunggah bukti bayar');
+    } finally {
+      setUploadLoading(false);
+    }
+  };
 
   return (
     <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
@@ -608,6 +659,61 @@ export default function ChatDetailPage() {
           </button>
         </form>
       </div>
+
+      {/* Upload Proof Modal */}
+      {showUploadModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div style={{ background: 'white', borderRadius: '16px', width: '100%', maxWidth: '400px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', margin: 0 }}>Upload Bukti Pembayaran</h3>
+              <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>
+                <Icons.X size={20} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', flex: 1, overflowY: 'auto' }}>
+              <p style={{ fontSize: '0.9rem', color: '#6b7280', marginBottom: '1.5rem' }}>
+                Pesanan berhasil dibuat! Silakan upload foto atau *screenshot* bukti transfer Anda untuk memverifikasi pembayaran.
+              </p>
+
+              <form onSubmit={handleUploadProof} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <label style={{ 
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', 
+                  cursor: 'pointer', padding: '2rem 1.5rem', border: '2px dashed var(--primary)', borderRadius: '12px', 
+                  background: '#f0fdf4', color: 'var(--primary)', textAlign: 'center', transition: 'all 0.2s'
+                }}>
+                  <Icons.Upload size={32} />
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                    {proofFile ? proofFile.name : 'Pilih Gambar Bukti Transfer'}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Format: JPG, PNG (Maks. 10MB)</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    required
+                    style={{ display: 'none' }}
+                    onChange={e => {
+                      if (e.target.files && e.target.files[0]) {
+                        setProofFile(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </label>
+
+                <button 
+                  type="submit" 
+                  disabled={uploadLoading || !proofFile} 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', height: '48px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '12px' }}
+                >
+                  {uploadLoading ? <><Icons.Loader size={18} /> Mengunggah...</> : 'Kirim Bukti Pembayaran'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

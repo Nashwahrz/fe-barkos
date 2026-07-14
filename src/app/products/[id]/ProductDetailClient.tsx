@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { fetchApi, getStorageUrl, swrFetcher } from '@/lib/api';
 import { offerApi } from '@/services/api/offer.api';
 import { useAuth } from '@/components/AuthProvider';
 import { Icons } from '@/components/Icons';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 function calculateDistanceKM(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371;
@@ -21,6 +23,7 @@ type BuyStep = 'method' | 'confirm' | 'upload' | 'done';
 export default function ProductDetailClient({ initialProduct, productId }: { initialProduct: any, productId: string }) {
   const id = productId;
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
 
   const { data: productData, isLoading: loading, mutate } = useSWR(`/products/${id}`, swrFetcher, {
@@ -56,6 +59,16 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
   const { data: offersData } = useSWR(user ? 'buyer-offers' : null, () => offerApi.getBuyerOffers());
   const acceptedOffer = offersData?.data?.find((o: any) => o.product_id === Number(id) && o.status === 'accepted');
+
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'true') {
+      setShowBuyModal(true);
+      const payment = searchParams.get('payment');
+      if (payment === 'transfer') {
+        setPaymentMethod('bank_transfer');
+      }
+    }
+  }, [searchParams]);
 
   const calculateDistance = () => {
     if (!product?.latitude || !product?.longitude) {
@@ -184,48 +197,48 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
   const resetBuy = () => { setShowBuyModal(false); setBuyStep('method'); setPaymentMethod('cod'); setNotes(''); setTransaction(null); setProofFile(null); setBuyError(''); };
 
   if (!product) return (
-    <div style={{ textAlign: 'center', padding: '80px 0', opacity: 0.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-      <Icons.Loader size={32} color="#16a34a" />
+    <div style={{ textAlign: 'center', padding: '80px 0', opacity: 0.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--foreground)' }}>
+      <Icons.Loader size={32} />
       Memuat produk...
     </div>
   );
 
   return (
     <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '1100px' }}>
-      <div className="md-grid-1" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.1fr) minmax(0,1fr)', gap: '2.5rem', alignItems: 'flex-start' }}>
+      <div className="product-detail-layout" style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start' }}>
 
         {/* ── Left: Image & Map ────────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', background: '#fff', position: 'relative' }}>
+          <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: '24px', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--card)', position: 'relative' }}>
             {product.foto
               ? <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={64} color="#d1d5db" /></div>}
+              : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={64} color="var(--border)" /></div>}
             {product.is_promoted && (
-              <span style={{ position: 'absolute', top: '12px', left: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'linear-gradient(135deg,#f59e0b,#ef4444)', color: 'white', padding: '4px 10px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 800 }}>
-                <Icons.Zap size={11} color="white" /> PROMO
+              <span style={{ position: 'absolute', top: '16px', left: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--foreground)', color: 'var(--background)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600 }}>
+                <Icons.Zap size={14} color="var(--background)" /> Rekomendasi
               </span>
             )}
           </div>
 
           {/* Location Map */}
           {product.latitude && product.longitude && (
-            <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+            <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <iframe width="100%" height="220" frameBorder="0" title="Peta Penjual" src={`https://maps.google.com/maps?q=${product.latitude},${product.longitude}&hl=id&z=15&output=embed`} />
               {!distanceInfo ? (
-                <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
-                  <button onClick={calculateDistance} disabled={calculating} className="btn btn-secondary" style={{ width: '100%', fontSize: '0.875rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                    <Icons.Compass size={15} color="white" />
+                <div style={{ padding: '1.25rem', borderTop: '1px solid var(--border)', background: 'var(--card)' }}>
+                  <Button onClick={calculateDistance} disabled={calculating} variant="secondary" size="md" fullWidth>
+                    <Icons.Compass size={16} />
                     {calculating ? 'Menghitung...' : 'Hitung Jarak dari Lokasi Saya'}
-                  </button>
+                  </Button>
                 </div>
               ) : (
-                <div style={{ padding: '1rem', background: 'var(--primary-light)', borderTop: '1px solid var(--border)' }}>
-                  <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: 'var(--primary)', fontSize: '0.875rem', marginBottom: buyerLocation ? '0.75rem' : 0 }}>
-                    <Icons.CheckCircle size={15} color="var(--primary)" /> {distanceInfo}
+                <div style={{ padding: '1.25rem', background: 'var(--primary-light)', borderTop: '1px solid var(--border)' }}>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem', marginBottom: buyerLocation ? '0.75rem' : 0 }}>
+                    <Icons.CheckCircle size={16} /> {distanceInfo}
                   </p>
                   {buyerLocation && (
-                    <a href={`https://www.google.com/maps/dir/?api=1&origin=${buyerLocation.lat},${buyerLocation.lng}&destination=${product.latitude},${product.longitude}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>
-                      <Icons.MapPin size={13} color="var(--primary)" /> Buka Google Maps
+                    <a href={`https://www.google.com/maps/dir/?api=1&origin=${buyerLocation.lat},${buyerLocation.lng}&destination=${product.latitude},${product.longitude}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', opacity: 0.9 }}>
+                      <Icons.MapPin size={14} /> Buka Google Maps
                     </a>
                   )}
                 </div>
@@ -235,43 +248,48 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
         </div>
 
         {/* ── Right: Product Info ───────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
           {/* Badges */}
-          <div style={{ display: 'flex', gap: '6px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ padding: '4px 12px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700 }}>{product.category?.name || 'Umum'}</span>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem', flexWrap: 'wrap' }}>
+            <span style={{ padding: '6px 12px', border: '1px solid var(--border)', color: 'var(--foreground)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, opacity: 0.8 }}>{product.category?.name || 'Umum'}</span>
             {product.kondisi && (
-              <span style={{ padding: '4px 12px', background: product.kondisi === 'baru' ? '#D8F3DC' : '#FEF3C7', color: product.kondisi === 'baru' ? '#2D6A4F' : '#92400E', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700 }}>
+              <span style={{ padding: '6px 12px', background: product.kondisi === 'baru' ? 'var(--primary-light)' : 'rgba(245, 158, 11, 0.1)', color: product.kondisi === 'baru' ? 'var(--primary)' : 'var(--warning)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600 }}>
                 {product.kondisi === 'baru' ? 'Baru' : 'Bekas'}
               </span>
             )}
+            {product.durasi_pemakaian && (
+              <span style={{ padding: '6px 12px', background: 'var(--input)', color: 'var(--foreground)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, opacity: 0.8 }}>
+                Lama pakai: {product.durasi_pemakaian}
+              </span>
+            )}
             {product.status_terjual && (
-              <span style={{ padding: '4px 12px', background: '#FEE2E2', color: '#991B1B', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700 }}>TERJUAL</span>
+              <span style={{ padding: '6px 12px', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700 }}>TERJUAL</span>
             )}
           </div>
 
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.5rem', lineHeight: 1.2 }}>{product.nama_barang}</h1>
-          <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--primary)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.75rem', lineHeight: 1.2, color: 'var(--foreground)' }}>{product.nama_barang}</h1>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
             Rp {Number(product.harga).toLocaleString('id-ID')}
           </div>
           
           {acceptedOffer && (
-            <div style={{ padding: '0.75rem', background: '#D8F3DC', border: '1px solid #2D6A4F', borderRadius: '8px', color: '#2D6A4F', fontWeight: 700, fontSize: '0.9rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icons.CheckCircle size={18} color="#2D6A4F" />
-              Penawaran kamu sebesar Rp {Number(acceptedOffer.offered_price).toLocaleString('id-ID')} telah disetujui penjual!
+            <div style={{ padding: '1rem', background: 'var(--primary-light)', border: '1px solid var(--primary)', borderRadius: '12px', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Icons.CheckCircle size={20} />
+              Penawaran kamu sebesar Rp {Number(acceptedOffer.offered_price).toLocaleString('id-ID')} telah disetujui!
             </div>
           )}
           
-          <hr style={{ border: 'none', borderBottom: '1px solid var(--border)', margin: '1.5rem 0' }} />
+          <hr style={{ border: 'none', borderBottom: '1px solid var(--border)', margin: '1.5rem 0', opacity: 0.5 }} />
 
           {/* Description */}
-          <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--foreground)', marginBottom: '0.75rem' }}>Deskripsi Produk</h3>
-            <p style={{ lineHeight: 1.7, color: '#6b7280', fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{product.deskripsi || '—'}</p>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h3 style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--foreground)', marginBottom: '1rem' }}>Deskripsi Produk</h3>
+            <p style={{ lineHeight: 1.8, color: 'var(--foreground)', opacity: 0.7, fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>{product.deskripsi || '—'}</p>
           </div>
 
           {/* Seller Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden', border: '1px solid var(--border)' }}>
               {product.user?.foto ? (
                 <img src={getStorageUrl(product.user.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -279,71 +297,74 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
               )}
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{product.user?.name}</div>
-              <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
+              <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--foreground)' }}>{product.user?.name}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
             </div>
           </div>
 
           {/* ── Action Buttons ── */}
           {!isSeller && !isAdmin && !product.status_terjual && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
+            <div className="fixed-bottom-action" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <Button
                   onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowBuyModal(true); }}
-                  className="btn btn-primary"
-                  style={{ flex: 1, height: '52px', fontSize: '1rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  variant="primary"
+                  size="lg"
+                  style={{ flex: 1 }}
                 >
-                  <Icons.ShoppingBag size={18} color="white" />
+                  <Icons.ShoppingBag size={18} />
                   Beli
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowOfferModal(true); }}
-                  className="btn"
-                  style={{ flex: 1, height: '52px', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'var(--primary-light)', color: 'var(--primary)', border: 'none', borderRadius: 'var(--radius)', fontWeight: 700 }}
+                  variant="secondary"
+                  size="lg"
+                  style={{ flex: 1 }}
                 >
-                  <Icons.Zap size={18} color="var(--primary)" />
+                  <Icons.Zap size={18} />
                   Tawar
-                </button>
+                </Button>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   if (!user) { router.push('/auth/login'); return; }
                   const sellerId = product.user_id || product.user?.id;
                   if (user.id === sellerId) { alert('Tidak bisa chat dengan diri sendiri.'); return; }
                   router.push(`/chat/${product.id}/${sellerId}`);
                 }}
-                className="btn"
-                style={{ height: '46px', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: '2px solid var(--primary)', background: 'white', color: 'var(--primary)', borderRadius: 'var(--radius)', fontWeight: 700 }}
+                variant="ghost"
+                size="md"
+                style={{ border: '1px solid var(--border)' }}
               >
-                <Icons.MessageCircle size={16} color="var(--primary)" />
+                <Icons.MessageCircle size={16} />
                 Tanya Penjual
-              </button>
+              </Button>
             </div>
           )}
 
           {product.status_terjual && (
-            <div style={{ textAlign: 'center', padding: '1.5rem', background: '#FEE2E2', borderRadius: '12px', color: '#991B1B', fontWeight: 700 }}>
+            <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.2)', borderRadius: '12px', color: 'var(--danger)', fontWeight: 600 }}>
               Produk ini sudah terjual
             </div>
           )}
 
           {isSeller && (
-            <button onClick={() => router.push(`/seller/products/${product.id}/edit`)} className="btn btn-secondary" style={{ width: '100%', height: '46px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Icons.Edit size={16} color="white" />
+            <Button onClick={() => router.push(`/seller/products/${product.id}/edit`)} variant="secondary" size="lg" fullWidth>
+              <Icons.Edit size={16} />
               Edit Produk
-            </button>
+            </Button>
           )}
 
           {/* Report */}
           {!isSeller && (
-            <button onClick={() => user ? setShowReport(true) : router.push('/auth/login')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#6b7280', marginTop: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <Icons.Flag size={13} color="#6b7280" />
+            <button onClick={() => user ? setShowReport(true) : router.push('/auth/login')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.5, marginTop: '2rem', display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+              <Icons.Flag size={14} />
               Laporkan produk ini
             </button>
           )}
           {isAdmin && (
-            <button onClick={async () => { if (!confirm('Hapus produk ini?')) return; await fetchApi(`/products/${id}`, { method: 'DELETE' }); router.push('/products'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#ef4444', marginTop: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <Icons.Trash2 size={13} color="#ef4444" />
+            <button onClick={async () => { if (!confirm('Hapus produk ini?')) return; await fetchApi(`/products/${id}`, { method: 'DELETE' }); router.push('/products'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--danger)', marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+              <Icons.Trash2 size={14} />
               Hapus Produk (Admin)
             </button>
           )}
@@ -354,62 +375,64 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           BUY MODAL
       ═══════════════════════════════════════════════ */}
       {showBuyModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2rem', position: 'relative', borderRadius: '16px' }}>
-            <button onClick={resetBuy} style={{ position: 'absolute', top: '16px', right: '20px', background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: '#6b7280' }}>✕</button>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem', position: 'relative', borderRadius: '20px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', maxHeight: 'calc(100vh - 3rem)', overflowY: 'auto' }}>
+            <button onClick={resetBuy} style={{ position: 'absolute', top: '20px', right: '20px', background: 'var(--input)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--foreground)' }}>
+              <Icons.X size={16} />
+            </button>
 
             {/* STEP: method */}
             {buyStep === 'method' && (
               <>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '6px' }}>Konfirmasi Pembelian</h2>
-                <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.nama_barang}</p>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: 'var(--foreground)' }}>Konfirmasi Pembelian</h2>
+                <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '0.9rem', marginBottom: '1.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.nama_barang}</p>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'var(--card)', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                  <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>Total Pembayaran {acceptedOffer && '(Sesuai Penawaran)'}</span>
-                  <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Rp {Number(acceptedOffer ? acceptedOffer.offered_price : product.harga).toLocaleString('id-ID')}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                  <span style={{ color: 'var(--foreground)', opacity: 0.8, fontSize: '0.9rem' }}>Total Bayar {acceptedOffer && '(Disetujui)'}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--foreground)', fontSize: '1.1rem' }}>Rp {Number(acceptedOffer ? acceptedOffer.offered_price : product.harga).toLocaleString('id-ID')}</span>
                 </div>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.75rem' }}>Metode Pembayaran</label>
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--foreground)' }}>Metode Pembayaran</label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {[
-                      { value: 'cod', Icon: Icons.Handshake, title: 'COD (Bayar di Tempat)', desc: 'Bertemu langsung, bayar tunai' },
-                      { value: 'bank_transfer', Icon: Icons.CreditCard, title: 'Transfer Bank', desc: 'Upload bukti transfer setelah dikonfirmasi' },
+                      { value: 'cod', Icon: Icons.Handshake, title: 'COD (Bayar di Tempat)' },
+                      { value: 'bank_transfer', Icon: Icons.CreditCard, title: 'Transfer Bank' },
                     ].map(m => (
                       <button key={m.value} onClick={() => setPaymentMethod(m.value as any)}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem',
-                          border: `2px solid ${paymentMethod === m.value ? 'var(--primary)' : 'var(--border)'}`,
-                          borderRadius: '12px', background: paymentMethod === m.value ? 'var(--primary-light)' : 'white',
-                          cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s', width: '100%'
+                          display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem',
+                          border: `1px solid ${paymentMethod === m.value ? 'var(--primary)' : 'var(--border)'}`,
+                          borderRadius: '12px', background: paymentMethod === m.value ? 'var(--primary-light)' : 'transparent',
+                          cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', width: '100%'
                         }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: paymentMethod === m.value ? 'rgba(22,163,74,0.15)' : '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <m.Icon size={18} color={paymentMethod === m.value ? 'var(--primary)' : '#6b7280'} />
+                        <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: paymentMethod === m.value ? 'rgba(22,163,74,0.1)' : 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <m.Icon size={18} color={paymentMethod === m.value ? 'var(--primary)' : 'var(--foreground)'} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, fontSize: '0.875rem', color: paymentMethod === m.value ? 'var(--primary)' : 'var(--foreground)' }}>{m.title}</div>
+                          <div style={{ fontWeight: 600, fontSize: '0.95rem', color: paymentMethod === m.value ? 'var(--primary)' : 'var(--foreground)' }}>{m.title}</div>
                         </div>
-                        {paymentMethod === m.value ? <Icons.CheckCircle size={20} color="var(--primary)" /> : <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--border)' }} />}
+                        {paymentMethod === m.value ? <Icons.CheckCircle size={20} color="var(--primary)" /> : <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px solid var(--border)' }} />}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {paymentMethod === 'bank_transfer' && (
-                  <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#eff6ff', borderRadius: '12px', border: '1px solid #bfdbfe' }}>
-                    <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1e3a8a', marginBottom: '0.75rem' }}>Daftar Rekening Penjual:</h3>
+                  <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--input)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.75rem' }}>Daftar Rekening Penjual:</h3>
                     {product.user?.bank_accounts && product.user.bank_accounts.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {product.user.bank_accounts.map((acc: any) => (
-                          <div key={acc.id} style={{ background: 'white', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-                            <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{acc.bank_name}</div>
-                            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--primary)', fontWeight: 700 }}>{acc.account_number}</div>
-                            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>a.n. {acc.account_name}</div>
+                          <div key={acc.id} style={{ background: 'var(--card)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                            <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--foreground)' }}>{acc.bank_name}</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: '1rem', color: 'var(--foreground)', fontWeight: 700, margin: '4px 0' }}>{acc.account_number}</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6 }}>a.n. {acc.account_name}</div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, lineHeight: 1.5 }}>
                         Penjual belum menambahkan rekening. Hubungi penjual melalui chat untuk meminta nomor rekening tujuan.
                       </div>
                     )}
@@ -417,27 +440,28 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                 )}
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.5rem' }}>Catatan untuk Penjual (opsional)</label>
-                  <textarea className="input" rows={2} style={{ height: 'auto', padding: '12px', resize: 'none', fontSize: '0.875rem', borderRadius: '12px' }} placeholder="Kapan bisa COD?" value={notes} onChange={e => setNotes(e.target.value)} />
+                  <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>Catatan untuk Penjual (opsional)</label>
+                  <textarea className="input-field" rows={2} style={{ height: 'auto', padding: '12px', resize: 'none', borderRadius: '12px' }} placeholder="Kapan bisa COD?" value={notes} onChange={e => setNotes(e.target.value)} />
                 </div>
 
-                {buyError && <div style={{ padding: '0.75rem', background: '#FEF2F2', color: '#ef4444', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', fontWeight: 600 }}>{buyError}</div>}
+                {buyError && <div style={{ padding: '0.75rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.875rem', fontWeight: 500, border: '1px solid rgba(220, 38, 38, 0.2)' }}>{buyError}</div>}
 
                 {paymentMethod === 'bank_transfer' ? (
-                  <button 
+                  <Button 
                     onClick={() => {
                       const sellerId = product.user_id || product.user?.id;
                       router.push(`/chat/${product.id}/${sellerId}?template=transfer_check`);
                     }} 
-                    className="btn btn-primary" 
-                    style={{ width: '100%', height: '48px', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                    variant="primary"
+                    size="lg"
+                    fullWidth
                   >
-                    <Icons.MessageCircle size={16} color="white" /> Tanya Stok (Transfer)
-                  </button>
+                    <Icons.MessageCircle size={16} /> Tanya Stok (Transfer)
+                  </Button>
                 ) : (
-                  <button onClick={handlePlaceOrder} disabled={buyLoading} className="btn btn-primary" style={{ width: '100%', height: '48px', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    {buyLoading ? <><Icons.Loader size={16} color="white" /> Memproses...</> : <>Kirim Pesanan <Icons.ArrowRight size={16} color="white" /></>}
-                  </button>
+                  <Button onClick={handlePlaceOrder} disabled={buyLoading} variant="primary" size="lg" fullWidth>
+                    {buyLoading ? 'Memproses...' : 'Kirim Pesanan'}
+                  </Button>
                 )}
               </>
             )}
@@ -446,15 +470,15 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
             {buyStep === 'upload' && (
               <>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <div style={{ width: '56px', height: '56px', background: '#DBEAFE', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                    <Icons.CreditCard size={26} color="#1D4ED8" />
+                  <div style={{ width: '64px', height: '64px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                    <Icons.CreditCard size={32} color="var(--primary)" />
                   </div>
-                  <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '8px' }}>Pesanan Dibuat!</h2>
-                  <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Pesanan sedang menunggu konfirmasi penjual. Setelah dikonfirmasi, unggah bukti transfer di halaman <strong>Pesanan Saya</strong>.</p>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: 'var(--foreground)' }}>Pesanan Dibuat!</h2>
+                  <p style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.95rem', lineHeight: 1.6 }}>Pesanan sedang menunggu konfirmasi penjual. Setelah dikonfirmasi, unggah bukti transfer di halaman <strong>Pesanan Saya</strong>.</p>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <button onClick={() => router.push('/orders')} className="btn btn-primary" style={{ width: '100%', height: '48px' }}>Lihat Pesanan Saya</button>
-                  <button onClick={resetBuy} className="btn btn-secondary" style={{ width: '100%', height: '44px' }}>Tutup</button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <Button onClick={() => router.push('/orders')} variant="primary" size="lg" fullWidth>Lihat Pesanan Saya</Button>
+                  <Button onClick={resetBuy} variant="secondary" size="lg" fullWidth>Tutup</Button>
                 </div>
               </>
             )}
@@ -462,17 +486,17 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
             {/* STEP: done (COD) */}
             {buyStep === 'done' && (
               <>
-                <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                  <div style={{ width: '64px', height: '64px', background: '#D8F3DC', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                    <Icons.CheckCircle size={30} color="#2D6A4F" />
+                <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                  <div style={{ width: '64px', height: '64px', background: 'var(--primary-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                    <Icons.CheckCircle size={32} color="var(--primary)" />
                   </div>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.75rem' }}>Pesanan Dikirim!</h2>
-                  <p style={{ color: '#6b7280', lineHeight: 1.6, marginBottom: '2.5rem' }}>
-                    Pesanan COD kamu sudah masuk. Penjual akan segera mengkonfirmasi dan menghubungimu untuk mengatur waktu & tempat pertemuan.
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: 'var(--foreground)' }}>Pesanan Dikirim!</h2>
+                  <p style={{ color: 'var(--foreground)', opacity: 0.7, lineHeight: 1.6, marginBottom: '2rem', fontSize: '0.95rem' }}>
+                    Pesanan COD kamu sudah masuk. Penjual akan segera mengkonfirmasi dan menghubungimu.
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <button onClick={() => router.push('/orders')} className="btn btn-primary" style={{ width: '100%', height: '48px' }}>Lihat Status Pesanan</button>
-                    <button onClick={resetBuy} className="btn btn-secondary" style={{ width: '100%', height: '44px' }}>Tutup</button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <Button onClick={() => router.push('/orders')} variant="primary" size="lg" fullWidth>Lihat Status Pesanan</Button>
+                    <Button onClick={resetBuy} variant="secondary" size="lg" fullWidth>Tutup</Button>
                   </div>
                 </div>
               </>
@@ -485,14 +509,14 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           REPORT MODAL
       ═══════════════════════════════════════════════ */}
       {showReport && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem' }}>
-            <h2 style={{ fontWeight: 900, fontSize: '1.25rem', marginBottom: '0.5rem' }}>Laporkan Produk</h2>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '2rem' }}>Bantu kami menjaga keamanan komunitas.</p>
-            <form onSubmit={handleReport} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', borderRadius: '20px', boxShadow: 'var(--shadow-lg)', maxHeight: 'calc(100vh - 3rem)', overflowY: 'auto' }}>
+            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--foreground)' }}>Laporkan Produk</h2>
+            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '0.9rem', marginBottom: '2rem' }}>Bantu kami menjaga keamanan komunitas.</p>
+            <form onSubmit={handleReport} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <label className="label">Alasan</label>
-                <select className="input" required value={reportData.reason} onChange={e => setReportData({ ...reportData, reason: e.target.value })}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>Alasan</label>
+                <select className="input-field" required value={reportData.reason} onChange={e => setReportData({ ...reportData, reason: e.target.value })} style={{ width: '100%' }}>
                   <option value="">Pilih alasan...</option>
                   <option value="Spam">Spam / Iklan tidak relevan</option>
                   <option value="Penipuan">Indikasi Penipuan</option>
@@ -502,48 +526,47 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                 </select>
               </div>
               <div>
-                <label className="label">Keterangan Tambahan</label>
-                <textarea className="input" rows={3} style={{ height: 'auto', padding: '12px', resize: 'none' }} placeholder="Jelaskan singkat alasan pelaporan..." value={reportData.description} onChange={e => setReportData({ ...reportData, description: e.target.value })} />
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>Keterangan Tambahan</label>
+                <textarea className="input-field" rows={3} style={{ height: 'auto', padding: '12px', resize: 'none', borderRadius: '12px', width: '100%' }} placeholder="Jelaskan singkat alasan pelaporan..." value={reportData.description} onChange={e => setReportData({ ...reportData, description: e.target.value })} />
               </div>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button type="button" onClick={() => setShowReport(false)} className="btn btn-secondary" style={{ flex: 1, height: '44px' }}>Batal</button>
-                <button type="submit" disabled={reportLoading} className="btn btn-primary" style={{ flex: 1, height: '44px', background: '#ef4444' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <Button type="button" onClick={() => setShowReport(false)} variant="secondary" size="lg" style={{ flex: 1 }}>Batal</Button>
+                <Button type="submit" disabled={reportLoading} variant="danger" size="lg" style={{ flex: 1 }}>
                   {reportLoading ? 'Mengirim...' : 'Kirim Laporan'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       {/* ═══════════════════════════════════════════════
           OFFER MODAL
       ═══════════════════════════════════════════════ */}
       {showOfferModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem', borderRadius: '16px', position: 'relative' }}>
-            <button onClick={() => setShowOfferModal(false)} style={{ position: 'absolute', top: '16px', right: '20px', background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: '#6b7280' }}>✕</button>
-            <h2 style={{ fontWeight: 900, fontSize: '1.25rem', marginBottom: '0.5rem' }}>Tawar Harga</h2>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Berikan penawaran harga terbaikmu untuk <strong>{product.nama_barang}</strong> (Harga asli: Rp {Number(product.harga).toLocaleString('id-ID')}).</p>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem', borderRadius: '20px', position: 'relative', boxShadow: 'var(--shadow-lg)', maxHeight: 'calc(100vh - 3rem)', overflowY: 'auto' }}>
+            <button onClick={() => setShowOfferModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'var(--input)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--foreground)' }}>
+              <Icons.X size={16} />
+            </button>
+            <h2 style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--foreground)' }}>Tawar Harga</h2>
+            <p style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Berikan penawaran harga terbaikmu untuk <strong>{product.nama_barang}</strong> (Harga asli: Rp {Number(product.harga).toLocaleString('id-ID')}).</p>
             
-            <form onSubmit={handleOffer} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <label className="label">Nominal Penawaran (Rp)</label>
-                <input 
-                  type="number" 
-                  className="input" 
-                  required 
-                  min="1"
-                  placeholder="Contoh: 50000" 
-                  value={offerPrice} 
-                  onChange={e => setOfferPrice(e.target.value)} 
-                />
-              </div>
+            <form onSubmit={handleOffer} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <Input 
+                type="number" 
+                label="Nominal Penawaran (Rp)"
+                required 
+                placeholder="Contoh: 50000" 
+                value={offerPrice} 
+                onChange={e => setOfferPrice(e.target.value)} 
+              />
               
-              {offerError && <div style={{ padding: '0.75rem', background: '#FEF2F2', color: '#ef4444', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>{offerError}</div>}
+              {offerError && <div style={{ padding: '0.75rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 500, border: '1px solid rgba(220, 38, 38, 0.2)' }}>{offerError}</div>}
               
-              <button type="submit" disabled={offerLoading} className="btn btn-primary" style={{ width: '100%', height: '48px' }}>
+              <Button type="submit" disabled={offerLoading} variant="primary" size="lg" fullWidth>
                 {offerLoading ? 'Mengirim...' : 'Kirim Penawaran'}
-              </button>
+              </Button>
             </form>
           </div>
         </div>

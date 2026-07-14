@@ -8,12 +8,13 @@ import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/Icons';
 import useSWR from 'swr';
 import { OrderItemSkeleton } from '@/components/Skeleton';
+import { Button } from '@/components/ui/Button';
 
-const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
-  pending:   { label: 'Menunggu Konfirmasi', bg: '#FEF3C7', color: '#92400E' },
-  confirmed: { label: 'Dikonfirmasi',        bg: '#DBEAFE', color: '#1D4ED8' },
-  completed: { label: 'Selesai',             bg: '#D8F3DC', color: '#2D6A4F' },
-  cancelled: { label: 'Dibatalkan',          bg: '#FEE2E2', color: '#991B1B' },
+const STATUS_MAP: Record<string, { label: string; bg: string; color: string; borderColor: string }> = {
+  pending:   { label: 'Menunggu Konfirmasi', bg: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', borderColor: 'rgba(245, 158, 11, 0.2)' },
+  confirmed: { label: 'Dikonfirmasi',        bg: 'var(--primary-light)', color: 'var(--primary)', borderColor: 'rgba(13, 148, 136, 0.2)' },
+  completed: { label: 'Selesai',             bg: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', borderColor: 'rgba(16, 185, 129, 0.2)' },
+  cancelled: { label: 'Dibatalkan',          bg: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderColor: 'rgba(220, 38, 38, 0.2)' },
 };
 
 export default function BuyerOrdersPage() {
@@ -21,7 +22,7 @@ export default function BuyerOrdersPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('all');
 
-  const { data, isLoading } = useSWR(user ? '/transactions' : null, swrFetcher);
+  const { data, isLoading } = useSWR(user ? '/transactions?as=buyer' : null, swrFetcher);
   const orders: any[] = data?.data || data || [];
 
   const tabs = [
@@ -43,22 +44,23 @@ export default function BuyerOrdersPage() {
   return (
     <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '860px' }}>
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 900, marginBottom: '4px' }}>Pesanan Saya</h1>
-        <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Pantau status semua pesanan Anda</p>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Pesanan Saya</h1>
+        <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem' }}>Pantau status semua pesanan Anda</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '2.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', flexWrap: 'wrap' }}>
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
-            padding: '6px 16px', borderRadius: '9999px', border: 'none', cursor: 'pointer',
-            fontWeight: 600, fontSize: '0.8rem', transition: 'all 0.15s',
+            padding: '8px 20px', borderRadius: '12px', border: '1px solid', cursor: 'pointer',
+            fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s',
             background: activeTab === tab.key ? 'var(--primary)' : 'var(--card)',
-            color: activeTab === tab.key ? 'white' : '#6b7280',
+            color: activeTab === tab.key ? 'white' : 'var(--foreground)',
+            borderColor: activeTab === tab.key ? 'var(--primary)' : 'var(--border)',
           }}>
             {tab.label}
             {tab.key !== 'all' && orders.filter(o => o.status === tab.key).length > 0 && (
-              <span style={{ marginLeft: '6px', background: activeTab === tab.key ? 'rgba(255,255,255,0.3)' : 'var(--border)', borderRadius: '20px', padding: '1px 7px', fontSize: '0.7rem' }}>
+              <span style={{ marginLeft: '8px', background: activeTab === tab.key ? 'rgba(255,255,255,0.2)' : 'var(--input)', color: activeTab === tab.key ? 'white' : 'var(--foreground)', borderRadius: '20px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 700 }}>
                 {orders.filter(o => o.status === tab.key).length}
               </span>
             )}
@@ -68,60 +70,62 @@ export default function BuyerOrdersPage() {
 
       {/* Order List */}
       {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {Array.from({ length: 3 }).map((_, i) => <OrderItemSkeleton key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '5rem 0', opacity: 0.6 }}>
-          <div style={{ width: '56px', height: '56px', background: '#f3f4f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-            <Icons.ShoppingBag size={24} color="#9ca3af" />
+        <div style={{ textAlign: 'center', padding: '6rem 2rem', background: 'var(--card)', borderRadius: '24px', border: '1px dashed var(--border)' }}>
+          <div style={{ width: '80px', height: '80px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--foreground)', opacity: 0.5 }}>
+            <Icons.ShoppingBag size={32} />
           </div>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px' }}>Tidak ada pesanan</h2>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '12px', color: 'var(--foreground)' }}>Tidak ada pesanan</h2>
+          <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '0.95rem', marginBottom: '2.5rem' }}>
             {activeTab === 'all' ? 'Kamu belum pernah membeli barang apapun.' : `Tidak ada pesanan dengan status "${tabs.find(t => t.key === activeTab)?.label}".`}
           </p>
           {activeTab === 'all' && (
-            <Link href="/products" className="btn btn-primary">Mulai Belanja</Link>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Button href="/products" variant="primary" size="lg">Mulai Belanja</Button>
+            </div>
           )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filtered.map(order => {
             const s = STATUS_MAP[order.status] || STATUS_MAP.pending;
             return (
-              <Link href={`/orders/${order.id}`} key={order.id} className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', textDecoration: 'none', color: 'inherit', padding: '1rem' }}>
+              <Link href={`/orders/${order.id}`} key={order.id} className="card" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', textDecoration: 'none', color: 'inherit', padding: '1.25rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
                 {/* Product Image */}
-                <div style={{ width: '72px', height: '72px', borderRadius: '12px', background: 'var(--card)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '16px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
                   {order.product?.foto
                     ? <img src={getStorageUrl(order.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <Icons.Package size={28} color="#d1d5db" />}
+                    : <Icons.Package size={32} color="var(--border)" />}
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px', gap: '8px' }}>
-                    <h3 style={{ fontWeight: 700, fontSize: '0.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px', gap: '12px' }}>
+                    <h3 style={{ fontWeight: 700, fontSize: '1.05rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, color: 'var(--foreground)' }}>
                       {order.product?.nama_barang}
                     </h3>
-                    <span style={{ padding: '3px 10px', borderRadius: '9999px', background: s.bg, color: s.color, fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>
+                    <span style={{ padding: '4px 12px', borderRadius: '8px', background: s.bg, color: s.color, border: `1px solid ${s.borderColor}`, fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
                       {s.label}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: '6px' }}>
-                    Penjual: {order.seller?.name} &bull; {new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, marginBottom: '8px' }}>
+                    Penjual: <strong style={{ color: 'var(--foreground)' }}>{order.seller?.name}</strong> &bull; {new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1rem' }}>
+                    <div style={{ fontWeight: 800, color: 'var(--foreground)', fontSize: '1.1rem' }}>
                       Rp {Number(order.agreed_price).toLocaleString('id-ID')}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#6b7280', fontWeight: 500 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, fontWeight: 600 }}>
                       {order.payment_method === 'cod'
-                        ? <><Icons.Handshake size={12} color="#6b7280" /> COD</>
-                        : <><Icons.CreditCard size={12} color="#6b7280" /> Transfer</>}
+                        ? <><Icons.Handshake size={14} /> COD</>
+                        : <><Icons.CreditCard size={14} /> Transfer</>}
                     </div>
                   </div>
                 </div>
-                <Icons.ChevronRight size={18} color="#9ca3af" />
+                <Icons.ChevronRight size={20} color="var(--border)" />
               </Link>
             );
           })}
@@ -130,4 +134,3 @@ export default function BuyerOrdersPage() {
     </div>
   );
 }
-

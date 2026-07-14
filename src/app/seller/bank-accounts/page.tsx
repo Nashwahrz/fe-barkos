@@ -112,7 +112,12 @@ export default function SellerBankAccounts() {
     }
   };
 
-  if (loading || authLoading) return <div className="p-8 text-center">Memuat data...</div>;
+  if (loading || authLoading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
+      <Icons.Loader size={32} />
+      <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data rekening...</div>
+    </div>
+  );
 
   return (
     <div className="container" style={{ padding: '60px 1rem', maxWidth: '800px' }}>

@@ -6,6 +6,13 @@ import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
 import { Icons } from '@/components/Icons';
+import Script from 'next/script';
+
+declare global {
+  interface Window {
+    snap: any;
+  }
+}
 
 export default function SellerPromotions() {
   const { user, loading: authLoading } = useAuth();
@@ -94,7 +101,7 @@ export default function SellerPromotions() {
       if (mediaSource === 'url' && !adMediaUrl.trim()) return showMessage('Masukkan URL media iklan', 'error');
     }
 
-    if (!confirm('Simulasi Pembayaran: Apakah Anda yakin ingin mengaktifkan paket promosi ini? (Anggap pembayaran berhasil)')) return;
+    // if (!confirm('Simulasi Pembayaran: Apakah Anda yakin ingin mengaktifkan paket promosi ini? (Anggap pembayaran berhasil)')) return;
 
     setActionLoading(true);
     try {
@@ -114,28 +121,72 @@ export default function SellerPromotions() {
         }
       }
 
-      await fetchApi('/promotions', {
+      const res = await fetchApi('/promotions', {
         method: 'POST',
         body: formData
       });
-      showMessage('Promosi berhasil diaktifkan!', 'success');
-      setSelectedProduct('');
-      setSelectedPackage('');
-      setAdType('none');
-      setAdMediaUrl('');
-      setAdMediaFile(null);
-      setFilePreviewUrl('');
-      setAdTitle('');
-      setPreviewError(false);
-      await loadData();
+      
+      const snapToken = res.data?.snap_token;
+      const orderId = res.data?.order_id;
+      
+      if (snapToken && window.snap) {
+        window.snap.pay(snapToken, {
+          onSuccess: async function (result: any) {
+            try {
+              await fetchApi('/promotions/force-paid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_id: orderId })
+              });
+            } catch(e) { console.error('Force paid failed', e); }
+
+            showMessage('Pembayaran berhasil! Promosi akan segera aktif.', 'success');
+            resetForm();
+            await loadData();
+            setActionLoading(false);
+          },
+          onPending: async function (result: any) {
+            showMessage('Menunggu pembayaran diselesaikan.', 'success');
+            resetForm();
+            await loadData();
+            setActionLoading(false);
+          },
+          onError: function (result: any) {
+            showMessage('Pembayaran gagal atau dibatalkan.', 'error');
+            setActionLoading(false);
+          },
+          onClose: function () {
+            showMessage('Anda menutup popup tanpa menyelesaikan pembayaran.', 'error');
+            setActionLoading(false);
+          }
+        });
+      } else {
+        showMessage('Gagal memuat sistem pembayaran.', 'error');
+        setActionLoading(false);
+      }
+      
+      function resetForm() {
+        setSelectedProduct('');
+        setSelectedPackage('');
+        setAdType('none');
+        setAdMediaUrl('');
+        setAdMediaFile(null);
+        setFilePreviewUrl('');
+        setAdTitle('');
+        setPreviewError(false);
+      }
     } catch (err: any) {
       showMessage(err.message || 'Gagal mengaktifkan promosi', 'error');
-    } finally {
       setActionLoading(false);
     }
   };
 
-  if (loading || authLoading) return <div className="p-8 text-center">Memuat data promosi...</div>;
+  if (loading || authLoading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
+      <Icons.Loader size={32} />
+      <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data promosi...</div>
+    </div>
+  );
 
   const adTypeOptions: { value: 'none' | 'image' | 'video'; label: string; icon: string; desc: string }[] = [
     { value: 'none',  label: 'Tanpa Iklan',  icon: '🚫', desc: 'Hanya boost posisi produk tanpa banner iklan.' },
@@ -144,8 +195,14 @@ export default function SellerPromotions() {
   ];
 
   return (
-    <div className="container" style={{ padding: '60px 1rem', maxWidth: '1100px' }}>
-      <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
+    <>
+      <Script 
+        src="https://app.sandbox.midtrans.com/snap/snap.js" 
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="lazyOnload"
+      />
+      <div className="container" style={{ padding: '60px 1rem', maxWidth: '1100px' }}>
+        <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#111827', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
           <Icons.Zap size={36} color="#f59e0b" /> Pusat Promosi
         </h1>
@@ -318,7 +375,7 @@ export default function SellerPromotions() {
                           {adMediaFile ? adMediaFile.name : `Klik untuk memilih ${adType === 'image' ? 'gambar' : 'video'}`}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
-                          Maksimal 500MB (PNG, JPG, MP4, MOV, dll.)
+                          Maksimal 2GB (PNG, JPG, MP4, MOV, dll.)
                         </div>
                       </div>
 
@@ -455,7 +512,11 @@ export default function SellerPromotions() {
 
                       {/* Status badge */}
                       <div style={{ flexShrink: 0 }}>
-                        {isActive ? (
+                        {promo.payment_status === 'pending' ? (
+                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU PEMBAYARAN</span>
+                        ) : promo.payment_status === 'failed' ? (
+                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>GAGAL</span>
+                        ) : isActive ? (
                           <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>AKTIF <Icons.Zap size={12} color="#16a34a" /></span>
                         ) : (
                           <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(107, 114, 128, 0.08)', color: '#6b7280', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.05em' }}>EXPIRED</span>
@@ -502,5 +563,6 @@ export default function SellerPromotions() {
 
       </div>
     </div>
+  </>
   );
 }

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 
 export default function VerifyEmailProcess() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -35,6 +35,11 @@ export default function VerifyEmailProcess() {
         setStatus('success');
         setMessage('Email Anda berhasil diverifikasi! Mengalihkan ke beranda...');
         
+        // Fetch latest user data so RouteGuard knows the email is verified
+        if (user) {
+          await refreshUser();
+        }
+
         // Redirect based on login status and role
         if (user && user.role === 'penjual') {
           router.replace('/seller/products');

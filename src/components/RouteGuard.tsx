@@ -15,9 +15,23 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   const [resendError, setResendError] = useState('');
 
   useEffect(() => {
-    // If auth finishes loading and there is no user, and we are not on an auth page
-    if (!loading && !user && !pathname.startsWith('/auth')) {
+    if (loading) return;
+
+    // If there is no user and we are not on an auth page
+    if (!user && !pathname.startsWith('/auth')) {
       router.push('/auth/login');
+      return;
+    }
+
+    if (user) {
+      // Role-based redirection and protection
+      if (user.role === 'super_admin' && !pathname.startsWith('/admin') && !pathname.startsWith('/auth')) {
+        router.push('/admin/dashboard');
+      } else if (user.role === 'penjual' && pathname.startsWith('/admin')) {
+        router.push('/seller/products');
+      } else if (user.role === 'pembeli' && (pathname.startsWith('/admin') || pathname.startsWith('/seller'))) {
+        router.push('/');
+      }
     }
   }, [user, loading, pathname, router]);
 

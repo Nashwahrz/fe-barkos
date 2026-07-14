@@ -9,7 +9,24 @@ const withPWA = require('next-pwa')({
 
 const nextConfig: NextConfig = {
   /* config options here */
-  turbopack: {}
+  turbopack: {},
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '8000',
+        pathname: '**',
+      },
+    ],
+  },
 };
 
 export default withPWA(nextConfig);

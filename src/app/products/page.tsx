@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { Icons } from '@/components/Icons';
 import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { ProductCard } from '@/components/ui/ProductCard';
 
 // ── Filter Panel (shared by desktop + mobile modal) ──────────
 function FilterPanel({
@@ -16,8 +19,8 @@ function FilterPanel({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Kategori */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Kategori</label>
-        <select className="input-field" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
+        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Kategori</label>
+        <select className="input-field" value={categoryId} onChange={e => setCategoryId(e.target.value)} style={{ width: '100%' }}>
           <option value="">Semua Kategori</option>
           {categories.map((c: any) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -27,8 +30,8 @@ function FilterPanel({
 
       {/* Kondisi */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Kondisi</label>
-        <select className="input-field" value={kondisi} onChange={e => setKondisi(e.target.value)}>
+        <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Kondisi</label>
+        <select className="input-field" value={kondisi} onChange={e => setKondisi(e.target.value)} style={{ width: '100%' }}>
           <option value="">Semua Kondisi</option>
           <option value="baru">Baru</option>
           <option value="sangat baik">Sangat Baik</option>
@@ -37,24 +40,30 @@ function FilterPanel({
       </div>
 
       {/* Harga */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Harga Min</label>
-          <input type="number" className="input-field" placeholder="0" value={minPrice} onChange={e => setMinPrice(e.target.value)} />
-        </div>
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Harga Max</label>
-          <input type="number" className="input-field" placeholder="Tak terhingga" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} />
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <Input 
+          type="number" 
+          label="Harga Min"
+          placeholder="0" 
+          value={minPrice} 
+          onChange={e => setMinPrice(e.target.value)} 
+        />
+        <Input 
+          type="number" 
+          label="Harga Max"
+          placeholder="Tak terhingga" 
+          value={maxPrice} 
+          onChange={e => setMaxPrice(e.target.value)} 
+        />
       </div>
 
       {/* Lokasi */}
       <div>
-        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '0.5rem' }}>
           <span>Lokasi & Jarak</span>
           {lat && (
             <span style={{ color: 'var(--primary)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-              <Icons.Check size={14} color="var(--primary)" />
+              <Icons.Check size={14} />
               {locStatus || 'Lokasi Aktif'}
             </span>
           )}
@@ -62,23 +71,18 @@ function FilterPanel({
         {!lat ? (
           <div style={{
             background: 'var(--primary-light)', border: '1px dashed var(--primary)',
-            borderRadius: '8px', padding: '12px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px'
+            borderRadius: '12px', padding: '16px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px'
           }}>
-            <div style={{ fontSize: '0.78rem', color: 'var(--primary)', fontWeight: 600, lineHeight: 1.3 }}>
+            <div style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 500, lineHeight: 1.4 }}>
               Aktifkan GPS untuk mencari barang di sekitar Anda
             </div>
-            <button type="button" onClick={requestLocation} style={{
-              background: 'var(--primary)', color: 'white', border: 'none',
-              padding: '8px 12px', borderRadius: '6px', fontSize: '0.85rem',
-              fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center',
-              gap: '6px', justifyContent: 'center', width: '100%'
-            }}>
-              <Icons.MapPin size={14} color="white" />
+            <Button variant="primary" size="sm" onClick={requestLocation} fullWidth>
+              <Icons.MapPin size={14} />
               Aktifkan GPS Sekarang
-            </button>
+            </Button>
           </div>
         ) : (
-          <select className="input-field" value={radius} onChange={e => setRadius(e.target.value)}>
+          <select className="input-field" value={radius} onChange={e => setRadius(e.target.value)} style={{ width: '100%' }}>
             <option value="1000">Radius 1 KM</option>
             <option value="2000">Radius 2 KM</option>
             <option value="5000">Radius 5 KM</option>
@@ -88,8 +92,8 @@ function FilterPanel({
       </div>
 
       {/* Promosi */}
-      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', color: 'var(--foreground)' }}>
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', color: 'var(--foreground)' }}>
           <input
             type="checkbox"
             checked={isPromoted}
@@ -256,42 +260,45 @@ function ProductCatalogContent() {
   };
 
   return (
-    <div className="container" style={{ padding: '24px 1rem 40px' }}>
+    <div className="container" style={{ paddingTop: '32px', paddingBottom: '140px' }}>
       
       {/* ── Page Title ─────────────────────────────────────────── */}
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '1rem' }}>Katalog Barang Bekas</h1>
+      <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Katalog Barang Bekas</h1>
 
       {/* ── Search + Filter Button Row ────────────────────────── */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '1.25rem' }}>
-        <input
-          type="text"
-          className="input-field"
-          style={{ flex: 1 }}
-          placeholder="Cari kasur, lemari, kipas angin..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '2rem' }}>
+        <div style={{ flex: 1 }}>
+          <Input
+            type="text"
+            placeholder="Cari kasur, lemari, kipas angin..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         {/* Filter button — shows on all, more prominent on mobile */}
         <button
           onClick={() => setShowFilterModal(true)}
           style={{
-            display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
+            display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
             background: activeFilterCount > 0 ? 'var(--primary)' : 'var(--card)',
             color: activeFilterCount > 0 ? 'white' : 'var(--foreground)',
             border: `1px solid ${activeFilterCount > 0 ? 'var(--primary)' : 'var(--border)'}`,
-            padding: '0 16px', borderRadius: '8px', fontWeight: 700, fontSize: '0.9rem',
-            cursor: 'pointer', position: 'relative', height: '48px'
+            padding: '0 20px', borderRadius: '12px', fontWeight: 600, fontSize: '0.9rem',
+            cursor: 'pointer', position: 'relative', height: '48px',
+            transition: 'all 0.2s',
+            boxShadow: activeFilterCount > 0 ? 'var(--shadow-sm)' : 'none'
           }}
         >
-          <Icons.LayoutGrid size={18} color={activeFilterCount > 0 ? 'white' : 'var(--foreground)'} />
+          <Icons.LayoutGrid size={18} color={activeFilterCount > 0 ? 'white' : 'currentColor'} />
           <span>Filter</span>
           {activeFilterCount > 0 && (
             <span style={{
               position: 'absolute', top: '-6px', right: '-6px',
-              background: '#ef4444', color: 'white', borderRadius: '50%',
-              width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 800,
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
+              background: 'var(--danger)', color: 'white', borderRadius: '50%',
+              width: '20px', height: '20px', fontSize: '0.7rem', fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 0 2px var(--background)'
             }}>
               {activeFilterCount}
             </span>
@@ -307,18 +314,18 @@ function ProductCatalogContent() {
           <div
             onClick={() => setShowFilterModal(false)}
             style={{
-              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-              zIndex: 300, backdropFilter: 'blur(2px)'
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+              zIndex: 300, backdropFilter: 'blur(4px)'
             }}
           />
 
           {/* Bottom Sheet */}
           <div style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
-            background: 'var(--card)', borderRadius: '20px 20px 0 0',
-            padding: '0 1rem 2rem', maxHeight: '90vh', overflowY: 'auto',
-            boxShadow: '0 -8px 40px rgba(0,0,0,0.2)',
-            animation: 'slideUp 0.25s ease-out'
+            background: 'var(--card)', borderRadius: '24px 24px 0 0',
+            padding: '0 1.5rem 2rem', maxHeight: '90vh', overflowY: 'auto',
+            boxShadow: 'var(--shadow-lg)',
+            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}>
             {/* Handle bar */}
             <div style={{ textAlign: 'center', padding: '12px 0 0' }}>
@@ -326,19 +333,20 @@ function ProductCatalogContent() {
             </div>
 
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0 20px' }}>
-              <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--foreground)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0 24px' }}>
+              <span style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--foreground)' }}>
                 Filter Produk
               </span>
               <button
                 onClick={() => setShowFilterModal(false)}
                 style={{
-                  width: '32px', height: '32px', borderRadius: '50%', background: 'var(--input)',
+                  width: '36px', height: '36px', borderRadius: '50%', background: 'var(--input)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: 'none', cursor: 'pointer', color: 'var(--foreground)'
+                  border: 'none', cursor: 'pointer', color: 'var(--foreground)',
+                  transition: 'background 0.2s'
                 }}
               >
-                <Icons.X size={16} />
+                <Icons.X size={18} />
               </button>
             </div>
 
@@ -346,89 +354,38 @@ function ProductCatalogContent() {
             <FilterPanel {...filterProps} />
 
             {/* Apply button */}
-            <button
-              onClick={() => setShowFilterModal(false)}
-              style={{
-                marginTop: '1.5rem', width: '100%', background: 'var(--primary)', color: 'white',
-                border: 'none', padding: '14px', borderRadius: '10px', fontWeight: 700, fontSize: '1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Tampilkan Hasil ({loading ? '...' : products.length} produk)
-            </button>
+            <div style={{ marginTop: '2rem' }}>
+              <Button onClick={() => setShowFilterModal(false)} variant="primary" size="lg" fullWidth>
+                Tampilkan Hasil ({loading ? '...' : products.length} produk)
+              </Button>
+            </div>
           </div>
         </>
       )}
 
       {/* ── Products Grid ─────────────────────────────────────── */}
       {loading ? (
-        <div style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
-          <div style={{ width: '56px', height: '56px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-            <Icons.Loader size={28} color="var(--primary)" />
+        <div style={{ padding: '6rem 0', textAlign: 'center', opacity: 0.5 }}>
+          <div style={{ width: '64px', height: '64px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--foreground)' }}>
+            <Icons.Loader size={32} />
           </div>
-          <h2 style={{ fontWeight: 800 }}>Memuat katalog...</h2>
+          <h2 style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--foreground)' }}>Memuat katalog...</h2>
         </div>
       ) : (
         <>
           <div className="product-grid">
             {products.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="card" style={{
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'pointer',
-                position: 'relative', overflow: 'hidden', padding: 0
-              }}>
-                {product.is_promoted && (
-                  <div style={{
-                    position: 'absolute', top: '10px', left: '10px', zIndex: 2,
-                    background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-                    color: 'white', fontWeight: 800, fontSize: '0.7rem',
-                    padding: '3px 8px', borderRadius: '12px',
-                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
-                  }}>
-                    🔥 Promosi
-                  </div>
-                )}
-                <div style={{
-                  height: '160px', background: 'var(--input)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: product.is_promoted ? '2px solid #f59e0b' : 'none',
-                  overflow: 'hidden'
-                }}>
-                  {product.foto ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <span style={{ opacity: 0.3, display: 'flex' }}><Icons.Package size={40} color="var(--foreground)" /></span>
-                  )}
-                </div>
-                <div style={{ padding: '10px 12px 12px' }}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '4px', color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {product.nama_barang}
-                  </div>
-                  <div style={{ color: 'var(--primary)', fontWeight: 800, fontSize: '1rem', marginBottom: '8px' }}>
-                    Rp {Number(product.harga).toLocaleString('id-ID')}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span style={{ padding: '2px 8px', background: 'var(--primary-light)', color: 'var(--primary)', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 600 }}>
-                      {product.kondisi || 'Bekas'}
-                    </span>
-                    {product.distance_km != null && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 600 }} title={product.is_driving ? "Jarak rute berkendara" : "Jarak garis lurus"}>
-                        <Icons.MapPin size={11} color="var(--primary)" /> {product.distance_km} km {product.is_driving ? '(jalan)' : '(lurus)'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} promoted={product.is_promoted} />
             ))}
           </div>
 
           {products.length === 0 && (
-            <div style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
-              <div style={{ width: '56px', height: '56px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-                <Icons.Search size={28} color="var(--foreground)" />
+            <div style={{ padding: '6rem 0', textAlign: 'center', opacity: 0.5 }}>
+              <div style={{ width: '64px', height: '64px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--foreground)' }}>
+                <Icons.Search size={32} />
               </div>
-              <h2 style={{ fontWeight: 800 }}>Tidak ada produk ditemukan</h2>
-              <p style={{ marginTop: '8px', fontSize: '0.9rem' }}>Coba sesuaikan filter atau gunakan kata kunci lain.</p>
+              <h2 style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--foreground)' }}>Tidak ada produk ditemukan</h2>
+              <p style={{ marginTop: '8px', fontSize: '0.95rem', color: 'var(--foreground)' }}>Coba sesuaikan filter atau gunakan kata kunci lain.</p>
             </div>
           )}
         </>

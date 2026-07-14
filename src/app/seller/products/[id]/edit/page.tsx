@@ -8,6 +8,8 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { USER_ROLES } from '@/lib/constants';
 import { Icons } from '@/components/Icons';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
@@ -27,6 +29,7 @@ export default function EditProduct() {
     harga: '',
     category_id: '',
     kondisi: 'baru',
+    durasi_pemakaian: '',
     deskripsi: '',
     status_terjual: '0',
     latitude: '',
@@ -60,6 +63,7 @@ export default function EditProduct() {
         harga: p.harga?.toString() || '',
         category_id: p.category_id?.toString() || '',
         kondisi: p.kondisi || 'baru',
+        durasi_pemakaian: p.durasi_pemakaian || '',
         deskripsi: p.deskripsi || '',
         status_terjual: p.status_terjual ? '1' : '0',
         latitude: p.latitude?.toString() || '',
@@ -129,6 +133,9 @@ export default function EditProduct() {
       submitData.append('category_id', formData.category_id);
       submitData.append('kondisi', formData.kondisi);
       submitData.append('deskripsi', formData.deskripsi);
+      if (formData.durasi_pemakaian) {
+        submitData.append('durasi_pemakaian', formData.durasi_pemakaian);
+      }
       submitData.append('status_terjual', formData.status_terjual);
       
       if (formData.latitude && formData.longitude) {
@@ -156,64 +163,61 @@ export default function EditProduct() {
   }
 
   if (authLoading || loading) return (
-    <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 70px)' }}>
+    <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)' }}>
+      <Icons.Loader size={32} />
       <div style={{ fontSize: '1.2rem', fontWeight: 600, opacity: 0.5 }}>Memuat Formulir Edit...</div>
     </div>
   );
 
   if (error && error.includes('ditemukan')) return (
     <div className="container" style={{ padding: '60px 1rem', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}><Icons.X size={32} color="#ef4444" /> Ops!</h1>
-      <p>{error}</p>
-      <Link href="/seller/products" className="btn btn-primary" style={{ marginTop: '2rem' }}>Kembali ke Dashboard</Link>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--danger)' }}><Icons.X size={32} /> Ops!</h1>
+      <p style={{ color: 'var(--foreground)', opacity: 0.8, fontSize: '1rem' }}>{error}</p>
+      <div style={{ marginTop: '2rem' }}>
+        <Button href="/seller/products" variant="primary" size="lg">Kembali ke Dashboard</Button>
+      </div>
     </div>
   );
 
   return (
     <div className="container" style={{ padding: '60px 1rem', maxWidth: '800px' }}>
-      <Link href="/seller/products" style={{ display: 'inline-block', marginBottom: '2rem', fontWeight: 600, opacity: 0.7 }}>
-        &larr; Kembali ke Dashboard
+      <Link href="/seller/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '2rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.7, textDecoration: 'none' }}>
+        <Icons.ArrowLeft size={16} /> Kembali ke Dashboard
       </Link>
 
-      <div className="card">
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Edit Lapak Barang</h1>
-        <p style={{ opacity: 0.6, marginBottom: '2rem' }}>Perbarui informasi terkait barang bekas yang Anda jual.</p>
+      <div className="card" style={{ padding: '2.5rem', borderRadius: '24px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Edit Lapak Barang</h1>
+        <p style={{ color: 'var(--foreground)', opacity: 0.6, marginBottom: '2.5rem', fontSize: '0.95rem' }}>Perbarui informasi terkait barang bekas yang Anda jual.</p>
 
         {error && (
-          <div style={{ padding: '1rem', background: '#fef2f2', color: '#ef4444', borderRadius: 'var(--radius)', marginBottom: '2rem', fontWeight: 600 }}>
+          <div style={{ padding: '1rem', background: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.2)', color: 'var(--danger)', borderRadius: '12px', marginBottom: '2rem', fontWeight: 500, fontSize: '0.95rem' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex-col gap-5">
-          <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Nama Barang</label>
-            <input 
-               type="text" 
-               name="nama_barang" 
-               className="input-field" 
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <Input 
+             type="text" 
+             name="nama_barang" 
+             label="Nama Barang"
+             required
+             value={formData.nama_barang}
+             onChange={handleInputChange}
+          />
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+            <Input 
+               type="number" 
+               name="harga" 
+               label="Harga (Rp)"
                required
-               value={formData.nama_barang}
+               min={0}
+               value={formData.harga}
                onChange={handleInputChange}
             />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <div className="flex-col gap-2">
-              <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Harga (Rp)</label>
-              <input 
-                 type="number" 
-                 name="harga" 
-                 className="input-field" 
-                 required
-                 min="0"
-                 value={formData.harga}
-                 onChange={handleInputChange}
-              />
-            </div>
             
-            <div className="flex-col gap-2">
-              <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Kategori Pilihan</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kategori Pilihan</label>
               <select 
                  name="category_id" 
                  className="input-field" 
@@ -228,8 +232,8 @@ export default function EditProduct() {
               </select>
             </div>
             
-            <div className="flex-col gap-2">
-              <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Kondisi</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kondisi</label>
               <select 
                  name="kondisi" 
                  className="input-field" 
@@ -242,22 +246,33 @@ export default function EditProduct() {
                 <option value="layak pakai">Layak Pakai</option>
               </select>
             </div>
+            
+            <Input 
+               type="text" 
+               name="durasi_pemakaian" 
+               label="Durasi Pemakaian"
+               placeholder="Contoh: 6 Bulan, 1 Tahun" 
+               required
+               value={formData.durasi_pemakaian}
+               onChange={handleInputChange}
+            />
           </div>
 
-          <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Deskripsi Barang</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Deskripsi Barang</label>
             <textarea 
                name="deskripsi" 
                className="input-field" 
                rows={6}
+               style={{ height: 'auto', resize: 'vertical' }}
                required
                value={formData.deskripsi}
                onChange={handleInputChange}
             />
           </div>
 
-          <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Status Penjualan / Ketersediaan</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Status Penjualan / Ketersediaan</label>
             <select 
                name="status_terjual" 
                className="input-field" 
@@ -269,34 +284,36 @@ export default function EditProduct() {
             </select>
           </div>
 
-          <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lokasi Barang (Pin Point Peta)</label>
-            <div className="flex gap-2" style={{ marginBottom: '1rem' }}>
-              <input 
-                 type="text" 
-                 className="input-field" 
-                 style={{ flex: 1 }}
-                 placeholder="Koordinat terpilih..." 
-                 readOnly
-                 required
-                 value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
-              />
-              <button type="button" onClick={getLocation} className="btn btn-secondary" style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Icons.Compass size={15} color="white" /> Gunakan GPS Saya
-              </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Lokasi Barang (Pin Point Peta)</label>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <Input 
+                   type="text" 
+                   placeholder="Koordinat terpilih..." 
+                   readOnly
+                   required
+                   value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
+                />
+              </div>
+              <Button type="button" onClick={getLocation} variant="secondary" style={{ whiteSpace: 'nowrap' }}>
+                <Icons.Compass size={16} /> Gunakan GPS Saya
+              </Button>
             </div>
 
-            <LocationPicker 
-              lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
-              lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
-              onChange={handleLocationChange} 
-            />
+            <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+              <LocationPicker 
+                lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
+                lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
+                onChange={handleLocationChange} 
+              />
+            </div>
           </div>
 
-          <div className="flex-col gap-2">
-            <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Ubah Foto Barang (Max 20MB)</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Ubah Foto Barang (Max 2MB)</label>
             {currentFoto && (
-              <div style={{ marginBottom: '0.5rem', width: '150px', height: '100px', borderRadius: 'var(--radius)', overflow: 'hidden', background: '#f5f5f5' }}>
+              <div style={{ marginBottom: '0.5rem', width: '120px', height: '120px', borderRadius: '12px', overflow: 'hidden', background: 'var(--input)', border: '1px solid var(--border)' }}>
                  {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={getStorageUrl(currentFoto) || ''} alt="Current Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
@@ -305,16 +322,16 @@ export default function EditProduct() {
                type="file" 
                accept="image/*" 
                className="input-field" 
-               style={{ padding: '0.5rem' }}
+               style={{ padding: '0.75rem', fontSize: '0.875rem' }}
                onChange={handleFileChange}
             />
-            <small style={{ opacity: 0.6 }}>Abaikan jika Anda tidak ingin mengubah foto</small>
+            <small style={{ color: 'var(--foreground)', opacity: 0.5, fontSize: '0.8rem' }}>Abaikan jika Anda tidak ingin mengubah foto</small>
           </div>
 
-          <div style={{ marginTop: '1.5rem' }}>
-            <button type="submit" disabled={saving || !formData.latitude} className="btn btn-primary" style={{ width: '100%', padding: '15px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              {saving ? <><Icons.Loader size={18} color="white" /> Menyimpan Perubahan...</> : <>Simpan Perubahan <Icons.Check size={18} color="white" /></>}
-            </button>
+          <div style={{ marginTop: '2rem' }}>
+            <Button type="submit" disabled={saving || !formData.latitude} variant="primary" size="lg" fullWidth>
+              {saving ? 'Menyimpan Perubahan...' : 'Simpan Perubahan'}
+            </Button>
           </div>
         </form>
       </div>
