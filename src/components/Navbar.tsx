@@ -302,15 +302,18 @@ export default function Navbar() {
                 {user ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {user.role === USER_ROLES.SUPER_ADMIN && !pathname.startsWith('/admin') && (
-                      <Link href="/admin/dashboard" className="hide-mobile" style={{
-                        width: '36px', height: '36px', borderRadius: '8px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none',
-                        color: textColor, opacity: 0.7, transition: 'all 0.2s'
+                      <Link href="/admin/dashboard" className="hide-mobile nav-icon-btn" style={{
+                        color: textColor, opacity: 0.7
                       }} title="Admin"
                       onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
                       >
-                        <Icons.Shield size={18} />
+                        <div style={{ flexShrink: 0, display: 'flex' }}>
+                          <Icons.Shield size={18} />
+                        </div>
+                        <span className="nav-icon-text hide-tablet">
+                          Admin
+                        </span>
                       </Link>
                     )}
                     {user.role === USER_ROLES.PENJUAL ? (
@@ -323,16 +326,16 @@ export default function Navbar() {
                           { href: '/seller/promotions', icon: <Icons.Megaphone size={18} />, title: 'Promosi' }, // changed Zap to Megaphone for promotions
                           { href: '/seller/bank-accounts', icon: <Icons.CreditCard size={18} />, title: 'Rekening' }
                         ].map(item => (
-                          <Link key={item.href} href={item.href} style={{
-                            height: '36px', padding: '0 8px', borderRadius: '8px', gap: '6px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none',
-                            color: textColor, opacity: 0.7, transition: 'all 0.2s'
+                          <Link key={item.href} href={item.href} className="nav-icon-btn" style={{
+                            color: textColor, opacity: 0.7
                           }} title={item.title}
                           onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
                           onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
                           >
-                            {item.icon}
-                            <span className="hide-tablet" style={{ fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            <div style={{ flexShrink: 0, display: 'flex' }}>
+                              {item.icon}
+                            </div>
+                            <span className="nav-icon-text hide-tablet">
                               {item.title}
                             </span>
                           </Link>
@@ -346,15 +349,18 @@ export default function Navbar() {
 
                     {/* Chat */}
                     {!pathname.startsWith('/admin') && (
-                      <Link href="/chat" className="hide-mobile" style={{
-                        width: '36px', height: '36px', borderRadius: '8px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none',
-                        color: textColor, opacity: 0.7, transition: 'all 0.2s'
+                      <Link href="/chat" className="hide-mobile nav-icon-btn" style={{
+                        color: textColor, opacity: 0.7
                       }} title="Pesan"
                       onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
                       >
-                        <Icons.MessageCircle size={18} />
+                        <div style={{ flexShrink: 0, display: 'flex' }}>
+                          <Icons.MessageCircle size={18} />
+                        </div>
+                        <span className="nav-icon-text hide-tablet">
+                          Pesan
+                        </span>
                       </Link>
                     )}
 

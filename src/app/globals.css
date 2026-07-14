@@ -255,6 +255,44 @@ input, textarea, select {
   /* desktop default is static */
 }
 
+/* ── Navbar Expanding Icons ──────────────────────────────── */
+.nav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  height: 36px;
+  width: 36px;
+  padding: 0 9px; /* Centered icon visually */
+  border-radius: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nav-icon-btn:hover {
+  width: auto;
+  gap: 6px;
+  padding: 0 12px 0 10px;
+}
+
+.nav-icon-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0;
+  width: 0;
+  transform: translateX(-5px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-icon-btn:hover .nav-icon-text {
+  opacity: 1;
+  width: auto;
+  transform: translateX(0);
+}
+
 /* ── Mobile Layouts ─────────────────────────────────────── */
 @media (max-width: 1024px) {
   .hide-tablet { display: none !important; }
