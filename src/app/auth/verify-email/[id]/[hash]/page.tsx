@@ -33,16 +33,23 @@ export default function VerifyEmailProcess() {
       }
 
       try {
-        const data = await fetchApi(
-          `/email/verify/${id}/${hash}?expires=${expires}&signature=${signature}`
-        );
+        // Laravel's verification route expects a GET request to the signed URL
+        // In SPA, we proxy this call to the API
+        await fetchApi(`/email/verify/${id}/${hash}?expires=${expires}&signature=${signature}`);
+        
+        setStatus('success');
+        setMessage('Email Anda berhasil diverifikasi! Mengalihkan ke beranda...');
+        
+        // Fetch latest user data so RouteGuard knows the email is verified
+        if (user) {
+          await refreshUser();
+        }
 
-        // Refresh user state so the app knows it's now verified
-        await refreshUser();
-
-        if (data.status === 'already_verified') {
-          setStatus('already_verified');
-          setMessage('Email Anda sudah terverifikasi sebelumnya.');
+        // Redirect based on login status and role
+        if (user && user.role === 'penjual') {
+          router.replace('/seller/products');
+        } else if (user && user.role === 'super_admin') {
+          router.replace('/admin/dashboard');
         } else {
           setStatus('success');
           setMessage('Email Anda berhasil diverifikasi!');

@@ -4,11 +4,15 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/components/AuthProvider";
 
+import { RouteGuard } from "@/components/RouteGuard";
+import AIChatbot from "@/components/AIChatbot";
+
 const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: "Lapak Kos - Marketplace Barang Bekas Mahasiswa",
   description: "Platform jual beli barang bekas kos terdekat untuk mahasiswa dengan fitur geolocation.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -20,8 +24,11 @@ export default function RootLayout({
     <html lang="id">
       <body className={`${inter.className} ${inter.variable}`}>
         <AuthProvider>
-          <Navbar />
-          {children}
+          <RouteGuard>
+            <Navbar />
+            {children}
+            <AIChatbot />
+          </RouteGuard>
         </AuthProvider>
       </body>
     </html>

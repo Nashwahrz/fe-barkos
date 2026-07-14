@@ -1,44 +1,63 @@
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --secondary: #ec4899;
-  --accent: #8b5cf6;
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #1e293b;
-  --border: #e2e8f0;
-  --input: #f1f5f9;
-  --ring: rgba(99, 102, 241, 0.2);
+  /* Teal Brand Colors (Startup Aesthetic) */
+  --primary: #0D9488;
+  --primary-hover: #0F766E;
+  --primary-light: rgba(13, 148, 136, 0.08);
+  --secondary: #0F766E;
+  --accent: #14B8A6;
+  
+  /* Neutral Palette (Light) */
+  --background: #FAFAFA;
+  --foreground: #111827; /* Very dark gray for text, better readability than pure black */
+  --card: #FFFFFF;
+  --card-foreground: #374151; /* Medium dark gray for secondary text */
+  --border: #E5E7EB; /* Very light gray border */
+  --input: #FFFFFF;
+  --input-border: #D1D5DB;
+  --ring: rgba(13, 148, 136, 0.2);
+  
+  /* UI Elements */
   --radius: 12px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.04);
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03);
+  --success: #059669;
+  --danger: #DC2626;
+  --warning: #D97706;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #020617;
-    --foreground: #f8fafc;
-    --card: #0f172a;
-    --card-foreground: #f1f5f9;
-    --border: #1e293b;
-    --input: #1e293b;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  }
+[data-theme='dark'] {
+  /* Neutral Palette (Dark) */
+  --background: #111827;
+  --foreground: #F9FAFB;
+  --card: #1F2937;
+  --card-foreground: #D1D5DB;
+  --border: #374151;
+  --input: #1F2937;
+  --input-border: #4B5563;
+  --primary-light: rgba(13, 148, 136, 0.15);
+  
+  /* UI Elements */
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.5);
+  --shadow: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
 }
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   min-height: 100vh;
-  transition: background-color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -56,21 +75,14 @@ button {
 input, textarea, select {
   font-family: inherit;
   outline: none;
+  font-size: 16px; /* Prevent iOS zoom */
 }
 
-/* Glassmorphism utility */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Common Layouts */
+/* ── Common Layouts ─────────────────────────────────────────── */
 .container {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
 }
 
 .flex { display: flex; }
@@ -78,27 +90,34 @@ input, textarea, select {
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
+.flex-1 { flex: 1 1 0%; }
+.w-full { width: 100%; }
 .gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
 .gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+.gap-6 { gap: 1.5rem; }
 
-/* Components */
+/* ── Core Components (Legacy fallback, use UI components where possible) ── */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
   font-weight: 500;
-  transition: all 0.2s;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  border: 1px solid transparent;
 }
 
 .btn-primary {
@@ -109,23 +128,267 @@ input, textarea, select {
 .btn-primary:hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow);
 }
 
 .btn-secondary {
-  background: var(--secondary);
-  color: white;
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: rgba(0,0,0,0.03);
 }
 
 .input-field {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
   background: var(--input);
   color: var(--foreground);
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
 }
 
 .input-field:focus {
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.typing-dot {
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* ── Skeletons ──────────────────────────────────────────── */
+@keyframes skeleton-loading {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-base {
+  background: #E5E7EB;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme='dark'] .skeleton-base {
+  background: #374151;
+}
+
+/* ── Grids ──────────────────────────────────────── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* ── Mobile Bottom Navigation ────────────────────────────── */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ── Typography & Spacing Utilities ──────────────────────────────── */
+.text-hero {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.text-h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.page-padding {
+  padding: 3rem;
+}
+
+.card-padding {
+  padding: 2rem;
+}
+
+.section-padding {
+  padding: 6rem 0;
+}
+
+.admin-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ── Product Detail Specific ────────────────────────────────────── */
+.fixed-bottom-action {
+  /* desktop default is static */
+}
+
+/* ── Navbar Expanding Icons ──────────────────────────────── */
+.nav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  height: 36px;
+  width: 36px;
+  padding: 0 9px; /* Centered icon visually */
+  border-radius: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nav-icon-btn:hover {
+  width: auto;
+  gap: 6px;
+  padding: 0 12px 0 10px;
+}
+
+.nav-icon-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0;
+  width: 0;
+  transform: translateX(-5px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-icon-btn:hover .nav-icon-text {
+  opacity: 1;
+  width: auto;
+  transform: translateX(0);
+}
+
+/* ── Mobile Layouts ─────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hide-tablet { display: none !important; }
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    height: calc(60px + env(safe-area-inset-bottom, 16px));
+  }
+  .container {
+    padding: 0 1.25rem;
+  }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .filter-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: flex !important; }
+  
+  .md-flex-col { flex-direction: column !important; }
+  .md-grid-1 { grid-template-columns: 1fr !important; }
+  
+  .admin-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding: 1rem !important;
+  }
+  .admin-sidebar-menu {
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+  }
+  .admin-sidebar-link {
+    white-space: nowrap;
+  }
+  
+  /* Overrides for utility classes on mobile */
+  .page-padding { padding: 1.25rem !important; }
+  .card-padding { padding: 1.25rem !important; }
+  .section-padding { padding: 3rem 0 !important; }
+  
+  .admin-header-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+  .admin-header-flex > div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .admin-header-flex input {
+    width: 100% !important;
+  }
+
+  .product-detail-layout {
+    flex-direction: column !important;
+  }
+  
+  .fixed-bottom-action {
+    position: fixed !important;
+    bottom: calc(60px + env(safe-area-inset-bottom, 16px)); /* Above mobile nav */
+    left: 0;
+    right: 0;
+    background: var(--card);
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    z-index: 50;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    border-radius: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,6 +28,16 @@ function MapEvents({ onChange }: { onChange: (lat: number, lng: number) => void 
   return null;
 }
 
+function MapUpdater({ lat, lng }: { lat: number, lng: number }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat && lng) {
+      map.setView([lat, lng], 15);
+    }
+  }, [lat, lng, map]);
+  return null;
+}
+
 export default function LocationPicker({ lat, lng, onChange }: LocationPickerProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -47,9 +57,10 @@ export default function LocationPicker({ lat, lng, onChange }: LocationPickerPro
         scrollWheelZoom={false} 
         style={{ height: '100%', width: '100%' }}
       >
+        <MapUpdater lat={position[0]} lng={position[1]} />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; Google Maps'
+          url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         />
         <Marker position={position} icon={defaultIcon} draggable={true} eventHandlers={{
           dragend: (e) => {

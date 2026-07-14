@@ -1,15 +1,24 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { fetchApi, ApiError } from '@/lib/api';
+import { fetchApi, swrFetcher } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import useSWR, { mutate } from 'swr';
 
 interface User {
   id: number;
   name: string;
   email: string;
   role: string;
-  asal_kampus: string;
+  asal_kampus: string | null;
+  phone: string | null;
+  avatar: string | null;
+  foto: string | null;
+  is_active: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  email_verified_at: string | null;
+  bank_accounts?: any[];
 }
 
 interface AuthContextType {
@@ -24,71 +33,58 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [token, setToken] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const router = useRouter();
 
+  // Load token on mount
   useEffect(() => {
-    refreshUser();
+    setToken(localStorage.getItem('auth_token'));
+    setIsInitializing(false);
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => {
+        console.error('Service Worker registration failed:', err);
+      });
+    }
   }, []);
 
-  // Polling for notifications
-  useEffect(() => {
-    if (!user) return;
+  const { data, error, isLoading, mutate: refresh } = useSWR(
+    token ? '/me' : null,
+    swrFetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    }
+  );
 
-    const fetchUnread = async () => {
-      try {
-        const data = await fetchApi('/notifications/unread-count');
-        setUnreadCount(data.count || 0);
-      } catch (err) {
-        console.error('Failed to fetch notifications', err);
-      }
-    };
-
-    fetchUnread(); // Initial fetch
-    const interval = setInterval(fetchUnread, 10000); // Every 10 seconds
-    return () => clearInterval(interval);
-  }, [user]);
+  const user = data?.data || data || null;
 
   async function refreshUser() {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const data = await fetchApi('/me');
-      setUser(data.data || data); // Handle both resource wrapper or flat object
-    } catch (err: any) {
-      // 401 = token expired/invalid — expected scenario, clear silently.
-      // Any other error (network down, 500, etc.) gets logged for debugging.
-      if (!(err instanceof ApiError && err.status === 401)) {
-        console.error('Unexpected error fetching user:', err);
-      }
-      localStorage.removeItem('auth_token');
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    await refresh();
   }
 
-  function login(token: string, userData: User) {
-    localStorage.setItem('auth_token', token);
-    setUser(userData);
+  function login(newToken: string, userData: User) {
+    localStorage.setItem('auth_token', newToken);
+    setToken(newToken);
+    mutate('/me', { data: userData }, false);
   }
 
   function logout() {
     localStorage.removeItem('auth_token');
-    setUser(null);
-    setUnreadCount(0);
+    setToken(null);
+    mutate('/me', null, false);
     router.push('/auth/login');
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, unreadCount, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading: isInitializing || (token ? isLoading : false), 
+      login, 
+      logout, 
+      refreshUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -101,3 +97,4 @@ export function useAuth() {
   }
   return context;
 }
+
