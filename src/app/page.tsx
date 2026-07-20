@@ -11,12 +11,16 @@ import useSWR from "swr";
 import { ProductCardSkeleton } from "@/components/Skeleton";
 import { ProductCard } from "@/components/ui/ProductCard";
 import Image from "next/image";
+import dynamic from 'next/dynamic';
+
+const LocationMapModal = dynamic(() => import("@/components/LocationMapModal"), { ssr: false });
 
 export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [locating, setLocating] = useState(false);
+  const [mapCoords, setMapCoords] = useState<{lat: number, lng: number} | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -56,10 +60,11 @@ export default function Home() {
       return;
     }
     setLocating(true);
+    
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocating(false);
-        router.push(`/products?lat=${position.coords.latitude}&lng=${position.coords.longitude}&radius=5000`);
+        setMapCoords({ lat: position.coords.latitude, lng: position.coords.longitude });
       },
       () => {
         setLocating(false);
@@ -358,30 +363,45 @@ export default function Home() {
               .category-icon-wrapper {
                 width: 100%;
                 aspect-ratio: 1;
-                border-radius: 24px;
-                background: var(--primary-light);
+                border-radius: 28px;
+                background: linear-gradient(135deg, #115e59, #0f766e); /* Dark Teal */
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0, 170, 91, 0.05);
-                color: var(--primary);
-                border: 2px solid transparent;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 0 8px 16px rgba(15, 118, 110, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.95);
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(20, 184, 166, 0.2);
+              }
+              .category-icon-wrapper::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, #14b8a6, #0d9488); /* Vibrant Teal on hover */
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                z-index: 0;
               }
               .category-card:hover .category-icon-wrapper {
-                background: var(--primary);
-                transform: translateY(-6px);
-                box-shadow: 0 12px 24px rgba(0, 170, 91, 0.25);
+                transform: translateY(-8px);
+                box-shadow: 0 16px 32px rgba(20, 184, 166, 0.4);
                 color: white;
-                border-color: rgba(255, 255, 255, 0.2);
+                border-color: rgba(255, 255, 255, 0.3);
+              }
+              .category-card:hover .category-icon-wrapper::before {
+                opacity: 1;
               }
               .category-icon-wrapper svg {
-                width: 32px;
-                height: 32px;
-                transition: transform 0.3s ease;
+                width: 36px;
+                height: 36px;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 1;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
               }
               .category-card:hover .category-icon-wrapper svg {
-                transform: scale(1.15);
+                transform: scale(1.15) rotate(5deg);
               }
               .category-text {
                 font-size: 0.95rem;
@@ -389,23 +409,29 @@ export default function Home() {
                 color: var(--foreground);
                 line-height: 1.4;
                 text-align: center;
-                transition: color 0.3s;
+                transition: all 0.3s ease;
+                opacity: 0.85;
               }
               .category-card:hover .category-text {
-                color: var(--primary);
+                color: #0d9488;
+                opacity: 1;
+                transform: translateY(-2px);
               }
 
               .category-card-all .category-icon-wrapper {
-                background: var(--card);
-                border: 2px solid var(--border);
-                color: var(--foreground);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                background: linear-gradient(135deg, #334155, #1e293b);
+                border: 1px solid rgba(148, 163, 184, 0.2);
+                box-shadow: 0 8px 16px rgba(30, 41, 59, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+              }
+              .category-card-all .category-icon-wrapper::before {
+                background: linear-gradient(135deg, #475569, #334155);
               }
               .category-card-all:hover .category-icon-wrapper {
-                background: var(--card);
-                border-color: var(--primary);
-                color: var(--primary);
-                box-shadow: 0 12px 24px rgba(0, 170, 91, 0.15);
+                box-shadow: 0 16px 32px rgba(30, 41, 59, 0.3);
+                border-color: rgba(255, 255, 255, 0.2);
+              }
+              .category-card-all:hover .category-text {
+                color: var(--foreground);
               }
             `}</style>
             <div style={{ 
@@ -471,7 +497,7 @@ export default function Home() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : promotedProducts.length > 0 ? (
-                promotedProducts.slice(0, 5).map((p) => <ProductCard key={p.id} product={p} promoted />)
+                promotedProducts.slice(0, 5).map((p: any) => <ProductCard key={p.id} product={p} promoted />)
               ) : (
                 <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk rekomendasi saat ini.</div>
               )}
@@ -497,7 +523,7 @@ export default function Home() {
               {isLoading ? (
                 Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : products.length > 0 ? (
-                products.slice(0, 10).map((p) => <ProductCard key={p.id} product={p} />)
+                products.slice(0, 10).map((p: any) => <ProductCard key={p.id} product={p} />)
               ) : (
                 <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk.</div>
               )}
@@ -506,8 +532,20 @@ export default function Home() {
         </section>
       </div>
 
+      {/* Radar Locating Modal */}
+      {mapCoords && (
+        <LocationMapModal
+          lat={mapCoords.lat}
+          lng={mapCoords.lng}
+          products={allProducts}
+          onClose={() => setMapCoords(null)}
+          onSearch={(lat, lng, radius) => {
+            setMapCoords(null);
+            router.push(`/products?lat=${lat}&lng=${lng}&radius=${radius}`);
+          }}
+        />
+      )}
+
     </div>
   );
 }
-
-

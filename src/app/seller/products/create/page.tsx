@@ -29,6 +29,7 @@ export default function CreateProduct() {
     deskripsi: '',
     latitude: '',
     longitude: '',
+    minimum_offer_price: '',
   });
   const [foto, setFoto] = useState<File | null>(null);
 
@@ -106,6 +107,9 @@ export default function CreateProduct() {
       if (formData.durasi_pemakaian) {
         submitData.append('durasi_pemakaian', formData.durasi_pemakaian);
       }
+      if (formData.minimum_offer_price) {
+        submitData.append('minimum_offer_price', formData.minimum_offer_price);
+      }
       
       if (formData.latitude && formData.longitude) {
         submitData.append('latitude', formData.latitude);
@@ -170,6 +174,16 @@ export default function CreateProduct() {
                required
                min={0}
                value={formData.harga}
+               onChange={handleInputChange}
+            />
+            
+            <Input 
+               type="number" 
+               name="minimum_offer_price" 
+               label="Minimal Harga Tawar (Rp)"
+               placeholder="Opsional, misal: 450000" 
+               min={0}
+               value={formData.minimum_offer_price}
                onChange={handleInputChange}
             />
             
@@ -247,8 +261,8 @@ export default function CreateProduct() {
 
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <LocationPicker 
-                lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
-                lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
+                lat={formData.latitude ? parseFloat(formData.latitude) : -0.947083} 
+                lng={formData.longitude ? parseFloat(formData.longitude) : 100.417181} 
                 onChange={handleLocationChange} 
               />
             </div>

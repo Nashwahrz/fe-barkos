@@ -14,6 +14,7 @@ export default function SellerRegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [identityDocument, setIdentityDocument] = useState<File | null>(null);
 
   // Handle redirects inside useEffect — never during render
   useEffect(() => {
@@ -27,10 +28,15 @@ export default function SellerRegisterPage() {
 
   const handleUpgrade = async () => {
     if (!agreed) { setError('Harap setujui syarat & ketentuan penjual terlebih dahulu.'); return; }
+    if (!identityDocument) { setError('Harap unggah KTM / KTP Anda untuk verifikasi penjual.'); return; }
+    
     setSubmitting(true);
     setError('');
     try {
-      await fetchApi('/upgrade-role', { method: 'POST' });
+      const form = new FormData();
+      form.append('identity_document', identityDocument);
+
+      await fetchApi('/upgrade-role', { method: 'POST', body: form });
       await refreshUser?.();
       router.push('/seller/products/create');
     } catch (err: any) {
@@ -131,6 +137,40 @@ export default function SellerRegisterPage() {
             fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: '6px'
           }}>
             Akun Aktif
+          </div>
+        </div>
+
+        {/* Upload KTM/KTP */}
+        <div style={{
+          background: 'var(--card)', border: '1px solid var(--border)',
+          borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem'
+        }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--foreground)' }}>
+            Upload KTP / KTM (Wajib)
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <input 
+              type="file" 
+              accept="image/jpeg, image/png, image/jpg"
+              onChange={(e) => { setIdentityDocument(e.target.files ? e.target.files[0] : null); setError(''); }}
+              style={{
+                padding: '10px',
+                border: '1px dashed var(--input-border)',
+                borderRadius: '8px',
+                background: 'var(--input)',
+                color: 'var(--foreground)',
+                fontSize: '0.875rem',
+                width: '100%',
+              }}
+            />
+            <span style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Maksimal 5MB. AI kami akan memverifikasi dokumen Anda secara otomatis.</span>
+            
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '4px', padding: '10px', background: 'rgba(22, 163, 74, 0.08)', borderRadius: '8px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+              <Icons.Shield size={16} color="#16a34a" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span style={{ fontSize: '0.75rem', color: '#16a34a', lineHeight: 1.4, fontWeight: 500 }}>
+                Data KTP/KTM Anda dijamin aman. Dokumen ini hanya digunakan untuk keperluan verifikasi keamanan platform dan tidak akan disebarluaskan.
+              </span>
+            </div>
           </div>
         </div>
 

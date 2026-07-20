@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+import { USER_ROLES } from '@/lib/constants';
 import { Icons } from '@/components/Icons';
+import BankAccountsTab from './BankAccountsTab';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -12,7 +14,7 @@ export default function ProfilePage() {
   const { user, loading: authLoading, refreshUser } = useAuth();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'location'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'location' | 'rekening'>('profile');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null);
 
@@ -174,7 +176,8 @@ export default function ProfilePage() {
         {[
           { id: 'profile', label: 'Profil' },
           { id: 'password', label: 'Password' },
-          { id: 'location', label: 'Lokasi' }
+          { id: 'location', label: 'Lokasi' },
+          ...(user?.role === USER_ROLES.PENJUAL ? [{ id: 'rekening', label: 'Rekening' }] : [])
         ].map(tab => (
           <button 
             key={tab.id} 
@@ -261,6 +264,10 @@ export default function ProfilePage() {
             <Icons.Compass size={18} /> {loading ? 'Menyinkronkan...' : 'Sinkronkan Lokasi Saat Ini'}
           </Button>
         </div>
+      )}
+
+      {activeTab === 'rekening' && (
+        <BankAccountsTab />
       )}
     </div>
   );

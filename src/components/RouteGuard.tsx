@@ -29,7 +29,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         router.push('/admin/dashboard');
       } else if (user.role === 'penjual' && pathname.startsWith('/admin')) {
         router.push('/seller/products');
-      } else if (user.role === 'pembeli' && (pathname.startsWith('/admin') || pathname.startsWith('/seller'))) {
+      } else if (user.role === 'pembeli' && (pathname.startsWith('/admin') || (pathname.startsWith('/seller') && !pathname.startsWith('/seller/register')))) {
         router.push('/');
       }
     }

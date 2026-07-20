@@ -180,6 +180,10 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
       setOfferError('Masukkan nominal penawaran yang valid.');
       return;
     }
+    if (product.minimum_offer_price && Number(offerPrice) < Number(product.minimum_offer_price)) {
+      setOfferError(`Minimal tawaran untuk barang ini adalah Rp ${Number(product.minimum_offer_price).toLocaleString('id-ID')}`);
+      return;
+    }
     setOfferLoading(true);
     setOfferError('');
     try {
@@ -268,8 +272,13 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           </div>
 
           <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '0.75rem', lineHeight: 1.2, color: 'var(--foreground)' }}>{product.nama_barang}</h1>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.75rem', letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
             Rp {Number(product.harga).toLocaleString('id-ID')}
+            {product.minimum_offer_price && (
+              <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--primary)', background: 'var(--primary-light)', padding: '4px 10px', borderRadius: '20px', letterSpacing: 'normal' }}>
+                Nego min. Rp {Number(product.minimum_offer_price).toLocaleString('id-ID')}
+              </span>
+            )}
           </div>
           
           {acceptedOffer && (
@@ -550,7 +559,14 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
               <Icons.X size={16} />
             </button>
             <h2 style={{ fontWeight: 700, fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--foreground)' }}>Tawar Harga</h2>
-            <p style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>Berikan penawaran harga terbaikmu untuk <strong>{product.nama_barang}</strong> (Harga asli: Rp {Number(product.harga).toLocaleString('id-ID')}).</p>
+            <p style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              Berikan penawaran harga terbaikmu untuk <strong>{product.nama_barang}</strong> (Harga asli: Rp {Number(product.harga).toLocaleString('id-ID')}).
+              {product.minimum_offer_price && (
+                <span style={{ display: 'block', marginTop: '0.5rem', color: 'var(--primary)', fontWeight: 500 }}>
+                  * Minimal penawaran: Rp {Number(product.minimum_offer_price).toLocaleString('id-ID')}
+                </span>
+              )}
+            </p>
             
             <form onSubmit={handleOffer} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <Input 
@@ -561,6 +577,12 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                 value={offerPrice} 
                 onChange={e => setOfferPrice(e.target.value)} 
               />
+              
+              {product.minimum_offer_price && offerPrice && Number(offerPrice) < Number(product.minimum_offer_price) && (
+                <div style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '-0.75rem', fontWeight: 500 }}>
+                  ⚠️ Tawaran Anda lebih rendah dari batas minimum (Rp {Number(product.minimum_offer_price).toLocaleString('id-ID')})
+                </div>
+              )}
               
               {offerError && <div style={{ padding: '0.75rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 500, border: '1px solid rgba(220, 38, 38, 0.2)' }}>{offerError}</div>}
               

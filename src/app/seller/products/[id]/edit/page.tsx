@@ -34,6 +34,7 @@ export default function EditProduct() {
     status_terjual: '0',
     latitude: '',
     longitude: '',
+    minimum_offer_price: '',
   });
   const [foto, setFoto] = useState<File | null>(null);
 
@@ -61,13 +62,14 @@ export default function EditProduct() {
       setFormData({
         nama_barang: p.nama_barang || '',
         harga: p.harga?.toString() || '',
-        category_id: p.category_id?.toString() || '',
+        category_id: p.category?.id?.toString() || p.category_id?.toString() || '',
         kondisi: p.kondisi || 'baru',
         durasi_pemakaian: p.durasi_pemakaian || '',
         deskripsi: p.deskripsi || '',
         status_terjual: p.status_terjual ? '1' : '0',
         latitude: p.latitude?.toString() || '',
         longitude: p.longitude?.toString() || '',
+        minimum_offer_price: p.minimum_offer_price?.toString() || '',
       });
       setCurrentFoto(p.foto);
 
@@ -142,6 +144,12 @@ export default function EditProduct() {
         submitData.append('latitude', formData.latitude);
         submitData.append('longitude', formData.longitude);
       }
+
+      if (formData.minimum_offer_price !== undefined) {
+        // even if it's empty string, we can send it or omit it, but backend might need null
+        // Let's only send if it has a value, or empty string if cleared
+        submitData.append('minimum_offer_price', formData.minimum_offer_price);
+      }
       
       if (foto) {
         submitData.append('foto', foto);
@@ -213,6 +221,16 @@ export default function EditProduct() {
                required
                min={0}
                value={formData.harga}
+               onChange={handleInputChange}
+            />
+            
+            <Input 
+               type="number" 
+               name="minimum_offer_price" 
+               label="Minimal Harga Tawar (Rp)"
+               placeholder="Opsional, misal: 450000" 
+               min={0}
+               value={formData.minimum_offer_price}
                onChange={handleInputChange}
             />
             
@@ -303,8 +321,8 @@ export default function EditProduct() {
 
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <LocationPicker 
-                lat={formData.latitude ? parseFloat(formData.latitude) : -6.200000} 
-                lng={formData.longitude ? parseFloat(formData.longitude) : 106.816666} 
+                lat={formData.latitude ? parseFloat(formData.latitude) : -0.947083} 
+                lng={formData.longitude ? parseFloat(formData.longitude) : 100.417181} 
                 onChange={handleLocationChange} 
               />
             </div>

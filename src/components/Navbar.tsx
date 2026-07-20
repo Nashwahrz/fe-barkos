@@ -24,6 +24,7 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotif, setShowNotif] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -62,8 +63,10 @@ export default function Navbar() {
       const res = await notificationApi.getAll();
       setNotifications(res.data || []);
       setUnreadCount(res.unread_count || 0);
-    } catch (err) {
-      console.error('Failed to fetch notifications', err);
+    } catch (err: any) {
+      if (err?.status !== 401) {
+        console.error('Failed to fetch notifications', err);
+      }
     }
   };
 
@@ -323,8 +326,7 @@ export default function Navbar() {
                           { href: '/seller/products', icon: <Icons.Package size={18} />, title: 'Lapak Saya' },
                           { href: '/seller/orders', icon: <Icons.ShoppingBag size={18} />, title: 'Pesanan Masuk' },
                           { href: '/seller/offers', icon: <Icons.Zap size={18} />, title: 'Tawaran Masuk' },
-                          { href: '/seller/promotions', icon: <Icons.Megaphone size={18} />, title: 'Promosi' }, // changed Zap to Megaphone for promotions
-                          { href: '/seller/bank-accounts', icon: <Icons.CreditCard size={18} />, title: 'Rekening' }
+                          { href: '/seller/promotions', icon: <Icons.Megaphone size={18} />, title: 'Promosi' }
                         ].map(item => (
                           <Link key={item.href} href={item.href} className="nav-icon-btn" style={{
                             color: textColor, opacity: 0.7
@@ -365,48 +367,77 @@ export default function Navbar() {
                     )}
 
                     {/* Profile & Logout Group */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '8px', position: 'relative' }}>
                       {user.role !== USER_ROLES.SUPER_ADMIN && (
-                        <Link href="/profile" style={{
-                          display: 'flex', alignItems: 'center', gap: '8px',
-                          padding: '4px 12px 4px 4px', borderRadius: '24px',
-                          background: 'transparent', transition: 'background 0.2s', textDecoration: 'none'
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-                        >
-                          <div style={{
-                            width: '30px', height: '30px', borderRadius: '50%',
-                            background: navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)', color: textColor,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 500, fontSize: '0.85rem', flexShrink: 0, overflow: 'hidden'
-                          }}>
-                            {user.avatar ? (
-                              <img src={getStorageUrl(user.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              user.name.charAt(0).toUpperCase()
-                            )}
-                          </div>
-                          <span className="hide-mobile" style={{ fontWeight: 500, fontSize: '0.85rem', color: textColor }}>
-                            {user.name.split(' ')[0]}
-                          </span>
-                        </Link>
-                      )}
+                        <>
+                          <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} style={{
+                            display: 'flex', alignItems: 'center', gap: '8px',
+                            padding: '4px 12px 4px 4px', borderRadius: '24px', border: 'none',
+                            background: 'transparent', transition: 'background 0.2s', cursor: 'pointer'
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <div style={{
+                              width: '30px', height: '30px', borderRadius: '50%',
+                              background: navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)', color: textColor,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontWeight: 500, fontSize: '0.85rem', flexShrink: 0, overflow: 'hidden'
+                            }}>
+                              {user.avatar ? (
+                                <img src={getStorageUrl(user.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                user.name.charAt(0).toUpperCase()
+                              )}
+                            </div>
+                            <span className="hide-mobile" style={{ fontWeight: 500, fontSize: '0.85rem', color: textColor }}>
+                              {user.name.split(' ')[0]}
+                            </span>
+                            <Icons.ChevronDown size={14} style={{ opacity: 0.5, color: textColor }} />
+                          </button>
 
-                      <button
-                        onClick={logout}
-                        title="Keluar"
-                        className="hide-mobile"
-                        style={{
-                          width: '36px', height: '36px', borderRadius: '8px',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          transition: 'all 0.2s', color: textColor, opacity: 0.7, border: 'none', background: 'transparent', cursor: 'pointer'
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
-                      >
-                        <Icons.LogOut size={16} />
-                      </button>
+                          {showProfileDropdown && (
+                            <>
+                              <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowProfileDropdown(false)} />
+                              <div style={{
+                                position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                                width: '200px', background: 'var(--card)', border: '1px solid var(--border)',
+                                borderRadius: '12px', boxShadow: 'var(--shadow-lg)',
+                                zIndex: 100, display: 'flex', flexDirection: 'column', padding: '8px'
+                              }}>
+                                <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={{
+                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+                                  textDecoration: 'none', color: 'var(--foreground)', fontSize: '0.9rem',
+                                  borderRadius: '8px', transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                  <Icons.User size={16} /> Profil Saya
+                                </Link>
+                                <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={{
+                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+                                  textDecoration: 'none', color: 'var(--foreground)', fontSize: '0.9rem',
+                                  borderRadius: '8px', transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                  <Icons.ShoppingBag size={16} /> Pesanan Saya
+                                </Link>
+                                <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
+                                <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{
+                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+                                  background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: '0.9rem',
+                                  borderRadius: '8px', transition: 'background 0.2s', cursor: 'pointer', textAlign: 'left'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.1)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                  <Icons.LogOut size={16} /> Keluar
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 ) : (

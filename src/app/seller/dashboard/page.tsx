@@ -724,13 +724,6 @@ export default function SellerDashboard() {
           <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Tawaran Masuk</span>
         </Link>
 
-        <Link href="/seller/bank-accounts" className="card"
-          style={{ padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'var(--foreground)', border: '1px solid var(--border)', background: 'var(--card)', transition: 'all 0.2s', gap: '12px', borderRadius: '14px' }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = '#10b981'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--border)'; }}>
-          <div style={{ width: 48, height: 48, background: 'rgba(16,185,129,0.1)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.CreditCard size={24} color="#10b981" /></div>
-          <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Rekening Bank</span>
-        </Link>
 
         <Link href="/profile" className="card"
           style={{ padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'var(--foreground)', border: '1px solid var(--border)', background: 'var(--card)', transition: 'all 0.2s', gap: '12px', borderRadius: '14px' }}
