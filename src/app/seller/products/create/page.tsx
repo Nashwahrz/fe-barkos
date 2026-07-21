@@ -32,6 +32,7 @@ export default function CreateProduct() {
     minimum_offer_price: '',
   });
   const [foto, setFoto] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading) {
@@ -107,8 +108,10 @@ export default function CreateProduct() {
       if (file.type.startsWith('image/')) {
         const compressed = await compressImage(file);
         setFoto(compressed);
+        setFotoPreview(URL.createObjectURL(compressed));
       } else {
         setFoto(file);
+        setFotoPreview(URL.createObjectURL(file));
       }
     }
   };
@@ -319,14 +322,43 @@ export default function CreateProduct() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Foto Barang Utama (Max 2MB)</label>
-            <input 
-               type="file" 
-               accept="image/*" 
-               className="input-field" 
-               style={{ padding: '0.75rem', fontSize: '0.875rem' }}
-               onChange={handleFileChange}
-            />
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Foto Barang Utama</label>
+            <div 
+              style={{ 
+                border: '2px dashed var(--border)', 
+                borderRadius: '12px', 
+                padding: '2rem', 
+                textAlign: 'center', 
+                cursor: 'pointer', 
+                background: 'rgba(0,0,0,0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.2s'
+              }} 
+              onClick={() => document.getElementById('foto-upload')?.click()}
+            >
+              {fotoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={fotoPreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'contain' }} />
+              ) : (
+                <div style={{ color: 'var(--foreground)', opacity: 0.6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ padding: '12px', background: 'var(--background)', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                    <Icons.Image size={24} color="var(--primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Buka Galeri</span>
+                  <span style={{ fontSize: '0.75rem' }}>Format: JPG, PNG, WEBP</span>
+                </div>
+              )}
+              <input 
+                 id="foto-upload"
+                 type="file" 
+                 accept="image/jpeg, image/png, image/webp" 
+                 style={{ display: 'none' }}
+                 onChange={handleFileChange}
+              />
+            </div>
           </div>
 
           <div style={{ marginTop: '2rem' }}>

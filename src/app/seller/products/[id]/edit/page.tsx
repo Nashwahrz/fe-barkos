@@ -381,21 +381,44 @@ export default function EditProduct() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Ubah Foto Barang (Max 2MB)</label>
-            {currentFoto && (
-              <div style={{ marginBottom: '0.5rem', width: '120px', height: '120px', borderRadius: '12px', overflow: 'hidden', background: 'var(--input)', border: '1px solid var(--border)' }}>
-                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getStorageUrl(currentFoto) || ''} alt="Current Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-            )}
-            <input 
-               type="file" 
-               accept="image/*" 
-               className="input-field" 
-               style={{ padding: '0.75rem', fontSize: '0.875rem' }}
-               onChange={handleFileChange}
-            />
-            <small style={{ color: 'var(--foreground)', opacity: 0.5, fontSize: '0.8rem' }}>Abaikan jika Anda tidak ingin mengubah foto</small>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Foto Barang Utama</label>
+            <div 
+              style={{ 
+                border: '2px dashed var(--border)', 
+                borderRadius: '12px', 
+                padding: '2rem', 
+                textAlign: 'center', 
+                cursor: 'pointer', 
+                background: 'rgba(0,0,0,0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.2s'
+              }} 
+              onClick={() => document.getElementById('foto-upload')?.click()}
+            >
+              {fotoPreview || currentFoto ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={fotoPreview || getStorageUrl(currentFoto) || ''} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', objectFit: 'contain' }} />
+              ) : (
+                <div style={{ color: 'var(--foreground)', opacity: 0.6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ padding: '12px', background: 'var(--background)', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                    <Icons.Image size={24} color="var(--primary)" />
+                  </div>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Buka Galeri (Ubah Foto)</span>
+                  <span style={{ fontSize: '0.75rem' }}>Format: JPG, PNG, WEBP</span>
+                </div>
+              )}
+              <input 
+                 id="foto-upload"
+                 type="file" 
+                 accept="image/jpeg, image/png, image/webp" 
+                 style={{ display: 'none' }}
+                 onChange={handleFileChange}
+              />
+            </div>
+            <small style={{ color: 'var(--foreground)', opacity: 0.5, fontSize: '0.8rem', textAlign: 'center', marginTop: '4px' }}>Abaikan jika Anda tidak ingin mengubah foto</small>
           </div>
 
           <div style={{ marginTop: '2rem' }}>
