@@ -60,7 +60,7 @@ export function getStorageUrl(path: string | null) {
   if (!path) return null;
   if (path.startsWith('http')) return path;
   
-  const baseUrl = API_BASE_URL.replace('/api', '');
+  const baseUrl = API_BASE_URL.endsWith('/api') ? API_BASE_URL.slice(0, -4) : API_BASE_URL;
   let cleanPath = path;
   if (cleanPath.startsWith('/')) {
     cleanPath = cleanPath.substring(1);
