@@ -37,6 +37,7 @@ export default function EditProduct() {
     minimum_offer_price: '',
   });
   const [foto, setFoto] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading) {
