@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api-barkos-production-mkcjrn.laravel.cloud',
+        pathname: '**',
+      },
     ],
   },
 };
