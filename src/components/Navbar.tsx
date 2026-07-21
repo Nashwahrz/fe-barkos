@@ -133,6 +133,12 @@ export default function Navbar() {
   const navTransparent = isHome && !isScrolled;
   const textColor = navTransparent ? '#ffffff' : 'var(--foreground)';
 
+  const dropdownItemStyle = {
+    display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
+    textDecoration: 'none', color: 'var(--foreground)', fontSize: '0.9rem',
+    borderRadius: '8px', transition: 'background 0.2s'
+  };
+
   return (
     <>
       {/* ── Top Navbar ──────────────────────────────────────────── */}
@@ -401,33 +407,41 @@ export default function Navbar() {
                               <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowProfileDropdown(false)} />
                               <div style={{
                                 position: 'absolute', top: '100%', right: 0, marginTop: '8px',
-                                width: '200px', background: 'var(--card)', border: '1px solid var(--border)',
+                                width: '220px', background: 'var(--card)', border: '1px solid var(--border)',
                                 borderRadius: '12px', boxShadow: 'var(--shadow-lg)',
                                 zIndex: 100, display: 'flex', flexDirection: 'column', padding: '8px'
                               }}>
-                                <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={{
-                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
-                                  textDecoration: 'none', color: 'var(--foreground)', fontSize: '0.9rem',
-                                  borderRadius: '8px', transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                {user.role === USER_ROLES.PENJUAL && (
+                                  <>
+                                    <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toko Saya</div>
+                                    <Link href="/seller/dashboard" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
+                                      <Icons.BarChart2 size={16} /> Dashboard
+                                    </Link>
+                                    <Link href="/seller/products" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
+                                      <Icons.Package size={16} /> Lapak Saya
+                                    </Link>
+                                    <Link href="/seller/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
+                                      <Icons.ShoppingBag size={16} /> Pesanan Masuk
+                                    </Link>
+                                    <Link href="/seller/offers" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
+                                      <Icons.Zap size={16} /> Tawaran Masuk
+                                    </Link>
+                                    <Link href="/seller/promotions" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
+                                      <Icons.Megaphone size={16} /> Promosi
+                                    </Link>
+                                    <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
+                                    <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Akun</div>
+                                  </>
+                                )}
+                                <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
                                   <Icons.User size={16} /> Profil Saya
                                 </Link>
-                                <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={{
-                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
-                                  textDecoration: 'none', color: 'var(--foreground)', fontSize: '0.9rem',
-                                  borderRadius: '8px', transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
                                   <Icons.ShoppingBag size={16} /> Pesanan Saya
                                 </Link>
                                 <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
                                 <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{
-                                  display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px',
-                                  background: 'transparent', border: 'none', color: 'var(--danger)', fontSize: '0.9rem',
-                                  borderRadius: '8px', transition: 'background 0.2s', cursor: 'pointer', textAlign: 'left'
+                                  ...dropdownItemStyle, color: 'var(--danger)', cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none'
                                 }}
                                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.1)'}
                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
