@@ -313,42 +313,46 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
           {/* ── Action Buttons ── */}
           {!isSeller && !isAdmin && !product.status_terjual && (
-            <div className="fixed-bottom-action" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
+            <>
+              {/* Spacer on mobile so content isn't hidden behind the fixed buttons */}
+              <div className="mobile-only-spacer" style={{ height: '140px' }} />
+              <div className="fixed-bottom-action" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <Button
+                    onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowBuyModal(true); }}
+                    variant="primary"
+                    size="lg"
+                    style={{ flex: 1 }}
+                  >
+                    <Icons.ShoppingBag size={18} />
+                    Beli
+                  </Button>
+                  <Button
+                    onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowOfferModal(true); }}
+                    variant="secondary"
+                    size="lg"
+                    style={{ flex: 1 }}
+                  >
+                    <Icons.Zap size={18} />
+                    Tawar
+                  </Button>
+                </div>
                 <Button
-                  onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowBuyModal(true); }}
-                  variant="primary"
-                  size="lg"
-                  style={{ flex: 1 }}
+                  onClick={() => {
+                    if (!user) { router.push('/auth/login'); return; }
+                    const sellerId = product.user_id || product.user?.id;
+                    if (user.id === sellerId) { alert('Tidak bisa chat dengan diri sendiri.'); return; }
+                    router.push(`/chat/${product.id}/${sellerId}`);
+                  }}
+                  variant="ghost"
+                  size="md"
+                  style={{ border: '1px solid var(--border)' }}
                 >
-                  <Icons.ShoppingBag size={18} />
-                  Beli
-                </Button>
-                <Button
-                  onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowOfferModal(true); }}
-                  variant="secondary"
-                  size="lg"
-                  style={{ flex: 1 }}
-                >
-                  <Icons.Zap size={18} />
-                  Tawar
+                  <Icons.MessageCircle size={16} />
+                  Tanya Penjual
                 </Button>
               </div>
-              <Button
-                onClick={() => {
-                  if (!user) { router.push('/auth/login'); return; }
-                  const sellerId = product.user_id || product.user?.id;
-                  if (user.id === sellerId) { alert('Tidak bisa chat dengan diri sendiri.'); return; }
-                  router.push(`/chat/${product.id}/${sellerId}`);
-                }}
-                variant="ghost"
-                size="md"
-                style={{ border: '1px solid var(--border)' }}
-              >
-                <Icons.MessageCircle size={16} />
-                Tanya Penjual
-              </Button>
-            </div>
+            </>
           )}
 
           {product.status_terjual && (

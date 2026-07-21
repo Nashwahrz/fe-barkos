@@ -383,6 +383,14 @@ input, textarea, select {
     box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
     border-radius: 0 !important;
   }
+  
+  .mobile-only-spacer {
+    display: block !important;
+  }
+}
+
+.mobile-only-spacer {
+  display: none;
 }
 
 @media (max-width: 480px) {
