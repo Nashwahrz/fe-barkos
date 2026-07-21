@@ -132,6 +132,34 @@ export default function AIChatbot() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [currentMood, setCurrentMood] = useState<CatMood>('happy');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef({ startX: 0, startY: 0, initialClientX: 0, initialClientY: 0 });
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Only allow drag on the wrapper if chat is closed, or allow dragging the whole thing? 
+    // Usually it's better to only drag the FAB when closed.
+    if (isOpen) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current.initialClientX = e.clientX;
+    dragRef.current.initialClientY = e.clientY;
+    dragRef.current.startX = e.clientX - position.x;
+    dragRef.current.startY = e.clientY - position.y;
+    setIsDragging(true);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const newX = e.clientX - dragRef.current.startX;
+    const newY = e.clientY - dragRef.current.startY;
+    setPosition({ x: newX, y: newY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setIsDragging(false);
+  };
   
   const handleShareLocation = () => {
     if (!navigator.geolocation) {
@@ -253,7 +281,7 @@ export default function AIChatbot() {
         }
         @media (max-width: 480px) {
           .miu-chatbot-wrapper {
-            bottom: 16px;
+            bottom: 80px; /* Agak ke atas dikit untuk mobile agar tidak menutupi navbar */
             right: 12px;
           }
           .miu-chat-panel {
@@ -266,6 +294,7 @@ export default function AIChatbot() {
             height: 100%;
             max-height: 100%;
             border-radius: 0;
+            transform: none !important; /* Jangan ikuti transform saat drag jika panel terbuka di mobile */
           }
         }
         @media (min-width: 481px) and (max-width: 640px) {
@@ -277,7 +306,14 @@ export default function AIChatbot() {
         }
       `}</style>
 
-      <div className="miu-chatbot-wrapper">
+      <div 
+        className="miu-chatbot-wrapper"
+        style={{ transform: isOpen ? 'none' : `translate(${position.x}px, ${position.y}px)`, touchAction: 'none' }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+      >
         
         {/* Panel Chat */}
         {isOpen && (
@@ -474,7 +510,17 @@ export default function AIChatbot() {
 
         {/* FAB Button with Cat */}
         <button 
-          onClick={() => { setIsOpen(!isOpen); setShowTooltip(false); }}
+          onClick={(e) => {
+            // Prevent click if we just dragged it
+            const dx = Math.abs(e.clientX - dragRef.current.initialClientX);
+            const dy = Math.abs(e.clientY - dragRef.current.initialClientY);
+            if (dx > 5 || dy > 5) {
+              e.preventDefault();
+              return;
+            }
+            setIsOpen(!isOpen);
+            setShowTooltip(false);
+          }}
           style={{
             width: '60px', height: '60px', borderRadius: '50%',
             background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
