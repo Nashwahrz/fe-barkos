@@ -407,7 +407,7 @@ export default function ChatDetailPage() {
   };
 
   return (
-    <div style={{ height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
+    <div className="chat-container-mobile" style={{ display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
       
       {/* Chat Header */}
       <div style={{ padding: '0.8rem 1.5rem', background: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
@@ -625,7 +625,7 @@ export default function ChatDetailPage() {
         </div>
 
         {/* Action Toolbar */}
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 0', display: 'flex', gap: '0.5rem' }}>
+        <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 0', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button onClick={handleSendLocation} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: '#4b5563', cursor: 'pointer' }}>
             <Icons.MapPin size={14} color="var(--primary)" /> Kirim Lokasi
           </button>
@@ -639,20 +639,19 @@ export default function ChatDetailPage() {
           )}
         </div>
 
-        <form onSubmit={handleSendMessage} className="container flex gap-3" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 1rem' }}>
+        <form onSubmit={handleSendMessage} className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 1rem', display: 'flex', gap: '0.75rem' }}>
           <input 
             type="text" 
             className="input-field" 
             style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: '#f3f4f6', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }} 
-            placeholder="Tulis pesan Anda di sini..." 
+            placeholder="Tulis pesan..." 
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
-            autoFocus
           />
           <button 
             type="submit" 
             className="btn btn-primary" 
-            style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
+            style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
             disabled={!newMessage.trim()}
           >
             <Icons.Send size={20} color="white" />

@@ -101,6 +101,10 @@ input, textarea, select {
 .gap-6 { gap: 1.5rem; }
 
 /* ── Core Components (Legacy fallback, use UI components where possible) ── */
+.chat-container-mobile {
+  height: calc(100vh - 70px);
+}
+
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -353,6 +357,10 @@ input, textarea, select {
   .page-padding { padding: 1.25rem !important; }
   .card-padding { padding: 1.25rem !important; }
   .section-padding { padding: 3rem 0 !important; }
+  
+  .chat-container-mobile {
+    height: calc(100dvh - 70px - 60px) !important;
+  }
   
   .admin-header-flex {
     flex-direction: column !important;
