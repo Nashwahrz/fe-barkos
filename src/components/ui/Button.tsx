@@ -5,12 +5,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   href?: string;
+  target?: string;
+  rel?: string;
   fullWidth?: boolean;
   children: React.ReactNode;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', href, fullWidth, children, className, style, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', href, target, rel, fullWidth, children, className, style, ...props }, ref) => {
     
     // Base styles
     const baseStyle: React.CSSProperties = {
@@ -105,7 +107,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     if (href) {
       return (
         <Link 
-          href={href} 
+          href={href}
+          target={target}
+          rel={rel}
           style={combinedStyle as any} 
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}

@@ -36,7 +36,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               fontSize: '0.875rem',
               transition: 'all 0.2s ease',
               outline: 'none',
-              ...props.style
+              ...style
             }}
             onFocus={(e) => {
               if (!error) {

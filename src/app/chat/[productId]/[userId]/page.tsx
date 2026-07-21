@@ -138,7 +138,7 @@ export default function ChatDetailPage() {
       });
 
       // Try to extract otherUser from messages if product info failed or we are the seller
-      setOtherUser(prev => {
+      setOtherUser((prev: any) => {
         if (!prev && newMessages.length > 0) {
           const sampleMsg = newMessages[0];
           if (sampleMsg.sender?.id?.toString() === otherUserId) return sampleMsg.sender;

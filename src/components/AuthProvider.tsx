@@ -80,7 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ 
       user, 
-      loading: isInitializing || (token ? isLoading : false), 
+      loading: isInitializing || (token ? isLoading : false),
+      unreadCount: 0,
       login, 
       logout, 
       refreshUser 

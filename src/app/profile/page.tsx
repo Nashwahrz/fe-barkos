@@ -207,7 +207,7 @@ export default function ProfilePage() {
                 ) : avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={getStorageUrl(avatarUrl) || ''} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : <Icons.User size={32} color="var(--foreground)" opacity={0.3} />}
+                ) : <Icons.User size={32} color="var(--foreground)" style={{ opacity: 0.3 }} />}
               </div>
               <div style={{ flex: 1, minWidth: '200px' }}>
                 <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--foreground)' }}>Foto Profil</label>

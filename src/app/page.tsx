@@ -289,9 +289,9 @@ export default function Home() {
                     maxWidth: '800px', // Batasi lebar maksimal di layar besar
                   }}>
                     {banner.ad_type === 'image' ? (
-                      <img src={getStorageUrl(banner.ad_media_url)} alt={banner.ad_title || 'Iklan'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <video src={getStorageUrl(banner.ad_media_url)} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     )}
                     
                     {/* Overlay */}

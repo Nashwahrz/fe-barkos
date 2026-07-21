@@ -181,7 +181,7 @@ export default function SellerOrdersPage() {
       {/* Order list */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '6rem 2rem', opacity: 0.6, background: 'var(--card)', borderRadius: '24px', border: '1px dashed var(--border)' }}>
-          <div style={{ width: '80px', height: '80px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}><Icons.ShoppingBag size={32} color="var(--foreground)" opacity={0.5} /></div>
+          <div style={{ width: '80px', height: '80px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}><Icons.ShoppingBag size={32} color="var(--foreground)" style={{ opacity: 0.5 }} /></div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)' }}>Tidak ada pesanan</h2>
         </div>
       ) : (

@@ -130,7 +130,7 @@ export default function SellerProductsDashboard() {
       {products.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '6rem 2rem', border: '1px dashed var(--border)', borderRadius: '24px', background: 'var(--card)' }}>
           <div style={{ width: '80px', height: '80px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-            <Icons.Package size={32} color="var(--foreground)" opacity={0.5} />
+            <Icons.Package size={32} color="var(--foreground)" style={{ opacity: 0.5 }} />
           </div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: 'var(--foreground)' }}>Lapak Anda masih kosong</h2>
           <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem', marginBottom: '2.5rem' }}>Mulai jual barang bekas Anda dan dapatkan uang tambahan!</p>
