@@ -38,7 +38,8 @@ export default function Home() {
 
   const allProducts: any[] = data?.data || data || [];
   const promotedProducts = allProducts.filter((p: any) => p.is_promoted);
-  const products = allProducts.filter((p: any) => !p.is_promoted);
+  // Remove the filter so 'Produk Terbaru' shows all products (including promoted ones)
+  const products = allProducts;
 
   const dbCategories: any[] = catData?.data || catData || [];
   const banners: any[] = bannerData?.data || [];
