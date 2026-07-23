@@ -159,6 +159,14 @@ export default function AIChatbot() {
     if (!isDragging) return;
     e.currentTarget.releasePointerCapture(e.pointerId);
     setIsDragging(false);
+
+    // Detect tap vs drag — if movement < 6px it's a click, not a drag
+    const dx = Math.abs(e.clientX - dragRef.current.initialClientX);
+    const dy = Math.abs(e.clientY - dragRef.current.initialClientY);
+    if (dx <= 6 && dy <= 6) {
+      setIsOpen(prev => !prev);
+      setShowTooltip(false);
+    }
   };
   
   const handleShareLocation = () => {
@@ -510,17 +518,6 @@ export default function AIChatbot() {
 
         {/* FAB Button with Cat */}
         <button 
-          onClick={(e) => {
-            // Prevent click if we just dragged it
-            const dx = Math.abs(e.clientX - dragRef.current.initialClientX);
-            const dy = Math.abs(e.clientY - dragRef.current.initialClientY);
-            if (dx > 5 || dy > 5) {
-              e.preventDefault();
-              return;
-            }
-            setIsOpen(!isOpen);
-            setShowTooltip(false);
-          }}
           style={{
             width: '60px', height: '60px', borderRadius: '50%',
             background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
