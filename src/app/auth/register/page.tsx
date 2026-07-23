@@ -8,7 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Icons } from '@/components/Icons';
-import { MathCaptcha } from '@/components/ui/MathCaptcha';
+import { ReCaptchaV2 } from '@/components/ui/ReCaptchaV2';
 
 function RegisterForm() {
   const { user, login, refreshUser, loading: authLoading } = useAuth();
@@ -28,11 +28,11 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [nameWarning, setNameWarning] = useState('');
-  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
 
-  const handleCaptchaVerify = useCallback((verified: boolean) => {
-    setCaptchaVerified(verified);
+  const handleCaptchaVerify = useCallback((token: string | null) => {
+    setRecaptchaToken(token);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,6 +47,7 @@ function RegisterForm() {
           form.append(key, value as string | Blob);
         }
       });
+      if (recaptchaToken) form.append('recaptcha_token', recaptchaToken);
 
       const data = await fetchApi('/register', {
         method: 'POST',
@@ -60,7 +61,7 @@ function RegisterForm() {
     } catch (err: any) {
       setError(err.message || 'Gagal mendaftar. Silakan coba lagi.');
       // Reset captcha on failure
-      setCaptchaVerified(false);
+      setRecaptchaToken(null);
       setCaptchaKey((k) => k + 1);
     } finally {
       setLoading(false);
@@ -317,9 +318,9 @@ function RegisterForm() {
             />
           </div>
 
-          <MathCaptcha key={captchaKey} onVerify={handleCaptchaVerify} />
+          <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
 
-          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading || !captchaVerified} style={{ marginTop: '0.5rem' }}>
+          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading || !recaptchaToken} style={{ marginTop: '0.5rem' }}>
             {loading ? 'Memverifikasi Dokumen (AI)...' : 'Daftar Sekarang'}
           </Button>
         </form>

@@ -8,7 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Icons } from '@/components/Icons';
-import { MathCaptcha } from '@/components/ui/MathCaptcha';
+import { ReCaptchaV2 } from '@/components/ui/ReCaptchaV2';
 
 export default function Login() {
   const { login } = useAuth();
@@ -19,11 +19,11 @@ export default function Login() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
 
-  const handleCaptchaVerify = useCallback((verified: boolean) => {
-    setCaptchaVerified(verified);
+  const handleCaptchaVerify = useCallback((token: string | null) => {
+    setRecaptchaToken(token);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +34,7 @@ export default function Login() {
     try {
       const data = await fetchApi('/login', {
         method: 'POST',
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, recaptcha_token: recaptchaToken }),
         headers: { 'Content-Type': 'application/json' },
       });
 
@@ -51,7 +51,7 @@ export default function Login() {
     } catch (err: any) {
       setError(err.message || 'Login gagal. Periksa kembali email dan password Anda.');
       // Reset captcha on failure
-      setCaptchaVerified(false);
+      setRecaptchaToken(null);
       setCaptchaKey((k) => k + 1);
     } finally {
       setLoading(false);
@@ -94,9 +94,9 @@ export default function Login() {
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
 
-          <MathCaptcha key={captchaKey} onVerify={handleCaptchaVerify} />
+          <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
 
-          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading || !captchaVerified} style={{ marginTop: '0.5rem' }}>
+          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading || !recaptchaToken} style={{ marginTop: '0.5rem' }}>
             {loading ? 'Memproses...' : 'Masuk'}
           </Button>
         </form>
