@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
@@ -8,6 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Icons } from '@/components/Icons';
+import { MathCaptcha } from '@/components/ui/MathCaptcha';
 
 function RegisterForm() {
   const { user, login, refreshUser, loading: authLoading } = useAuth();
@@ -27,6 +28,12 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [nameWarning, setNameWarning] = useState('');
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState(0);
+
+  const handleCaptchaVerify = useCallback((verified: boolean) => {
+    setCaptchaVerified(verified);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +59,9 @@ function RegisterForm() {
       router.push('/auth/verify-email');
     } catch (err: any) {
       setError(err.message || 'Gagal mendaftar. Silakan coba lagi.');
+      // Reset captcha on failure
+      setCaptchaVerified(false);
+      setCaptchaKey((k) => k + 1);
     } finally {
       setLoading(false);
     }
@@ -307,7 +317,9 @@ function RegisterForm() {
             />
           </div>
 
-          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading} style={{ marginTop: '0.5rem' }}>
+          <MathCaptcha key={captchaKey} onVerify={handleCaptchaVerify} />
+
+          <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading || !captchaVerified} style={{ marginTop: '0.5rem' }}>
             {loading ? 'Memverifikasi Dokumen (AI)...' : 'Daftar Sekarang'}
           </Button>
         </form>
