@@ -4,10 +4,11 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   label?: string;
   error?: string;
   icon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, icon, className, style, ...props }, ref) => {
+  ({ label, error, icon, endIcon, className, style, ...props }, ref) => {
     
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', ...style }} className={className}>
@@ -29,6 +30,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               width: '100%',
               padding: '10px 14px',
               paddingLeft: icon ? '40px' : '14px',
+              paddingRight: endIcon ? '40px' : '14px',
               borderRadius: '8px',
               border: `1px solid ${error ? 'var(--danger)' : 'var(--input-border)'}`,
               background: 'var(--input)',
@@ -53,6 +55,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               if (props.onBlur) props.onBlur(e);
             }}
           />
+          {endIcon && (
+            <div style={{ position: 'absolute', right: '12px', color: 'var(--foreground)', opacity: 0.5, display: 'flex', cursor: 'pointer' }}>
+              {endIcon}
+            </div>
+          )}
         </div>
         {error && (
           <span style={{ fontSize: '0.75rem', color: 'var(--danger)', fontWeight: 500 }}>

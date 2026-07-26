@@ -22,7 +22,7 @@ function RegisterForm() {
     password: '',
     password_confirmation: '',
     asal_kampus: '',
-    role: initialRole,
+    role: 'pembeli',
     identity_document: null as File | null,
   });
   const [loading, setLoading] = useState(false);
@@ -30,6 +30,7 @@ function RegisterForm() {
   const [nameWarning, setNameWarning] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCaptchaVerify = useCallback((token: string | null) => {
     setRecaptchaToken(token);
@@ -225,98 +226,37 @@ function RegisterForm() {
             onChange={(e) => setFormData({ ...formData, asal_kampus: e.target.value })}
           />
 
-          <div className="flex flex-col gap-2">
-            <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--foreground)' }}>Daftar Sebagai</label>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                className="flex-1"
-                style={{
-                  height: '44px',
-                  borderRadius: '8px',
-                  border: '1px solid',
-                  borderColor: formData.role === 'pembeli' ? 'var(--primary)' : 'var(--input-border)',
-                  background: formData.role === 'pembeli' ? 'var(--primary-light)' : 'var(--input)',
-                  color: formData.role === 'pembeli' ? 'var(--primary)' : 'var(--foreground)',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: formData.role === 'pembeli' ? '0 0 0 1px var(--primary)' : 'none'
-                }}
-                onClick={() => setFormData({ ...formData, role: 'pembeli' })}
-              >
-                Pembeli
-              </button>
-              <button
-                type="button"
-                className="flex-1"
-                style={{
-                  height: '44px',
-                  borderRadius: '8px',
-                  border: '1px solid',
-                  borderColor: formData.role === 'penjual' ? 'var(--primary)' : 'var(--input-border)',
-                  background: formData.role === 'penjual' ? 'var(--primary-light)' : 'var(--input)',
-                  color: formData.role === 'penjual' ? 'var(--primary)' : 'var(--foreground)',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: formData.role === 'penjual' ? '0 0 0 1px var(--primary)' : 'none'
-                }}
-                onClick={() => setFormData({ ...formData, role: 'penjual' })}
-              >
-                Penjual
-              </button>
-            </div>
-          </div>
-
-          {formData.role === 'penjual' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--foreground)' }}>Upload KTP / KTM (Wajib)</label>
-              <input
-                type="file"
-                accept="image/jpeg, image/png, image/jpg"
-                onChange={(e) => setFormData({ ...formData, identity_document: e.target.files ? e.target.files[0] : null })}
-                required={formData.role === 'penjual'}
-                style={{
-                  padding: '10px',
-                  border: '1px dashed var(--input-border)',
-                  borderRadius: '8px',
-                  background: 'var(--input)',
-                  color: 'var(--foreground)',
-                  fontSize: '0.875rem'
-                }}
-              />
-              <span style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Maksimal 5MB. AI kami akan memverifikasi dokumen Anda secara otomatis.</span>
-
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '4px', padding: '10px', background: 'rgba(22, 163, 74, 0.08)', borderRadius: '8px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
-                <Icons.Shield size={16} color="#16a34a" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span style={{ fontSize: '0.75rem', color: '#16a34a', lineHeight: 1.4, fontWeight: 500 }}>
-                  Data KTP/KTM Anda dijamin aman. Dokumen ini hanya digunakan untuk verifikasi dan tidak akan disebarluaskan.
-                </span>
-              </div>
-            </div>
-          )}
-
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '4px' }}>
             <Input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               label="Password"
-              placeholder="••••••••"
+              placeholder="Minimal 8 karakter"
               required
+              minLength={8}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              endIcon={
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <Icons.EyeOff size={18} /> : <Icons.Eye size={18} />}
+                </button>
+              }
             />
             <Input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               label="Konfirmasi"
               placeholder="••••••••"
               required
+              minLength={8}
               value={formData.password_confirmation}
               onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
             />
           </div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6, marginTop: '-12px' }}>* Password minimal 8 karakter</span>
 
           <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
 

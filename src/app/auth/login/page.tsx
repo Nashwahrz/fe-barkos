@@ -21,6 +21,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCaptchaVerify = useCallback((token: string | null) => {
     setRecaptchaToken(token);
@@ -86,12 +87,22 @@ export default function Login() {
           />
 
           <Input 
-            type="password" 
+            type={showPassword ? 'text' : 'password'}
             label="Password"
             placeholder="••••••••" 
             required
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            endIcon={
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                tabIndex={-1}
+              >
+                {showPassword ? <Icons.EyeOff size={18} /> : <Icons.Eye size={18} />}
+              </button>
+            }
           />
 
           <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
