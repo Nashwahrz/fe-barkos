@@ -308,7 +308,7 @@ export default function Home() {
           {/* Decorative blobs */}
           <div style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', bottom: '-20px', left: '10%', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
-          <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '20px 24px', flexWrap: 'wrap' }}>
+          <div className="container install-banner-inner">
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: 0 }}>
               <div style={{
                 width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
@@ -322,7 +322,7 @@ export default function Home() {
                 <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', marginTop: '2px' }}>Pasang di HP kamu — gratis, ringan, notifikasi langsung!</div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
+            <div className="install-banner-buttons">
               <button
                 onClick={handleInstallClick}
                 style={{
