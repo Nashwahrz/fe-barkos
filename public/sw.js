@@ -22,6 +22,7 @@ self.addEventListener('push', function (e) {
       body: data.body,
       icon: data.icon || '/icon-192x192.png',
       badge: '/icon-192x192.png',
+      vibrate: [200, 100, 200, 100, 200, 100, 200],
       data: data.data || {}
     };
 

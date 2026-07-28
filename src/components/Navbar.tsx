@@ -165,12 +165,15 @@ export default function Navbar() {
       const registration = await navigator.serviceWorker.ready;
       let subscription = await registration.pushManager.getSubscription();
       
-      if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
-        });
+      // Force unsubscribe old subscription to ensure fresh VAPID keys are used
+      if (subscription) {
+        await subscription.unsubscribe();
       }
+      
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
 
       await subscribeToPushNotifications(subscription);
       setIsPushEnabled(true);
