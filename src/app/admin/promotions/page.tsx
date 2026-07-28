@@ -75,33 +75,37 @@ export default function AdminPromotions() {
         <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
           <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
             <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
-            <div style={{ marginTop: '1rem' }}>
-              <Link href="/admin/promotions/packages" style={{
-                background: 'var(--primary)', color: 'white', padding: '10px 20px', borderRadius: '8px', 
-                fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px',
-                fontSize: '0.9rem', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)'
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
-              >
-                <Icons.Tag size={18} /> Kelola Paket Promosi
-              </Link>
-            </div>
+            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ position: 'relative' }}>
-              <Icons.Search size={16} color="var(--foreground)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-              <input 
-                type="text" 
-                placeholder="Cari promosi..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem' }}
-              />
-            </div>
-            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
-              Total: {totalItems} Promosi
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end', flex: '0 0 auto' }}>
+            <Link href="/admin/promotions/packages" style={{
+              background: 'var(--primary)', color: 'white', padding: '10px 20px', borderRadius: '8px', 
+              fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px',
+              fontSize: '0.9rem', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <Icons.Tag size={18} /> Kelola Paket Promosi
+            </Link>
+
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                  <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Cari promosi..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0 }}
+                />
+              </div>
+              <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
+                Total: {totalItems} Promosi
+              </div>
             </div>
           </div>
         </header>
