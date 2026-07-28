@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/components/AuthProvider";
 
 import { RouteGuard } from "@/components/RouteGuard";
+import Footer from "@/components/Footer";
 import AIChatbot from "@/components/AIChatbot";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap', variable: '--font-inter' });
@@ -22,11 +23,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${inter.className} ${inter.variable}`}>
+      <body className={`${inter.className} ${inter.variable}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <AuthProvider>
           <RouteGuard>
             <Navbar />
-            {children}
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {children}
+            </main>
+            <Footer />
             <AIChatbot />
           </RouteGuard>
         </AuthProvider>
