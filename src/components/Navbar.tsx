@@ -139,6 +139,10 @@ export default function Navbar() {
     borderRadius: '8px', transition: 'background 0.2s'
   };
 
+  if (pathname.match(/^\/chat\/\d+\/\d+/)) {
+    return null;
+  }
+
   return (
     <>
       {/* ── Top Navbar ──────────────────────────────────────────── */}

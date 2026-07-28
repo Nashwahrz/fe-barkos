@@ -102,7 +102,8 @@ input, textarea, select {
 
 /* ── Core Components (Legacy fallback, use UI components where possible) ── */
 .chat-container-mobile {
-  height: calc(100vh - 70px);
+  height: 100vh;
+  height: 100dvh;
 }
 
 .card {
@@ -365,7 +366,7 @@ input, textarea, select {
   .section-padding { padding: 3rem 0 !important; }
   
   .chat-container-mobile {
-    height: calc(100dvh - 70px - 60px) !important;
+    height: 100dvh !important;
   }
   
   .admin-header-flex {
