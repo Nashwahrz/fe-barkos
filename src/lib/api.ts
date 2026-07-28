@@ -75,3 +75,23 @@ export function getStorageUrl(path: string | null) {
   return `${baseUrl}/${cleanPath}`;
 }
 
+/**
+ * Push Notification Helpers
+ */
+export async function subscribeToPushNotifications(subscription: PushSubscription) {
+  const subJson = subscription.toJSON();
+  return fetchApi('/push-subscribe', {
+    method: 'POST',
+    body: JSON.stringify({
+      endpoint: subJson.endpoint,
+      keys: subJson.keys,
+    }),
+  });
+}
+
+export async function unsubscribeFromPushNotifications(endpoint: string) {
+  return fetchApi('/push-unsubscribe', {
+    method: 'POST',
+    body: JSON.stringify({ endpoint }),
+  });
+}

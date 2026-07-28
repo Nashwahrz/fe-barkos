@@ -11,6 +11,24 @@ import { notificationApi } from '@/services/api/notification.api';
 import { AppNotification } from '@/types/notification';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
+import { subscribeToPushNotifications } from '@/lib/api';
+
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
+
+function urlB64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
 
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
@@ -25,6 +43,17 @@ export default function Navbar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotif, setShowNotif] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isPushEnabled, setIsPushEnabled] = useState(false);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        reg.pushManager.getSubscription().then(sub => {
+          if (sub) setIsPushEnabled(true);
+        });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -118,6 +147,37 @@ export default function Navbar() {
         }
         setDeferredPrompt(null);
       });
+    }
+  };
+
+  const handlePushSubscribe = async () => {
+    if (!VAPID_PUBLIC_KEY) {
+      alert('VAPID Public Key belum diatur di .env.local!');
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('Izin notifikasi ditolak oleh peramban.');
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+      }
+
+      await subscribeToPushNotifications(subscription);
+      setIsPushEnabled(true);
+      alert('Notifikasi HP berhasil diaktifkan!');
+    } catch (err: any) {
+      console.error(err);
+      alert('Gagal mengaktifkan notifikasi: ' + err.message);
     }
   };
 
@@ -311,6 +371,13 @@ export default function Navbar() {
               </Button>
             )}
 
+            {/* Web Push Subscribe */}
+            {user && !isPushEnabled && (
+              <Button size="sm" variant="secondary" onClick={handlePushSubscribe} className="hide-mobile" style={{ color: 'var(--primary)' }}>
+                <Icons.Bell size={14} /> Nyalakan Notif
+              </Button>
+            )}
+
             {!loading && (
               <>
                 {user ? (
@@ -449,6 +516,13 @@ export default function Navbar() {
                                     ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%'
                                   }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                     <Icons.Download size={16} /> Install Aplikasi
+                                  </button>
+                                )}
+                                {!isPushEnabled && (
+                                  <button onClick={() => { setShowProfileDropdown(false); handlePushSubscribe(); }} className="mobile-only-menu" style={{
+                                    ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: 'var(--primary)'
+                                  }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                    <Icons.Bell size={16} /> Nyalakan Notif
                                   </button>
                                 )}
                                 <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
