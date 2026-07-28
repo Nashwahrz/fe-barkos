@@ -263,6 +263,24 @@ export default function Navbar() {
           {/* ── Right Actions ── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
 
+            {/* Push Subscribe Button - Mobile/Desktop */}
+            {user && !isPushEnabled && (
+              <button
+                onClick={handlePushSubscribe}
+                title="Aktifkan Notif HP"
+                style={{
+                  padding: '6px 12px', borderRadius: '8px', border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.35)' : 'var(--primary)'}`,
+                  display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
+                  color: navTransparent ? '#fff' : 'var(--primary)', background: navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)',
+                  fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', marginRight: '4px'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)'; e.currentTarget.style.color = navTransparent ? '#fff' : 'var(--primary)'; }}
+              >
+                <Icons.Bell size={15} /> <span className="hide-mobile">Aktifkan Notif</span>
+              </button>
+            )}
+
             {/* PWA Install Button */}
             {deferredPrompt && (
               <button
