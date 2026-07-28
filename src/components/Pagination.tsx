@@ -7,7 +7,7 @@ interface PaginationProps {
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  if (totalPages <= 1) return null;
+  const safeTotalPages = Math.max(1, totalPages);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '1.5rem' }}>
@@ -25,16 +25,16 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       </button>
 
       <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)' }}>
-        Halaman {currentPage} dari {totalPages}
+        Halaman {currentPage} dari {safeTotalPages}
       </div>
 
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === safeTotalPages}
         style={{
           width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--foreground)',
-          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.5 : 1,
+          cursor: currentPage === safeTotalPages ? 'not-allowed' : 'pointer', opacity: currentPage === safeTotalPages ? 0.5 : 1,
           transition: 'all 0.2s'
         }}
       >
