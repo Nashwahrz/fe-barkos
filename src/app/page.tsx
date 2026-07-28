@@ -556,7 +556,7 @@ export default function Home() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : promotedProducts.length > 0 ? (
-                promotedProducts.slice(0, 5).map((p: any) => <ProductCard key={p.id} product={p} promoted />)
+                promotedProducts.map((p: any) => <ProductCard key={p.id} product={p} promoted />)
               ) : (
                 <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk rekomendasi saat ini.</div>
               )}
