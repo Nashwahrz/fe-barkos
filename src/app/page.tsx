@@ -580,9 +580,9 @@ export default function Home() {
             </div>
             <div className="product-grid">
               {isLoading ? (
-                Array.from({ length: 10 }).map((_, i) => <ProductCardSkeleton key={i} />)
+                Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)
               ) : products.length > 0 ? (
-                products.slice(0, 10).map((p: any) => <ProductCard key={p.id} product={p} />)
+                products.slice(0, 3).map((p: any) => <ProductCard key={p.id} product={p} />)
               ) : (
                 <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk.</div>
               )}
