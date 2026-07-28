@@ -516,37 +516,78 @@ export default function SellerPromotions() {
                           <>
                             <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU PEMBAYARAN</span>
                             {promo.snap_token && (
-                              <button
-                                onClick={() => {
-                                  if (window.snap) {
-                                    window.snap.pay(promo.snap_token, {
-                                      onSuccess: async function () {
-                                        try {
-                                          await fetchApi('/promotions/force-paid', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ order_id: promo.order_id })
-                                          });
-                                        } catch(e) {}
-                                        showMessage('Pembayaran berhasil!', 'success');
-                                        loadData();
-                                      },
-                                      onPending: function () {
-                                        showMessage('Menunggu pembayaran diselesaikan.', 'success');
-                                      },
-                                      onError: function () {
-                                        showMessage('Pembayaran gagal.', 'error');
-                                      },
-                                      onClose: function () {
-                                        showMessage('Popup pembayaran ditutup.', 'error');
+                              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                <button
+                                  onClick={() => {
+                                    if (window.snap) {
+                                      window.snap.pay(promo.snap_token, {
+                                        onSuccess: async function () {
+                                          try {
+                                            await fetchApi('/promotions/force-paid', {
+                                              method: 'POST',
+                                              headers: { 'Content-Type': 'application/json' },
+                                              body: JSON.stringify({ order_id: promo.order_id })
+                                            });
+                                          } catch(e) {}
+                                          showMessage('Pembayaran berhasil!', 'success');
+                                          loadData();
+                                        },
+                                        onPending: function () {
+                                          showMessage('Menunggu pembayaran diselesaikan.', 'success');
+                                        },
+                                        onError: function () {
+                                          showMessage('Pembayaran gagal.', 'error');
+                                        },
+                                        onClose: function () {
+                                          showMessage('Popup pembayaran ditutup.', 'error');
+                                        }
+                                      });
+                                    }
+                                  }}
+                                  style={{ fontSize: '0.7rem', background: 'var(--primary)', color: 'white', padding: '6px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Icons.CreditCard size={12} /> Lanjutkan
+                                </button>
+
+                                <button
+                                  onClick={async () => {
+                                    if (!confirm('Yakin ingin mengganti metode pembayaran? Ini akan membuat tagihan baru.')) return;
+                                    try {
+                                      const res = await fetchApi(`/promotions/${promo.id}/recreate-snap`, { method: 'PATCH' });
+                                      const newSnap = res.snap_token || res.data?.snap_token;
+                                      if (newSnap && window.snap) {
+                                        window.snap.pay(newSnap, {
+                                          onSuccess: async function () {
+                                            try {
+                                              await fetchApi('/promotions/force-paid', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ order_id: res.order_id || res.data?.order_id })
+                                              });
+                                            } catch(e) {}
+                                            showMessage('Pembayaran berhasil!', 'success');
+                                            loadData();
+                                          },
+                                          onPending: function () {
+                                            showMessage('Menunggu pembayaran diselesaikan.', 'success');
+                                          },
+                                          onError: function () {
+                                            showMessage('Pembayaran gagal.', 'error');
+                                          },
+                                          onClose: function () {
+                                            showMessage('Popup ditutup.', 'error');
+                                          }
+                                        });
                                       }
-                                    });
-                                  }
-                                }}
-                                style={{ fontSize: '0.7rem', background: 'var(--primary)', color: 'white', padding: '6px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
-                              >
-                                <Icons.CreditCard size={12} /> Bayar / Ubah Metode
-                              </button>
+                                    } catch (err: any) {
+                                      showMessage(err.message || 'Gagal mengubah metode pembayaran', 'error');
+                                    }
+                                  }}
+                                  style={{ fontSize: '0.7rem', background: '#f3f4f6', color: '#374151', padding: '6px 10px', borderRadius: '6px', border: '1px solid #d1d5db', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Icons.RefreshCw size={12} /> Ganti Metode
+                                </button>
+                              </div>
                             )}
                           </>
                         ) : promo.payment_status === 'failed' ? (
