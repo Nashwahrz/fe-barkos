@@ -111,12 +111,12 @@ export default function AdminCategories() {
       <AdminSidebar currentPath="/admin/categories" />
 
       <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header className="admin-header-flex" style={{ marginBottom: '3rem' }}>
-          <div>
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+          <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
             <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Manajemen Kategori</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Kelola kategori produk untuk memudahkan pencarian pengguna.</p>
+            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Kelola kategori produk untuk memudahkan pencarian pengguna.</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', flex: '0 0 auto' }}>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
                 <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
