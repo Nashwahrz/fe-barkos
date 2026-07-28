@@ -184,7 +184,13 @@ export default function AIChatbot() {
           lng: position.coords.longitude
         });
         setIsLocating(false);
-        const locMsg: Message = { id: Date.now().toString(), sender: 'ai', text: '📍 Lokasi kamu berhasil didapatkan! Sekarang kamu bisa tanyakan jarak barang ke lokasimu.', mood: 'happy' };
+        const locMsg: Message = { 
+          id: Date.now().toString(), 
+          sender: 'ai', 
+          text: '📍 Lokasi kamu berhasil didapatkan! Sekarang Miu bisa carikan barang terdekat dari kosmu.', 
+          mood: 'happy',
+          suggestions: ['Barang terdekat dari sini']
+        };
         setMessages(prev => [...prev, locMsg]);
         setCurrentMood('happy');
       },
