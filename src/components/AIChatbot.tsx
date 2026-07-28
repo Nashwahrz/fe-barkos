@@ -290,18 +290,16 @@ export default function AIChatbot() {
         @media (max-width: 480px) {
           .miu-chatbot-wrapper {
             bottom: 80px; /* Agak ke atas dikit untuk mobile agar tidak menutupi navbar */
-            right: 12px;
+            right: 16px;
           }
           .miu-chat-panel {
             position: fixed;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            max-height: 100%;
-            border-radius: 0;
+            bottom: 80px;
+            right: 16px;
+            width: calc(100vw - 32px);
+            height: 480px;
+            max-height: calc(100dvh - 100px);
+            border-radius: 20px;
             transform: none !important; /* Jangan ikuti transform saat drag jika panel terbuka di mobile */
           }
         }
