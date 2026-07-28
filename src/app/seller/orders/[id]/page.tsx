@@ -102,6 +102,9 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
           {order.status === 'pending' && <Icons.Clock size={14} />}
           STATUS: {order.status.toUpperCase()}
         </div>
+        <Button onClick={() => window.print()} variant="secondary" size="sm" className="no-print">
+          <Icons.Printer size={16} /> Cetak Struk
+        </Button>
       </div>
 
       {message && (
@@ -146,7 +149,7 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Info Produk */}
-      <div className="card" style={{ padding: '2rem', marginBottom: '2rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
+      <div className="card no-print" style={{ padding: '2rem', marginBottom: '2rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground)' }}>
           <Icons.Package size={20} color="var(--primary)" /> Produk yang Dipesan
         </h2>
@@ -226,6 +229,42 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
           </>
         )}
 
+      </div>
+
+      {/* Hidden Print Receipt Layout */}
+      <div className="print-area no-print" style={{ color: '#000', background: '#fff', padding: '40px', fontFamily: 'monospace', maxWidth: '400px', margin: '0 auto', border: '1px dashed #ccc' }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <img src="/logo-lapak-kos.png" alt="Lapak Kos" style={{ height: '40px', margin: '0 auto 10px', filter: 'grayscale(100%)' }} />
+          <h2 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: 'bold' }}>LAPAK KOS</h2>
+          <div style={{ fontSize: '12px' }}>Surganya Barang Bekas Anak Kos</div>
+        </div>
+        
+        <div style={{ borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '10px 0', margin: '15px 0', fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>No Pesanan:</span> <strong>#{order.id}</strong></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Tanggal:</span> <span>{new Date(order.created_at).toLocaleDateString('id-ID')}</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Status:</span> <strong>{order.status.toUpperCase()}</strong></div>
+        </div>
+
+        <div style={{ fontSize: '12px', marginBottom: '15px' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Detail Pembeli:</div>
+          <div>{order.buyer?.name}</div>
+          <div>{order.buyer?.phone || '-'}</div>
+          {order.notes && <div style={{ fontStyle: 'italic', marginTop: '5px' }}>Catatan: {order.notes}</div>}
+        </div>
+
+        <div style={{ borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '10px 0', margin: '15px 0', fontSize: '12px' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{order.product?.nama_barang}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Metode: {order.payment_method === 'cod' ? 'COD' : 'Transfer'}</span>
+            <strong>Rp {Number(order.agreed_price).toLocaleString('id-ID')}</strong>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center', fontSize: '11px', marginTop: '30px' }}>
+          <strong>TERIMA KASIH</strong><br />
+          Telah berbelanja di Lapak Kos<br />
+          <em>"Platform Jual Beli Terpercaya Anak Kos"</em>
+        </div>
       </div>
 
     </div>

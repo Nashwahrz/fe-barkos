@@ -426,3 +426,28 @@ input, textarea, select {
     grid-template-columns: 1fr;
   }
 }
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    margin: 0;
+  }
+  .no-print, .no-print * {
+    display: none !important;
+  }
+}
