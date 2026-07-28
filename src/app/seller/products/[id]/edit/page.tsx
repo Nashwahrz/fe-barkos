@@ -381,23 +381,24 @@ export default function EditProduct() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Foto Barang Utama</label>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 600, color: 'var(--foreground)' }}>Foto Barang Utama</label>
             <div 
-              style={{ 
-                border: '2px dashed var(--border)', 
-                borderRadius: '12px', 
-                padding: '2rem', 
-                textAlign: 'center', 
-                cursor: 'pointer', 
-                background: 'rgba(0,0,0,0.02)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '12px',
+              style={{
+                border: '2px dashed var(--border)',
+                borderRadius: '12px',
+                padding: '2.5rem 1rem',
+                textAlign: 'center',
+                cursor: 'pointer',
+                background: 'var(--card)',
                 transition: 'all 0.2s'
-              }} 
-              onClick={() => document.getElementById('foto-upload')?.click()}
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+              onClick={() => {
+                const optionsDiv = document.getElementById('photo-options-modal');
+                if (optionsDiv) optionsDiv.style.display = 'flex';
+              }}
             >
               {fotoPreview || currentFoto ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -407,19 +408,54 @@ export default function EditProduct() {
                   <div style={{ padding: '12px', background: 'var(--background)', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                     <Icons.Image size={24} color="var(--primary)" />
                   </div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Buka Kamera / Galeri (Ubah Foto)</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Menambahkan Foto</span>
                   <span style={{ fontSize: '0.75rem' }}>Format: JPG, PNG, WEBP</span>
                 </div>
               )}
-              <input 
-                 id="foto-upload"
-                 type="file" 
-                 accept="image/jpeg, image/png, image/webp" 
-                 style={{ display: 'none' }}
-                 onChange={handleFileChange}
-              />
             </div>
-            <small style={{ color: 'var(--foreground)', opacity: 0.5, fontSize: '0.8rem', textAlign: 'center', marginTop: '4px' }}>Abaikan jika Anda tidak ingin mengubah foto</small>
+            
+            {/* Hidden Inputs */}
+            <input 
+               id="foto-upload-camera"
+               type="file" 
+               accept="image/jpeg, image/png, image/webp" 
+               capture="environment"
+               style={{ display: 'none' }}
+               onChange={(e) => {
+                 handleFileChange(e);
+                 const optionsDiv = document.getElementById('photo-options-modal');
+                 if (optionsDiv) optionsDiv.style.display = 'none';
+               }}
+            />
+            <input 
+               id="foto-upload-gallery"
+               type="file" 
+               accept="image/jpeg, image/png, image/webp" 
+               style={{ display: 'none' }}
+               onChange={(e) => {
+                 handleFileChange(e);
+                 const optionsDiv = document.getElementById('photo-options-modal');
+                 if (optionsDiv) optionsDiv.style.display = 'none';
+               }}
+            />
+
+            {/* Photo Source Options Modal (Simple Overlay) */}
+            <div id="photo-options-modal" style={{ display: 'none', position: 'fixed', inset: 0, zIndex: 9999, alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }} onClick={(e) => { if (e.target === e.currentTarget) e.currentTarget.style.display = 'none'; }}>
+              <div style={{ background: 'var(--card)', padding: '24px', borderRadius: '16px', width: '90%', maxWidth: '320px', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', textAlign: 'center' }}>Pilih Sumber Foto</h3>
+                <Button type="button" variant="primary" onClick={() => document.getElementById('foto-upload-camera')?.click()} style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <Icons.Camera size={18} /> Buka Kamera
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => document.getElementById('foto-upload-gallery')?.click()} style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <Icons.Image size={18} /> Pilih dari Galeri
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => { const el = document.getElementById('photo-options-modal'); if (el) el.style.display = 'none'; }} style={{ marginTop: '8px' }}>
+                  Batal
+                </Button>
+              </div>
+            </div>
+            
+            <small style={{ color: 'var(--foreground)', opacity: 0.5, fontSize: '0.8rem', textAlign: 'center', marginTop: '4px', display: 'block' }}>Abaikan jika Anda tidak ingin mengubah foto</small>
           </div>
 
           <div style={{ marginTop: '2rem' }}>
