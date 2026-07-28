@@ -401,9 +401,18 @@ input, textarea, select {
   .mobile-only-spacer {
     display: block !important;
   }
+  
+  .mobile-only-menu {
+    display: flex !important;
+    flex-direction: column;
+  }
 }
 
 .mobile-only-spacer {
+  display: none;
+}
+
+.mobile-only-menu {
   display: none;
 }
 

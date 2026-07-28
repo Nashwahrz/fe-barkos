@@ -412,7 +412,7 @@ export default function Navbar() {
                                 zIndex: 100, display: 'flex', flexDirection: 'column', padding: '8px'
                               }}>
                                 {user.role === USER_ROLES.PENJUAL && (
-                                  <>
+                                  <div className="mobile-only-menu">
                                     <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toko Saya</div>
                                     <Link href="/seller/dashboard" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
                                       <Icons.BarChart2 size={16} /> Dashboard
@@ -431,7 +431,7 @@ export default function Navbar() {
                                     </Link>
                                     <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
                                     <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Akun</div>
-                                  </>
+                                  </div>
                                 )}
                                 <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
                                   <Icons.User size={16} /> Profil Saya
