@@ -355,7 +355,6 @@ export default function CreateProduct() {
                  id="foto-upload"
                  type="file" 
                  accept="image/jpeg, image/png, image/webp" 
-                 capture="environment"
                  style={{ display: 'none' }}
                  onChange={handleFileChange}
               />

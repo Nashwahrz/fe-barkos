@@ -415,7 +415,6 @@ export default function EditProduct() {
                  id="foto-upload"
                  type="file" 
                  accept="image/jpeg, image/png, image/webp" 
-                 capture="environment"
                  style={{ display: 'none' }}
                  onChange={handleFileChange}
               />
