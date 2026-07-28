@@ -150,8 +150,35 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Metode</div>
-                <div style={{ fontWeight: 700, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  {order.payment_method === 'cod' ? <><Icons.Handshake size={14}/> COD</> : <><Icons.CreditCard size={14}/> Transfer Bank</>}
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {order.payment_method === 'cod' ? <><Icons.Handshake size={14}/> COD</> : <><Icons.CreditCard size={14}/> Transfer Bank</>}
+                  </div>
+                  {order.status !== 'completed' && order.status !== 'cancelled' && !order.has_payment_proof && (
+                    <button 
+                      onClick={async () => {
+                        if (!confirm(`Yakin ingin mengubah metode pembayaran menjadi ${order.payment_method === 'cod' ? 'Transfer Bank' : 'COD'}?`)) return;
+                        setActionLoading(true);
+                        try {
+                          await fetchApi(`/transactions/${resolvedParams.id}/payment-method`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ payment_method: order.payment_method === 'cod' ? 'bank_transfer' : 'cod' })
+                          });
+                          showToast('Metode pembayaran berhasil diubah', 'success');
+                          loadOrder();
+                        } catch (err: any) {
+                          showToast(err.message || 'Gagal mengubah metode pembayaran', 'error');
+                        } finally {
+                          setActionLoading(false);
+                        }
+                      }} 
+                      disabled={actionLoading}
+                      style={{ fontSize: '0.75rem', color: 'var(--primary)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', fontWeight: 700, opacity: actionLoading ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: '2px' }}
+                    >
+                      <Icons.RefreshCw size={12} /> Ubah ke {order.payment_method === 'cod' ? 'Transfer' : 'COD'}
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
