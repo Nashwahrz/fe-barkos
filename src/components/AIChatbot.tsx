@@ -10,6 +10,7 @@ type Message = {
   sender: 'user' | 'ai';
   text: string;
   mood?: CatMood;
+  suggestions?: string[];
 };
 
 // Cat mood types mapped to images
@@ -208,11 +209,32 @@ export default function AIChatbot() {
     }
   }, [isTyping]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
+  const handleSend = async (e?: React.FormEvent, overrideText?: string) => {
+    if (e) e.preventDefault();
+    const textToSend = overrideText || inputValue;
+    if (!textToSend.trim()) return;
 
-    const newUserMsg: Message = { id: Date.now().toString(), sender: 'user', text: inputValue };
+    const lowerInput = textToSend.toLowerCase().trim();
+    const greetingRegex = /^(halo|hai|hi|hello|helo|selamat pagi|selamat siang|selamat sore|selamat malam) ?(miu|semua)?$/i;
+
+    if (greetingRegex.test(lowerInput)) {
+      const newUserMsg: Message = { id: Date.now().toString(), sender: 'user', text: textToSend };
+      setMessages(prev => [
+        ...prev, 
+        newUserMsg,
+        {
+          id: (Date.now() + 1).toString(),
+          sender: 'ai',
+          text: `Halo juga! Miu di sini 🐱✨ Miu bisa bantu kamu cari kos atau barang bekas lho. Mau cari apa hari ini?`,
+          mood: 'happy',
+          suggestions: ['List barang terbaru', 'Barang terdekat dari sini', 'Cari laptop murah']
+        }
+      ]);
+      setInputValue('');
+      return;
+    }
+
+    const newUserMsg: Message = { id: Date.now().toString(), sender: 'user', text: textToSend };
     setMessages(prev => [...prev, newUserMsg]);
     setInputValue('');
     setIsTyping(true);
@@ -228,7 +250,7 @@ export default function AIChatbot() {
       const response = await fetchApi('/chatbot', {
         method: 'POST',
         body: JSON.stringify({
-          message: inputValue,
+          message: textToSend,
           history,
           lat: userLocation?.lat,
           lng: userLocation?.lng
@@ -393,17 +415,38 @@ export default function AIChatbot() {
                       />
                     </div>
                   )}
-                  <div style={{
-                    padding: '10px 14px',
-                    borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    background: msg.sender === 'user' ? 'var(--primary)' : 'white',
-                    color: msg.sender === 'user' ? 'white' : 'var(--foreground)',
-                    boxShadow: msg.sender === 'user' ? 'none' : '0 2px 8px rgba(0,0,0,0.05)',
-                    border: msg.sender === 'user' ? 'none' : '1px solid var(--border)',
-                    fontSize: '0.85rem', lineHeight: 1.4,
-                    wordBreak: 'break-word' as const,
-                  }}>
-                    {renderMessageWithCards(msg.text)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{
+                      padding: '10px 14px',
+                      borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      background: msg.sender === 'user' ? 'var(--primary)' : 'white',
+                      color: msg.sender === 'user' ? 'white' : 'var(--foreground)',
+                      boxShadow: msg.sender === 'user' ? 'none' : '0 2px 8px rgba(0,0,0,0.05)',
+                      border: msg.sender === 'user' ? 'none' : '1px solid var(--border)',
+                      fontSize: '0.85rem', lineHeight: 1.4,
+                      wordBreak: 'break-word' as const,
+                    }}>
+                      {renderMessageWithCards(msg.text)}
+                    </div>
+                    {msg.suggestions && msg.suggestions.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+                        {msg.suggestions.map((sug, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSend(undefined, sug)}
+                            style={{
+                              background: 'rgba(0,170,91,0.08)', color: 'var(--primary)', border: '1px solid rgba(0,170,91,0.2)',
+                              borderRadius: '16px', padding: '5px 12px', fontSize: '0.75rem', fontWeight: 600,
+                              cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left'
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,170,91,0.08)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                          >
+                            {sug}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
