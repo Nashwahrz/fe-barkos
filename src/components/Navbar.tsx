@@ -211,45 +211,42 @@ export default function Navbar() {
         position: 'sticky', top: 0, zIndex: 100,
         background: navTransparent ? 'transparent' : 'var(--card)',
         borderBottom: navTransparent ? '1px solid transparent' : '1px solid var(--border)',
-        boxShadow: navTransparent ? 'none' : '0 4px 20px rgba(0, 170, 91, 0.05)',
+        boxShadow: navTransparent ? 'none' : '0 2px 16px rgba(0,0,0,0.06)',
         transition: 'all 0.3s ease'
       }}>
-        <div className="container flex items-center justify-between" style={{ height: '64px', gap: '16px' }}>
+        <div className="container flex items-center justify-between" style={{ height: '64px', gap: '12px' }}>
 
-          {/* Logo */}
+          {/* ── Logo ── */}
           <Link href="/" style={{
-            fontSize: '1.25rem', fontWeight: 800, color: textColor,
+            fontWeight: 800, color: textColor, whiteSpace: 'nowrap',
             letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px',
-            textDecoration: 'none', transition: 'color 0.3s'
+            textDecoration: 'none', transition: 'color 0.3s', flexShrink: 0,
           }}>
             <img
               src="/logo-lapak-kos.png"
               alt={APP_NAME}
-              style={{ height: '32px', width: 'auto', objectFit: 'contain', filter: navTransparent ? 'brightness(0) invert(1)' : 'none', transition: 'filter 0.3s' }}
+              style={{ height: '34px', width: 'auto', objectFit: 'contain', filter: navTransparent ? 'brightness(0) invert(1)' : 'none', transition: 'filter 0.3s' }}
             />
-            <span className="hide-mobile" style={{ marginLeft: '4px' }}>{APP_NAME.toUpperCase()}</span>
+            <span className="hide-mobile" style={{ fontSize: '1.05rem', letterSpacing: '-0.01em' }}>{APP_NAME}</span>
           </Link>
 
-          {/* Center Nav Links — hidden on mobile */}
+          {/* ── Center Nav Links ── */}
           {user && !pathname.startsWith('/admin') && (
-            <div className="nav-links hide-mobile" style={{ display: 'flex', gap: '8px' }}>
+            <div className="hide-mobile" style={{ display: 'flex', gap: '2px', flex: 1, justifyContent: 'center' }}>
               {[
                 { label: 'Beranda', href: '/' },
                 { label: 'Katalog', href: '/products' },
               ].map(item => (
                 <Link key={item.href} href={item.href} style={{
-                  padding: '8px 16px', borderRadius: '8px', fontWeight: 500,
-                  fontSize: '0.9rem', color: (isActive(item.href) && !navTransparent) ? 'var(--primary)' : textColor,
+                  padding: '7px 16px', borderRadius: '8px', fontWeight: 500,
+                  fontSize: '0.9rem',
+                  color: (isActive(item.href) && !navTransparent) ? 'var(--primary)' : textColor,
                   background: (isActive(item.href) && !navTransparent) ? 'var(--primary-light)' : 'transparent',
                   transition: 'all 0.2s', textDecoration: 'none',
-                  opacity: isActive(item.href) ? 1 : 0.7
+                  opacity: isActive(item.href) ? 1 : 0.75,
                 }}
-                onMouseEnter={e => {
-                  if (!isActive(item.href) || navTransparent) e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)';
-                }}
-                onMouseLeave={e => {
-                  if (!isActive(item.href) || navTransparent) e.currentTarget.style.background = 'transparent';
-                }}
+                onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.05)'; e.currentTarget.style.opacity = '1'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = (isActive(item.href) && !navTransparent) ? 'var(--primary-light)' : 'transparent'; e.currentTarget.style.opacity = isActive(item.href) ? '1' : '0.75'; }}
                 >
                   {item.label}
                 </Link>
@@ -258,76 +255,74 @@ export default function Navbar() {
           )}
 
           {pathname.startsWith('/admin') && (
-            <div style={{ fontWeight: 600, fontSize: '0.95rem', color: textColor }}>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: textColor, opacity: 0.6, flex: 1 }}>
               Panel Administrasi
             </div>
           )}
 
-          {/* Right Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* ── Right Actions ── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
 
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               title={theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
               style={{
-                width: '36px', height: '36px', borderRadius: '8px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer',
-                color: textColor, opacity: 0.7, transition: 'all 0.2s'
+                width: '36px', height: '36px', borderRadius: '8px', border: 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                color: textColor, opacity: 0.65, background: 'transparent', transition: 'all 0.2s'
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'; e.currentTarget.style.opacity = '1'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.65'; }}
             >
               {theme === 'light' ? <Icons.Moon size={18} /> : <Icons.Sun size={18} />}
             </button>
-            
+
             {/* Notification Bell */}
             {user && !pathname.startsWith('/admin') && (
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setShowNotif(!showNotif)}
+                  title="Notifikasi"
                   style={{
-                    width: '36px', height: '36px', borderRadius: '8px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer',
-                    color: textColor, opacity: 0.7, transition: 'all 0.2s'
+                    width: '36px', height: '36px', borderRadius: '8px', border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                    color: textColor, opacity: 0.65, background: 'transparent', transition: 'all 0.2s', position: 'relative'
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'; e.currentTarget.style.opacity = '1'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.65'; }}
                 >
                   <Icons.Bell size={18} />
                   {unreadCount > 0 && (
                     <span style={{
-                      position: 'absolute', top: '4px', right: '4px',
+                      position: 'absolute', top: '6px', right: '6px',
                       background: 'var(--primary)', width: '8px', height: '8px', borderRadius: '50%',
+                      border: '2px solid var(--card)',
                     }} />
                   )}
                 </button>
 
-                {/* Dropdown Notifikasi */}
                 {showNotif && (
                   <>
-                    <div 
-                      style={{ position: 'fixed', inset: 0, zIndex: 90 }} 
-                      onClick={() => setShowNotif(false)}
-                    />
+                    <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowNotif(false)} />
                     <div style={{
-                      position: 'absolute', top: '100%', right: 0, marginTop: '8px',
-                      width: '320px', maxHeight: '400px', overflowY: 'auto',
+                      position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                      width: '340px', maxHeight: '420px', overflowY: 'auto',
                       background: 'var(--card)', border: '1px solid var(--border)',
-                      borderRadius: '12px', boxShadow: 'var(--shadow-lg)',
+                      borderRadius: '14px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                       zIndex: 100, display: 'flex', flexDirection: 'column'
                     }}>
-                      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'var(--card)', zIndex: 2 }}>
-                        <h3 style={{ fontSize: '0.9rem', fontWeight: 600 }}>Notifikasi</h3>
+                      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'var(--card)', zIndex: 2, borderRadius: '14px 14px 0 0' }}>
+                        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>Notifikasi {unreadCount > 0 && <span style={{ background: 'var(--primary)', color: 'white', borderRadius: '20px', padding: '1px 8px', fontSize: '0.72rem', marginLeft: '6px' }}>{unreadCount}</span>}</h3>
                         {unreadCount > 0 && (
-                          <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer' }}>
+                          <button onClick={handleMarkAllRead} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', padding: 0 }}>
                             Tandai semua dibaca
                           </button>
                         )}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         {notifications.length === 0 ? (
-                          <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.85rem' }}>
+                          <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.4, fontSize: '0.85rem' }}>
                             Belum ada notifikasi.
                           </div>
                         ) : (
@@ -336,22 +331,24 @@ export default function Navbar() {
                               key={notif.id}
                               onClick={() => handleNotifClick(notif)}
                               style={{
-                                display: 'flex', gap: '12px', padding: '12px 16px',
+                                display: 'flex', gap: '12px', padding: '12px 16px', border: 'none',
                                 borderBottom: '1px solid var(--border)', background: notif.read_at ? 'transparent' : 'var(--primary-light)',
                                 textAlign: 'left', cursor: 'pointer', transition: 'background 0.15s'
                               }}
+                              onMouseEnter={e => e.currentTarget.style.background = notif.read_at ? 'rgba(0,0,0,0.02)' : 'var(--primary-light)'}
+                              onMouseLeave={e => e.currentTarget.style.background = notif.read_at ? 'transparent' : 'var(--primary-light)'}
                             >
                               <div style={{
-                                width: '6px', height: '6px', borderRadius: '50%',
+                                width: '7px', height: '7px', borderRadius: '50%',
                                 background: notif.read_at ? 'transparent' : 'var(--primary)',
-                                marginTop: '6px', flexShrink: 0
+                                marginTop: '5px', flexShrink: 0
                               }} />
                               <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--foreground)', lineHeight: 1.4, margin: 0, fontWeight: notif.read_at ? 400 : 500 }}>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--foreground)', lineHeight: 1.45, margin: 0, fontWeight: notif.read_at ? 400 : 600 }}>
                                   {notif.data.message}
                                 </p>
-                                <span style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '4px', display: 'block' }}>
-                                  {new Date(notif.created_at).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                <span style={{ fontSize: '0.73rem', opacity: 0.45, marginTop: '3px', display: 'block' }}>
+                                  {new Date(notif.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                 </span>
                               </div>
                             </button>
@@ -364,186 +361,209 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* PWA Install */}
-            {deferredPrompt && (
-              <Button size="sm" variant="secondary" onClick={handleInstallClick} className="hide-mobile">
-                <Icons.Download size={14} /> Install
-              </Button>
+            {/* Seller Quick Links — Desktop Only */}
+            {user && user.role === USER_ROLES.PENJUAL && !pathname.startsWith('/admin') && (
+              <div className="hide-mobile" style={{ display: 'flex', gap: '2px', marginLeft: '4px', paddingLeft: '8px', borderLeft: `1px solid ${navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)'}` }}>
+                {[
+                  { href: '/seller/dashboard', icon: <Icons.BarChart2 size={17} />, title: 'Dashboard' },
+                  { href: '/seller/products', icon: <Icons.Package size={17} />, title: 'Lapak Saya' },
+                  { href: '/seller/orders', icon: <Icons.ShoppingBag size={17} />, title: 'Pesanan' },
+                  { href: '/seller/offers', icon: <Icons.Zap size={17} />, title: 'Tawaran' },
+                ].map(item => (
+                  <Link key={item.href} href={item.href} title={item.title} style={{
+                    width: '34px', height: '34px', borderRadius: '8px', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', color: pathname === item.href ? 'var(--primary)' : textColor,
+                    opacity: pathname === item.href ? 1 : 0.6, textDecoration: 'none', transition: 'all 0.2s',
+                    background: pathname === item.href ? 'var(--primary-light)' : 'transparent',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'var(--primary-light)'; e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = 'var(--primary)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = pathname === item.href ? 'var(--primary-light)' : 'transparent'; e.currentTarget.style.opacity = pathname === item.href ? '1' : '0.6'; e.currentTarget.style.color = pathname === item.href ? 'var(--primary)' : textColor; }}
+                  >
+                    {item.icon}
+                  </Link>
+                ))}
+              </div>
             )}
 
-            {/* Web Push Subscribe */}
-            {user && !isPushEnabled && (
-              <Button size="sm" variant="secondary" onClick={handlePushSubscribe} className="hide-mobile" style={{ color: 'var(--primary)' }}>
-                <Icons.Bell size={14} /> Nyalakan Notif
-              </Button>
+            {/* Chat icon */}
+            {user && !pathname.startsWith('/admin') && (
+              <Link href="/chat" title="Pesan" className="hide-mobile" style={{
+                width: '34px', height: '34px', borderRadius: '8px', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', color: pathname === '/chat' ? 'var(--primary)' : textColor,
+                opacity: pathname === '/chat' ? 1 : 0.6, textDecoration: 'none', transition: 'all 0.2s',
+                background: pathname === '/chat' ? 'var(--primary-light)' : 'transparent',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'var(--primary-light)'; e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = 'var(--primary)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = pathname === '/chat' ? 'var(--primary-light)' : 'transparent'; e.currentTarget.style.opacity = pathname === '/chat' ? '1' : '0.6'; e.currentTarget.style.color = pathname === '/chat' ? 'var(--primary)' : textColor; }}
+              >
+                <Icons.MessageCircle size={17} />
+              </Link>
             )}
+
+            {/* Separator before user section */}
+            {user && <div style={{ width: '1px', height: '22px', background: navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)', margin: '0 4px' }} />}
 
             {!loading && (
               <>
                 {user ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <>
+                    {/* Admin shortcut */}
                     {user.role === USER_ROLES.SUPER_ADMIN && !pathname.startsWith('/admin') && (
-                      <Link href="/admin/dashboard" className="hide-mobile nav-icon-btn" style={{
-                        color: textColor, opacity: 0.7
-                      }} title="Admin"
-                      onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
+                      <Link href="/admin/dashboard" title="Panel Admin" className="hide-mobile" style={{
+                        padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600,
+                        color: textColor, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px',
+                        opacity: 0.75, transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.05)'; e.currentTarget.style.opacity = '1'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.75'; }}
                       >
-                        <div style={{ flexShrink: 0, display: 'flex' }}>
-                          <Icons.Shield size={18} />
-                        </div>
-                        <span className="nav-icon-text hide-tablet">
-                          Admin
-                        </span>
-                      </Link>
-                    )}
-                    {user.role === USER_ROLES.PENJUAL ? (
-                      <div className="hide-mobile" style={{ display: 'flex', gap: '4px' }}>
-                        {[
-                          { href: '/seller/dashboard', icon: <Icons.BarChart2 size={18} />, title: 'Dashboard' },
-                          { href: '/seller/products', icon: <Icons.Package size={18} />, title: 'Lapak Saya' },
-                          { href: '/seller/orders', icon: <Icons.ShoppingBag size={18} />, title: 'Pesanan Masuk' },
-                          { href: '/seller/offers', icon: <Icons.Zap size={18} />, title: 'Tawaran Masuk' },
-                          { href: '/seller/promotions', icon: <Icons.Megaphone size={18} />, title: 'Promosi' }
-                        ].map(item => (
-                          <Link key={item.href} href={item.href} className="nav-icon-btn" style={{
-                            color: textColor, opacity: 0.7
-                          }} title={item.title}
-                          onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
-                          >
-                            <div style={{ flexShrink: 0, display: 'flex' }}>
-                              {item.icon}
-                            </div>
-                            <span className="nav-icon-text hide-tablet">
-                              {item.title}
-                            </span>
-                          </Link>
-                        ))}
-                      </div>
-                    ) : user.role !== USER_ROLES.SUPER_ADMIN ? (
-                      <Button href="/seller/register" size="sm" variant="ghost" className="hide-mobile" style={{ color: textColor }}>
-                        <Icons.Store size={16} /> Mulai Jual
-                      </Button>
-                    ) : null}
-
-                    {/* Chat */}
-                    {!pathname.startsWith('/admin') && (
-                      <Link href="/chat" className="hide-mobile nav-icon-btn" style={{
-                        color: textColor, opacity: 0.7
-                      }} title="Pesan"
-                      onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; e.currentTarget.style.opacity = '1'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.7'; }}
-                      >
-                        <div style={{ flexShrink: 0, display: 'flex' }}>
-                          <Icons.MessageCircle size={18} />
-                        </div>
-                        <span className="nav-icon-text hide-tablet">
-                          Pesan
-                        </span>
+                        <Icons.Shield size={16} /> Admin
                       </Link>
                     )}
 
-                    {/* Profile & Logout Group */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '8px', position: 'relative' }}>
-                      {user.role !== USER_ROLES.SUPER_ADMIN && (
-                        <>
-                          <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            padding: '4px 12px 4px 4px', borderRadius: '24px', border: 'none',
-                            background: 'transparent', transition: 'background 0.2s', cursor: 'pointer'
-                          }}
-                          onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.04)'; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-                          >
+                    {/* Mulai Jual for buyers */}
+                    {user.role !== USER_ROLES.PENJUAL && user.role !== USER_ROLES.SUPER_ADMIN && (
+                      <Link href="/seller/register" className="hide-mobile" style={{
+                        padding: '7px 16px', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600,
+                        color: navTransparent ? '#fff' : 'var(--primary)',
+                        border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.35)' : 'var(--primary)'}`,
+                        textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px',
+                        transition: 'all 0.2s', background: navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--primary)'; e.currentTarget.style.color = navTransparent ? '#fff' : '#fff'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)'; e.currentTarget.style.color = navTransparent ? '#fff' : 'var(--primary)'; }}
+                      >
+                        <Icons.Store size={15} /> Mulai Jual
+                      </Link>
+                    )}
+
+                    {/* Profile Dropdown */}
+                    {user.role !== USER_ROLES.SUPER_ADMIN && (
+                      <div style={{ position: 'relative' }}>
+                        <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} style={{
+                          display: 'flex', alignItems: 'center', gap: '8px',
+                          padding: '5px 10px 5px 5px', borderRadius: '24px', border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)'}`,
+                          background: navTransparent ? 'rgba(255,255,255,0.08)' : 'transparent', transition: 'all 0.2s', cursor: 'pointer'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.15)' : 'var(--input)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.08)' : 'transparent'; }}
+                        >
+                          <div style={{
+                            width: '28px', height: '28px', borderRadius: '50%',
+                            background: navTransparent ? 'rgba(255,255,255,0.25)' : 'var(--primary-light)',
+                            color: navTransparent ? '#fff' : 'var(--primary)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontWeight: 700, fontSize: '0.8rem', flexShrink: 0, overflow: 'hidden'
+                          }}>
+                            {user.avatar ? (
+                              <img src={getStorageUrl(user.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              user.name.charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <span className="hide-mobile" style={{ fontWeight: 600, fontSize: '0.85rem', color: textColor }}>
+                            {user.name.split(' ')[0]}
+                          </span>
+                          <Icons.ChevronDown size={13} style={{ opacity: 0.5, color: textColor, transition: 'transform 0.2s', transform: showProfileDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                        </button>
+
+                        {showProfileDropdown && (
+                          <>
+                            <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowProfileDropdown(false)} />
                             <div style={{
-                              width: '30px', height: '30px', borderRadius: '50%',
-                              background: navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--border)', color: textColor,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontWeight: 500, fontSize: '0.85rem', flexShrink: 0, overflow: 'hidden'
+                              position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                              width: '230px', background: 'var(--card)', border: '1px solid var(--border)',
+                              borderRadius: '14px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                              zIndex: 100, display: 'flex', flexDirection: 'column', padding: '6px', overflow: 'hidden'
                             }}>
-                              {user.avatar ? (
-                                <img src={getStorageUrl(user.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              ) : (
-                                user.name.charAt(0).toUpperCase()
-                              )}
-                            </div>
-                            <span className="hide-mobile" style={{ fontWeight: 500, fontSize: '0.85rem', color: textColor }}>
-                              {user.name.split(' ')[0]}
-                            </span>
-                            <Icons.ChevronDown size={14} style={{ opacity: 0.5, color: textColor }} />
-                          </button>
 
-                          {showProfileDropdown && (
-                            <>
-                              <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowProfileDropdown(false)} />
-                              <div style={{
-                                position: 'absolute', top: '100%', right: 0, marginTop: '8px',
-                                width: '220px', background: 'var(--card)', border: '1px solid var(--border)',
-                                borderRadius: '12px', boxShadow: 'var(--shadow-lg)',
-                                zIndex: 100, display: 'flex', flexDirection: 'column', padding: '8px'
-                              }}>
-                                {user.role === USER_ROLES.PENJUAL && (
-                                  <div className="mobile-only-menu">
-                                    <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toko Saya</div>
-                                    <Link href="/seller/dashboard" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                      <Icons.BarChart2 size={16} /> Dashboard
-                                    </Link>
-                                    <Link href="/seller/products" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                      <Icons.Package size={16} /> Lapak Saya
-                                    </Link>
-                                    <Link href="/seller/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                      <Icons.ShoppingBag size={16} /> Pesanan Masuk
-                                    </Link>
-                                    <Link href="/seller/offers" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                      <Icons.Zap size={16} /> Tawaran Masuk
-                                    </Link>
-                                    <Link href="/seller/promotions" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                      <Icons.Megaphone size={16} /> Promosi
-                                    </Link>
-                                    <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
-                                    <div style={{ padding: '8px 12px 4px', fontSize: '0.7rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Akun</div>
-                                  </div>
-                                )}
-                                <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                  <Icons.User size={16} /> Profil Saya
-                                </Link>
-                                <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
-                                  <Icons.ShoppingBag size={16} /> Pesanan Saya
-                                </Link>
-                                {deferredPrompt && (
-                                  <button onClick={() => { setShowProfileDropdown(false); handleInstallClick(); }} className="mobile-only-menu" style={{
-                                    ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%'
-                                  }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                    <Icons.Download size={16} /> Install Aplikasi
-                                  </button>
-                                )}
-                                {!isPushEnabled && (
-                                  <button onClick={() => { setShowProfileDropdown(false); handlePushSubscribe(); }} className="mobile-only-menu" style={{
-                                    ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: 'var(--primary)'
-                                  }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                    <Icons.Bell size={16} /> Nyalakan Notif
-                                  </button>
-                                )}
-                                <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
-                                <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{
-                                  ...dropdownItemStyle, color: 'var(--danger)', cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.1)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                  <Icons.LogOut size={16} /> Keluar
-                                </button>
+                              {/* User info header */}
+                              <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--foreground)' }}>{user.name}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '1px' }}>{user.email}</div>
                               </div>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
+
+                              {/* Seller menu — mobile only */}
+                              {user.role === USER_ROLES.PENJUAL && (
+                                <div className="mobile-only-menu">
+                                  <div style={{ padding: '6px 12px 2px', fontSize: '0.68rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Toko Saya</div>
+                                  {[
+                                    { href: '/seller/dashboard', icon: <Icons.BarChart2 size={15} />, label: 'Dashboard' },
+                                    { href: '/seller/products', icon: <Icons.Package size={15} />, label: 'Lapak Saya' },
+                                    { href: '/seller/orders', icon: <Icons.ShoppingBag size={15} />, label: 'Pesanan Masuk' },
+                                    { href: '/seller/offers', icon: <Icons.Zap size={15} />, label: 'Tawaran Masuk' },
+                                    { href: '/seller/promotions', icon: <Icons.Megaphone size={15} />, label: 'Promosi' },
+                                  ].map(item => (
+                                    <Link key={item.href} href={item.href} onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                      {item.icon} {item.label}
+                                    </Link>
+                                  ))}
+                                  <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
+                                </div>
+                              )}
+
+                              <Link href="/profile" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}
+                              onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <Icons.User size={15} /> Profil Saya
+                              </Link>
+                              <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}
+                              onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <Icons.ShoppingBag size={15} /> Pesanan Saya
+                              </Link>
+
+                              {/* Install & Push — in dropdown */}
+                              {deferredPrompt && (
+                                <button onClick={() => { setShowProfileDropdown(false); handleInstallClick(); }} style={{
+                                  ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                  <Icons.Download size={15} /> Install Aplikasi
+                                </button>
+                              )}
+                              {!isPushEnabled && (
+                                <button onClick={() => { setShowProfileDropdown(false); handlePushSubscribe(); }} style={{
+                                  ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: 'var(--primary)'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                  <Icons.Bell size={15} /> Aktifkan Notif HP
+                                </button>
+                              )}
+
+                              <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
+                              <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{
+                                ...dropdownItemStyle, color: '#ef4444', cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none'
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <Icons.LogOut size={15} /> Keluar
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Link href="/auth/login" style={{ color: textColor, textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500, padding: '8px 16px' }}>Masuk</Link>
-                    <Button href="/auth/register" variant={navTransparent ? 'secondary' : 'primary'} size="sm">Daftar</Button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Link href="/auth/login" style={{ color: textColor, textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500, padding: '7px 14px', borderRadius: '8px', opacity: 0.8, transition: 'opacity 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
+                    >Masuk</Link>
+                    <Link href="/auth/register" style={{
+                      padding: '7px 16px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700,
+                      background: navTransparent ? 'rgba(255,255,255,0.9)' : 'var(--primary)',
+                      color: navTransparent ? 'var(--primary)' : '#fff', textDecoration: 'none',
+                      transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,170,91,0.3)'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,170,91,0.4)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,170,91,0.3)'; }}
+                    >Daftar</Link>
                   </div>
                 )}
               </>
@@ -562,14 +582,14 @@ export default function Navbar() {
             { href: '/profile', icon: <Icons.User size={22} />, label: 'Profil' },
           ].map(item => (
             <Link key={item.href} href={item.href} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
               padding: '6px 12px', textDecoration: 'none', minWidth: '56px',
               color: isActive(item.href) ? 'var(--primary)' : 'var(--foreground)',
-              opacity: isActive(item.href) ? 1 : 0.5,
+              opacity: isActive(item.href) ? 1 : 0.45,
               transition: 'all 0.15s'
             }}>
               {item.icon}
-              <span style={{ fontSize: '0.65rem', fontWeight: 500 }}>{item.label}</span>
+              <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -577,3 +597,5 @@ export default function Navbar() {
     </>
   );
 }
+
+
