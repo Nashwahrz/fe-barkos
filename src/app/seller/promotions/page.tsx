@@ -511,9 +511,44 @@ export default function SellerPromotions() {
                       </div>
 
                       {/* Status badge */}
-                      <div style={{ flexShrink: 0 }}>
+                      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                         {promo.payment_status === 'pending' ? (
-                          <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU PEMBAYARAN</span>
+                          <>
+                            <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU PEMBAYARAN</span>
+                            {promo.snap_token && (
+                              <button
+                                onClick={() => {
+                                  if (window.snap) {
+                                    window.snap.pay(promo.snap_token, {
+                                      onSuccess: async function () {
+                                        try {
+                                          await fetchApi('/promotions/force-paid', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ order_id: promo.order_id })
+                                          });
+                                        } catch(e) {}
+                                        showMessage('Pembayaran berhasil!', 'success');
+                                        loadData();
+                                      },
+                                      onPending: function () {
+                                        showMessage('Menunggu pembayaran diselesaikan.', 'success');
+                                      },
+                                      onError: function () {
+                                        showMessage('Pembayaran gagal.', 'error');
+                                      },
+                                      onClose: function () {
+                                        showMessage('Popup pembayaran ditutup.', 'error');
+                                      }
+                                    });
+                                  }
+                                }}
+                                style={{ fontSize: '0.7rem', background: 'var(--primary)', color: 'white', padding: '6px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
+                              >
+                                <Icons.CreditCard size={12} /> Bayar / Ubah Metode
+                              </button>
+                            )}
+                          </>
                         ) : promo.payment_status === 'failed' ? (
                           <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>GAGAL</span>
                         ) : isActive ? (
