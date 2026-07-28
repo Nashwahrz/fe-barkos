@@ -214,26 +214,6 @@ export default function AIChatbot() {
     const textToSend = overrideText || inputValue;
     if (!textToSend.trim()) return;
 
-    const lowerInput = textToSend.toLowerCase().trim();
-    const greetingRegex = /^(halo|hai|hi|hello|helo|selamat pagi|selamat siang|selamat sore|selamat malam) ?(miu|semua)?$/i;
-
-    if (greetingRegex.test(lowerInput)) {
-      const newUserMsg: Message = { id: Date.now().toString(), sender: 'user', text: textToSend };
-      setMessages(prev => [
-        ...prev, 
-        newUserMsg,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: `Halo juga! Miu di sini 🐱✨ Miu bisa bantu kamu cari kos atau barang bekas lho. Mau cari apa hari ini?`,
-          mood: 'happy',
-          suggestions: ['List barang terbaru', 'Barang terdekat dari sini', 'Cari laptop murah']
-        }
-      ]);
-      setInputValue('');
-      return;
-    }
-
     const newUserMsg: Message = { id: Date.now().toString(), sender: 'user', text: textToSend };
     setMessages(prev => [...prev, newUserMsg]);
     setInputValue('');
@@ -257,11 +237,17 @@ export default function AIChatbot() {
         })
       });
 
-      // Misalkan backend mengembalikan { text: "jawaban AI" }
+      // Misalkan backend mengembalikan { text: "jawaban AI", suggestions: ["..."] }
       const aiText = response.text || response.answer || 'Maaf, Miu tidak mendapat jawaban dari server. Coba lagi ya! 🙏';
 
       const mood = detectMood(aiText);
-      setMessages(prev => [...prev, { id: Date.now().toString(), sender: 'ai', text: aiText, mood }]);
+      setMessages(prev => [...prev, { 
+        id: Date.now().toString(), 
+        sender: 'ai', 
+        text: aiText, 
+        mood,
+        suggestions: response.suggestions
+      }]);
       setCurrentMood(mood);
 
     } catch (error: any) {
