@@ -18,13 +18,13 @@ interface Order {
   agreed_price: number;
   created_at: string;
   buyer?: { name?: string; email?: string };
-  product?: { name?: string };
+  product?: { nama_barang?: string };
 }
 
 interface Product {
   id: number;
-  name: string;
-  price: number;
+  nama_barang: string;
+  harga: number;
   status_terjual: boolean;
   created_at: string;
   views?: number;
@@ -621,7 +621,7 @@ export default function SellerDashboard() {
                         onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
                       >
                         <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--primary)' }}>#{o.id}</td>
-                        <td style={{ padding: '10px 12px', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.product?.name ?? '—'}</td>
+                        <td style={{ padding: '10px 12px', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.product?.nama_barang ?? '—'}</td>
                         <td style={{ padding: '10px 12px', color: 'var(--muted-foreground)' }}>{o.buyer?.name ?? o.buyer?.email ?? '—'}</td>
                         <td style={{ padding: '10px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{formatRupiah(Number(o.agreed_price))}</td>
                         <td style={{ padding: '10px 12px' }}>
@@ -659,8 +659,8 @@ export default function SellerDashboard() {
                       onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--accent)'}
                       onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
                     >
-                      <td style={{ padding: '10px 12px', fontWeight: 600, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</td>
-                      <td style={{ padding: '10px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{formatRupiah(Number(p.price))}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nama_barang}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{formatRupiah(Number(p.harga))}</td>
                       <td style={{ padding: '10px 12px' }}>
                         <span style={{
                           background: p.status_terjual ? 'rgba(99,102,241,0.12)' : 'rgba(16,185,129,0.12)',
