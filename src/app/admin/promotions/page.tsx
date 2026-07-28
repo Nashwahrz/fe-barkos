@@ -72,8 +72,8 @@ export default function AdminPromotions() {
       <AdminSidebar currentPath="/admin/promotions" />
 
       <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header className="admin-header-flex" style={{ marginBottom: '3rem', alignItems: 'flex-start' }}>
-          <div>
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+          <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
             <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
             <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
             <div style={{ marginTop: '1rem' }}>
