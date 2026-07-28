@@ -84,7 +84,7 @@ function exportCSV(orders: Order[], products: Product[], stats: DashboardStats) 
   rows.push('--- Riwayat Transaksi ---');
   rows.push('ID,Produk,Pembeli,Harga Kesepakatan,Status,Tanggal');
   orders.forEach(o => {
-    const product = o.product?.name ?? '-';
+    const product = o.product?.nama_barang ?? '-';
     const buyer   = o.buyer?.name ?? o.buyer?.email ?? '-';
     const price   = `"${formatRupiah(Number(o.agreed_price))}"`;
     const { label } = getStatusColor(o.status);
@@ -97,7 +97,7 @@ function exportCSV(orders: Order[], products: Product[], stats: DashboardStats) 
   rows.push('--- Daftar Produk ---');
   rows.push('ID,Nama,Harga,Status');
   products.forEach(p => {
-    rows.push(`${p.id},"${p.name}","${formatRupiah(Number(p.price))}",${p.status_terjual ? 'Terjual' : 'Aktif'}`);
+    rows.push(`${p.id},"${p.nama_barang}","${formatRupiah(Number(p.harga))}",${p.status_terjual ? 'Terjual' : 'Aktif'}`);
   });
 
   const csvContent = rows.join('\n');
@@ -128,7 +128,7 @@ function exportExcel(orders: Order[], products: Product[], stats: DashboardStats
 
   const ordersData = orders.map(o => ({
     'ID': o.id,
-    'Produk': o.product?.name ?? '-',
+    'Produk': o.product?.nama_barang ?? '-',
     'Pembeli': o.buyer?.name ?? o.buyer?.email ?? '-',
     'Harga Kesepakatan': Number(o.agreed_price),
     'Status': getStatusColor(o.status).label,
@@ -139,8 +139,8 @@ function exportExcel(orders: Order[], products: Product[], stats: DashboardStats
 
   const productsData = products.map(p => ({
     'ID': p.id,
-    'Nama Produk': p.name,
-    'Harga': Number(p.price),
+    'Nama Produk': p.nama_barang,
+    'Harga': Number(p.harga),
     'Status': p.status_terjual ? 'Terjual' : 'Aktif'
   }));
   const productsWs = XLSX.utils.json_to_sheet(productsData);
@@ -190,7 +190,7 @@ function exportPDF(orders: Order[], products: Product[], stats: DashboardStats, 
   
   const ordersBody = orders.slice(0, 50).map(o => [
     o.id.toString(),
-    o.product?.name ?? '-',
+    o.product?.nama_barang ?? '-',
     o.buyer?.name ?? o.buyer?.email ?? '-',
     formatRupiah(Number(o.agreed_price)),
     getStatusColor(o.status).label,
