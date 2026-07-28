@@ -45,6 +45,17 @@ export default function AdminPromotions() {
     }
   }
 
+  async function handleDelete(id: string) {
+    if (!confirm('Yakin ingin menghapus promosi ini? Produk akan kembali ke status normal.')) return;
+    try {
+      await fetchApi(`/admin/promotions/${id}`, { method: 'DELETE' });
+      setPromotions(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Gagal menghapus promosi:', err);
+      alert('Gagal menghapus promosi');
+    }
+  }
+
   if (loading || authLoading) return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
       <Icons.Loader size={32} />
@@ -130,13 +141,14 @@ export default function AdminPromotions() {
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>BIAYA</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>IKLAN</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>BERAKHIR</th>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>STATUS</th>
+                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
+                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '0.95rem' }}>
                 {paginatedData.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
+                    <td colSpan={8} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
                       <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                       <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Tidak ada promosi ditemukan.</div>
                     </td>
@@ -201,6 +213,22 @@ export default function AdminPromotions() {
                             EXPIRED
                           </span>
                         )}
+                      </td>
+                      <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
+                        <button
+                          onClick={() => handleDelete(promo.id)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none',
+                            padding: '8px', borderRadius: '8px', cursor: 'pointer',
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                          title="Hapus Promosi"
+                        >
+                          <Icons.Trash size={16} />
+                        </button>
                       </td>
                     </tr>
                   );
