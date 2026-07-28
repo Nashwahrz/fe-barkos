@@ -265,38 +265,44 @@ input, textarea, select {
 .nav-icon-btn {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0;
+  justify-content: center;
   height: 36px;
   width: 36px;
-  padding: 0 9px; /* Centered icon visually */
   border-radius: 8px;
   text-decoration: none;
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
+  overflow: visible;
   white-space: nowrap;
+  position: relative;
 }
 
 .nav-icon-btn:hover {
-  width: auto;
-  gap: 6px;
-  padding: 0 12px 0 10px;
+  /* No width expansion */
 }
 
 .nav-icon-text {
-  font-size: 0.75rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  font-size: 0.7rem;
   font-weight: 600;
   opacity: 0;
-  width: 0;
-  transform: translateY(-10px);
+  pointer-events: none;
+  background: var(--card);
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  color: var(--foreground);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
 }
 
 .nav-icon-btn:hover .nav-icon-text {
   opacity: 1;
-  width: auto;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(6px);
 }
 
 /* ── Mobile Layouts ─────────────────────────────────────── */
