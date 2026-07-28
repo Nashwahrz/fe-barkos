@@ -263,6 +263,25 @@ export default function Navbar() {
           {/* ── Right Actions ── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
 
+            {/* PWA Install Button */}
+            {deferredPrompt && (
+              <button
+                onClick={handleInstallClick}
+                className="hide-mobile"
+                title="Install Aplikasi"
+                style={{
+                  padding: '6px 12px', borderRadius: '8px', border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.35)' : 'var(--border)'}`,
+                  display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
+                  color: textColor, background: navTransparent ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', marginRight: '4px'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--input)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'transparent'; }}
+              >
+                <Icons.Download size={15} /> Install
+              </button>
+            )}
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
