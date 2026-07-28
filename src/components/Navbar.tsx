@@ -334,12 +334,12 @@ export default function Navbar() {
                         )}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {notifications.length === 0 ? (
+                        {notifications.filter(n => !n.read_at).length === 0 ? (
                           <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.4, fontSize: '0.85rem' }}>
-                            Belum ada notifikasi.
+                            Belum ada notifikasi baru.
                           </div>
                         ) : (
-                          notifications.map(notif => (
+                          notifications.filter(n => !n.read_at).map(notif => (
                             <button
                               key={notif.id}
                               onClick={() => handleNotifClick(notif)}
