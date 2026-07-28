@@ -22,6 +22,36 @@ export default function Home() {
   const [locating, setLocating] = useState(false);
   const [mapCoords, setMapCoords] = useState<{lat: number, lng: number} | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [isPWAInstalled, setIsPWAInstalled] = useState(false);
+
+  useEffect(() => {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsPWAInstalled(true);
+    }
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBanner(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+        if (choiceResult.outcome === 'accepted') {
+          setIsPWAInstalled(true);
+        }
+        setDeferredPrompt(null);
+        setShowInstallBanner(false);
+      });
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -266,6 +296,62 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── PWA Install Banner ── */}
+      {showInstallBanner && !isPWAInstalled && (
+        <div style={{
+          background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
+          padding: '0',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Decorative blobs */}
+          <div style={{ position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-20px', left: '10%', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
+          <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '20px 24px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, minWidth: 0 }}>
+              <div style={{
+                width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
+                background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(4px)'
+              }}>
+                <img src="/logo-lapak-kos.png" alt="Lapak Kos" style={{ width: '32px', height: '32px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, color: 'white', fontSize: '1rem', letterSpacing: '-0.01em' }}>Unduh Lapak Kos</div>
+                <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', marginTop: '2px' }}>Pasang di HP kamu — gratis, ringan, notifikasi langsung!</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
+              <button
+                onClick={handleInstallClick}
+                style={{
+                  background: 'white', color: '#059669', fontWeight: 800, fontSize: '0.9rem',
+                  padding: '10px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)', transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'; }}
+              >
+                <Icons.Download size={16} /> Install Sekarang
+              </button>
+              <button
+                onClick={() => setShowInstallBanner(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.15)', color: 'white', fontWeight: 600,
+                  padding: '10px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.3)',
+                  cursor: 'pointer', fontSize: '0.85rem', transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+              >
+                Nanti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ padding: '80px 0', display: 'flex', flexDirection: 'column', gap: '80px' }}>
         
