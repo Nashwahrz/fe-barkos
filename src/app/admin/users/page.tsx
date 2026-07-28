@@ -91,14 +91,16 @@ export default function AdminUsers() {
             <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Lihat dan kelola basis pengguna platform Lapak Kos.</p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div style={{ position: 'relative' }}>
-              <Icons.Search size={16} color="var(--foreground)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
+              </div>
               <input 
                 type="text" 
                 placeholder="Cari user..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem' }}
+                style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0 }}
               />
             </div>
             <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
