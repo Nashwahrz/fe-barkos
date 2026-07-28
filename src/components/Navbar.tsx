@@ -95,6 +95,7 @@ export default function Navbar() {
       else router.push(`/orders`);
     }
     else if (t === 'chat') router.push(`/chat`);
+    else if (t === 'promotion' && notif.data.product_id) router.push(`/products/${notif.data.product_id}`);
     else router.push('/');
   };
 
