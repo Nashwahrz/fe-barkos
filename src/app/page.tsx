@@ -44,8 +44,17 @@ export default function Home() {
   const dbCategories: any[] = catData?.data || catData || [];
   const banners: any[] = bannerData?.data || [];
 
-  // Banner carousel state is removed in favor of native horizontal scroll
+  // Banner carousel state
+  const [currentBannerIdx, setCurrentBannerIdx] = useState(0);
 
+  // Auto-slide logic
+  useEffect(() => {
+    if (!banners || banners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBannerIdx(prev => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [banners]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -260,85 +269,134 @@ export default function Home() {
 
       <div style={{ padding: '80px 0', display: 'flex', flexDirection: 'column', gap: '80px' }}>
         
-        {/* ── Banners / Iklan (Horizontal Scroller) ───────────────── */}
+        {/* ── Banners / Iklan (Carousel) ───────────────── */}
         {banners.length > 0 && (
           <section>
-            <div className="container" style={{ paddingRight: 0 }}> {/* Biarkan bleed ke kanan untuk efek geser */}
+            <div className="container">
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '24px', letterSpacing: '-0.02em' }}>
                 Promo Spesial
               </h2>
-              <div style={{
-                display: 'flex',
-                gap: '16px',
-                overflowX: 'auto',
-                scrollSnapType: 'x mandatory',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch',
-                paddingBottom: '24px',
-                paddingRight: '1rem', // Padding untuk batas akhir scroll
-              }}>
-                {banners.map((banner) => (
-                  <div key={banner.id} style={{
-                    flex: banners.length > 1 ? '0 0 85%' : '0 0 100%',
-                    height: '300px',
-                    borderRadius: '24px',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                    scrollSnapAlign: 'center',
-                    maxWidth: '800px', // Batasi lebar maksimal di layar besar
-                  }}>
-                    {banner.ad_type === 'image' ? (
-                      <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    )}
-                    
-                    {/* Overlay */}
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
-                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-                      padding: '32px'
+              
+              <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+                {/* Carousel Tracks */}
+                <div style={{
+                  display: 'flex',
+                  transition: 'transform 0.5s ease-in-out',
+                  transform: `translateX(-${currentBannerIdx * 100}%)`,
+                  height: '300px'
+                }}>
+                  {banners.map((banner) => (
+                    <div key={banner.id} style={{
+                      flex: '0 0 100%',
+                      height: '100%',
+                      position: 'relative',
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
-                        <div style={{ color: 'white' }}>
-                          <span style={{ 
-                            background: 'var(--primary)', color: 'white', padding: '6px 12px', 
-                            borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, 
-                            marginBottom: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            letterSpacing: '0.05em'
-                          }}>
-                            <Icons.Sparkles size={14} /> IKLAN SPONSOR
-                          </span>
-                          <h3 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 8px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                            {banner.ad_title || banner.product_name || 'Promo Spesial!'}
-                          </h3>
-                          {banner.product_price && (
-                            <div style={{ fontSize: '1.25rem', fontWeight: 600, opacity: 0.9 }}>
-                              Rp {parseInt(banner.product_price).toLocaleString('id-ID')}
-                            </div>
+                      {banner.ad_type === 'image' ? (
+                        <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      )}
+                      
+                      {/* Overlay */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
+                        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                        padding: '32px'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
+                          <div style={{ color: 'white' }}>
+                            <span style={{ 
+                              background: 'var(--primary)', color: 'white', padding: '6px 12px', 
+                              borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, 
+                              marginBottom: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px',
+                              letterSpacing: '0.05em'
+                            }}>
+                              <Icons.Sparkles size={14} /> IKLAN SPONSOR
+                            </span>
+                            <h3 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 8px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                              {banner.ad_title || banner.product_name || 'Promo Spesial!'}
+                            </h3>
+                            {banner.product_price && (
+                              <div style={{ fontSize: '1.25rem', fontWeight: 600, opacity: 0.9 }}>
+                                Rp {parseInt(banner.product_price).toLocaleString('id-ID')}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {banner.product_id && (
+                            <Link href={`/products/${banner.product_id}`} style={{
+                              background: 'white', color: 'black', padding: '12px 24px', 
+                              borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700, 
+                              textDecoration: 'none', transition: 'transform 0.2s',
+                              display: 'flex', alignItems: 'center', gap: '8px'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                              Lihat Detail <Icons.ArrowRight size={18} />
+                            </Link>
                           )}
                         </div>
-                        
-                        {banner.product_id && (
-                          <Link href={`/products/${banner.product_id}`} style={{
-                            background: 'white', color: 'black', padding: '12px 24px', 
-                            borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700, 
-                            textDecoration: 'none', transition: 'transform 0.2s',
-                            display: 'flex', alignItems: 'center', gap: '8px'
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                          >
-                            Lihat Detail <Icons.ArrowRight size={18} />
-                          </Link>
-                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Navigation Buttons (Only if more than 1) */}
+                {banners.length > 1 && (
+                  <>
+                    <button 
+                      onClick={() => setCurrentBannerIdx(prev => prev === 0 ? banners.length - 1 : prev - 1)}
+                      style={{
+                        position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)',
+                        background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: 'white',
+                        border: '1px solid rgba(255,255,255,0.4)', borderRadius: '50%', width: '40px', height: '40px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    >
+                      <Icons.ChevronLeft size={24} />
+                    </button>
+                    <button 
+                      onClick={() => setCurrentBannerIdx(prev => (prev + 1) % banners.length)}
+                      style={{
+                        position: 'absolute', top: '50%', right: '16px', transform: 'translateY(-50%)',
+                        background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', color: 'white',
+                        border: '1px solid rgba(255,255,255,0.4)', borderRadius: '50%', width: '40px', height: '40px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    >
+                      <Icons.ChevronRight size={24} />
+                    </button>
+
+                    {/* Pagination Indicators */}
+                    <div style={{
+                      position: 'absolute', bottom: '16px', left: '50%', transform: 'translateX(-50%)',
+                      display: 'flex', gap: '8px', zIndex: 10
+                    }}>
+                      {banners.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setCurrentBannerIdx(idx)}
+                          style={{
+                            width: currentBannerIdx === idx ? '24px' : '8px',
+                            height: '8px',
+                            borderRadius: '4px',
+                            background: currentBannerIdx === idx ? 'var(--primary)' : 'rgba(255,255,255,0.5)',
+                            border: 'none', cursor: 'pointer', padding: 0,
+                            transition: 'all 0.3s ease'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </section>
