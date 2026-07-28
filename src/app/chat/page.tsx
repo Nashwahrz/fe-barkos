@@ -86,7 +86,8 @@ export default function ChatListPage() {
                   background: unreadCount > 0 ? 'var(--primary-light)' : 'var(--card)',
                   padding: '1.25rem 1.5rem',
                   boxShadow: unreadCount > 0 ? 'var(--shadow-sm)' : 'none',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  gap: '12px'
                 }}
                 onMouseEnter={e => {
                   if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
@@ -97,20 +98,20 @@ export default function ChatListPage() {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <div className="flex items-center gap-4">
-                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                <div className="flex items-center gap-4" style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
                     {otherUser?.foto ? (
                       <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       otherUser?.name?.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--foreground)', marginBottom: '4px' }}>{otherUser?.name}</div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Icons.Package size={14} /> {product?.nama_barang}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--foreground)', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name}</div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <Icons.Package size={14} style={{ flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{product?.nama_barang}</span>
                     </div>
-                    <div style={{ fontSize: '0.9rem', color: unreadCount > 0 ? 'var(--foreground)' : 'var(--foreground)', opacity: unreadCount > 0 ? 1 : 0.6, fontWeight: unreadCount > 0 ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '350px' }}>
+                    <div style={{ fontSize: '0.9rem', color: unreadCount > 0 ? 'var(--foreground)' : 'var(--foreground)', opacity: unreadCount > 0 ? 1 : 0.6, fontWeight: unreadCount > 0 ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {lastMsg?.sender?.id === user?.id ? 'Anda: ' : ''}
                       {(() => {
                         const m = lastMsg?.message;
@@ -125,12 +126,12 @@ export default function ChatListPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
-                  <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500 }}>
+                <div className="flex flex-col items-end gap-2" style={{ flexShrink: 0, minWidth: '70px' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500, whiteSpace: 'nowrap' }}>
                     {new Date(lastMsg?.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                   </div>
                   {unreadCount > 0 && (
-                    <div style={{ background: 'var(--danger)', color: 'white', fontWeight: 700, fontSize: '0.75rem', padding: '4px 10px', borderRadius: '12px' }}>
+                    <div style={{ background: 'var(--danger)', color: 'white', fontWeight: 700, fontSize: '0.75rem', padding: '4px 10px', borderRadius: '12px', whiteSpace: 'nowrap' }}>
                       {unreadCount} Pesan Baru
                     </div>
                   )}
