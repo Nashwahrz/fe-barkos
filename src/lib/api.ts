@@ -62,6 +62,12 @@ export function getStorageUrl(path: string | null) {
   
   const baseUrl = API_BASE_URL.endsWith('/api') ? API_BASE_URL.slice(0, -4) : API_BASE_URL;
   let cleanPath = path;
+  
+  // If backend returns /storage/xxx (from Storage::url), fix it to /api/storage/xxx
+  if (cleanPath.startsWith('/storage/')) {
+    cleanPath = '/api' + cleanPath;
+  }
+
   if (cleanPath.startsWith('/')) {
     cleanPath = cleanPath.substring(1);
   }
