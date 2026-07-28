@@ -444,6 +444,13 @@ export default function Navbar() {
                                 <Link href="/orders" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}>
                                   <Icons.ShoppingBag size={16} /> Pesanan Saya
                                 </Link>
+                                {deferredPrompt && (
+                                  <button onClick={() => { setShowProfileDropdown(false); handleInstallClick(); }} className="mobile-only-menu" style={{
+                                    ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%'
+                                  }} onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                    <Icons.Download size={16} /> Install Aplikasi
+                                  </button>
+                                )}
                                 <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
                                 <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{
                                   ...dropdownItemStyle, color: 'var(--danger)', cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none'
