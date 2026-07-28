@@ -289,14 +289,14 @@ input, textarea, select {
   font-weight: 600;
   opacity: 0;
   width: 0;
-  transform: translateX(-5px);
+  transform: translateY(-10px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-icon-btn:hover .nav-icon-text {
   opacity: 1;
   width: auto;
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 /* ── Mobile Layouts ─────────────────────────────────────── */
