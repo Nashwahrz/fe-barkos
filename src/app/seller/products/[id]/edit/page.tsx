@@ -407,7 +407,7 @@ export default function EditProduct() {
                   <div style={{ padding: '12px', background: 'var(--background)', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                     <Icons.Image size={24} color="var(--primary)" />
                   </div>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Buka Galeri (Ubah Foto)</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>Sentuh di sini untuk Buka Kamera / Galeri (Ubah Foto)</span>
                   <span style={{ fontSize: '0.75rem' }}>Format: JPG, PNG, WEBP</span>
                 </div>
               )}
@@ -415,6 +415,7 @@ export default function EditProduct() {
                  id="foto-upload"
                  type="file" 
                  accept="image/jpeg, image/png, image/webp" 
+                 capture="environment"
                  style={{ display: 'none' }}
                  onChange={handleFileChange}
               />
