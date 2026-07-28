@@ -681,3 +681,57 @@ input, textarea, select {
     display: none !important;
   }
 }
+
+/* Navbar Dropdowns */
+.nav-dropdown-notif {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -8px;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-dropdown-profile {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -8px;
+  width: 230px;
+  max-width: calc(100vw - 24px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .nav-dropdown-notif {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 120px);
+  }
+  .nav-dropdown-profile {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    left: auto;
+    width: 250px;
+  }
+}

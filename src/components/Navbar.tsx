@@ -324,13 +324,7 @@ export default function Navbar() {
                 {showNotif && (
                   <>
                     <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowNotif(false)} />
-                    <div style={{
-                      position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-                      width: '340px', maxHeight: '420px', overflowY: 'auto',
-                      background: 'var(--card)', border: '1px solid var(--border)',
-                      borderRadius: '14px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                      zIndex: 100, display: 'flex', flexDirection: 'column'
-                    }}>
+                    <div className="nav-dropdown-notif">
                       <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'var(--card)', zIndex: 2, borderRadius: '14px 14px 0 0' }}>
                         <h3 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>Notifikasi {unreadCount > 0 && <span style={{ background: 'var(--primary)', color: 'white', borderRadius: '20px', padding: '1px 8px', fontSize: '0.72rem', marginLeft: '6px' }}>{unreadCount}</span>}</h3>
                         {unreadCount > 0 && (
@@ -489,12 +483,7 @@ export default function Navbar() {
                         {showProfileDropdown && (
                           <>
                             <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setShowProfileDropdown(false)} />
-                            <div style={{
-                              position: 'absolute', top: 'calc(100% + 8px)', right: 0,
-                              width: '230px', background: 'var(--card)', border: '1px solid var(--border)',
-                              borderRadius: '14px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                              zIndex: 100, display: 'flex', flexDirection: 'column', padding: '6px', overflow: 'hidden'
-                            }}>
+                            <div className="nav-dropdown-profile">
 
                               {/* User info header */}
                               <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
