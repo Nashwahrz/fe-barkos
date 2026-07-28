@@ -59,6 +59,22 @@ export function ProductCard({ product, promoted = false }: ProductCardProps) {
         borderBottom: '1px solid var(--border)',
         position: 'relative'
       }}>
+        {product.status_terjual && (
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', zIndex: 1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <span style={{
+              background: 'var(--danger)', color: 'white',
+              padding: '6px 16px', borderRadius: '8px',
+              fontWeight: 800, fontSize: '1rem', letterSpacing: '1px',
+              transform: 'rotate(-10deg)', border: '2px solid white'
+            }}>
+              SOLD OUT
+            </span>
+          </div>
+        )}
         {product.foto ? (
           <Image 
             src={getStorageUrl(product.foto) || ''} 
