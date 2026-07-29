@@ -758,4 +758,7 @@ input, textarea, select {
     left: auto;
     width: 250px;
   }
+  .footer-container {
+    padding-bottom: calc(2rem + 60px + env(safe-area-inset-bottom, 16px)) !important;
+  }
 }

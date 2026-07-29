@@ -3,10 +3,17 @@
 import Link from 'next/link';
 import { Icons } from '@/components/Icons';
 import { APP_NAME } from '@/lib/constants';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname.match(/^\/chat\/\d+\/\d+/)) {
+    return null;
+  }
+  
   return (
-    <footer style={{
+    <footer className="footer-container" style={{
       background: 'var(--surface)',
       borderTop: '1px solid var(--border)',
       padding: '4rem 2rem 2rem',

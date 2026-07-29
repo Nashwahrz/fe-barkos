@@ -421,11 +421,12 @@ export default function ChatDetailPage() {
             otherUser?.name?.charAt(0).toUpperCase() || '?'
           )}
         </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2' }}>{otherUser?.name || 'Memuat...'}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
           {product && (
             <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
-              <span style={{ display: 'flex', alignItems: 'center' }}><Icons.Package size={14} /></span> {product.nama_barang}
+              <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}><Icons.Package size={14} /></span> 
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.nama_barang}</span>
             </Link>
           )}
         </div>
