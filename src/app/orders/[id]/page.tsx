@@ -105,7 +105,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
       </Link>
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900 }}>Detail Pesanan</h1>
           <div style={{ fontSize: '0.8rem', color: '#6b7280', fontFamily: 'monospace', marginTop: '4px' }}>
@@ -141,9 +141,9 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
               ? <img src={getStorageUrl(order.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={40} color="#d1d5db" /></div>}
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '4px' }}>{order.product?.nama_barang}</h3>
-            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
               <div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Total</div>
                 <div style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '1.25rem' }}>Rp {Number(order.agreed_price).toLocaleString('id-ID')}</div>

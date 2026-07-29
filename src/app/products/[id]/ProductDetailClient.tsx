@@ -209,10 +209,10 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
   return (
     <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '1100px' }}>
-      <div className="product-detail-layout" style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start' }}>
+      <div className="product-detail-layout">
 
         {/* ── Left: Image & Map ────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="product-detail-left">
           <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: '24px', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--card)', position: 'relative' }}>
             {product.foto
               ? <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -252,7 +252,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
         </div>
 
         {/* ── Right: Product Info ───────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <div className="product-detail-right">
           {/* Badges */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem', flexWrap: 'wrap' }}>
             <span style={{ padding: '6px 12px', border: '1px solid var(--border)', color: 'var(--foreground)', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600, opacity: 0.8 }}>{product.category?.name || 'Umum'}</span>
