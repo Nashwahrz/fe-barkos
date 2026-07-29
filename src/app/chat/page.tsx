@@ -48,7 +48,7 @@ export default function ChatListPage() {
   }
 
   return (
-    <div className="container" style={{ padding: '40px 1rem', maxWidth: '850px' }}>
+    <div className="container page-container-mobile" style={{ paddingTop: '1rem', paddingBottom: '5rem', maxWidth: '850px' }}>
       <header style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Icons.MessageSquare size={32} color="var(--primary)" /> Pesan Saya
@@ -68,7 +68,7 @@ export default function ChatListPage() {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
           {conversations.map((conv, idx) => {
             const lastMsg = conv.last_message;
             const otherUser = conv.other_user || { id: 0, name: 'Pengguna' };
@@ -84,10 +84,12 @@ export default function ChatListPage() {
                   transition: 'all 0.2s', 
                   border: `1px solid ${unreadCount > 0 ? 'var(--primary)' : 'var(--border)'}`,
                   background: unreadCount > 0 ? 'var(--primary-light)' : 'var(--card)',
-                  padding: '1.25rem 1.5rem',
+                  padding: '1.25rem 1rem',
                   boxShadow: unreadCount > 0 ? 'var(--shadow-sm)' : 'none',
                   textDecoration: 'none',
-                  gap: '12px'
+                  gap: '12px',
+                  minWidth: 0,
+                  width: '100%'
                 }}
                 onMouseEnter={e => {
                   if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
@@ -98,8 +100,8 @@ export default function ChatListPage() {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <div className="flex items-center gap-4" style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
+                <div className="flex items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
                     {otherUser?.foto ? (
                       <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
@@ -126,13 +128,13 @@ export default function ChatListPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2" style={{ flexShrink: 0, minWidth: '70px' }}>
+                <div className="flex flex-col items-end gap-2" style={{ flexShrink: 0, minWidth: '60px' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500, whiteSpace: 'nowrap' }}>
                     {new Date(lastMsg?.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                   </div>
                   {unreadCount > 0 && (
-                    <div style={{ background: 'var(--danger)', color: 'white', fontWeight: 700, fontSize: '0.75rem', padding: '4px 10px', borderRadius: '12px', whiteSpace: 'nowrap' }}>
-                      {unreadCount} Pesan Baru
+                    <div style={{ background: 'var(--danger)', color: 'white', fontWeight: 700, fontSize: '0.75rem', padding: '4px 8px', borderRadius: '12px', whiteSpace: 'nowrap' }}>
+                      {unreadCount} Baru
                     </div>
                   )}
                 </div>
