@@ -42,7 +42,7 @@ export default function BuyerOrdersPage() {
   }
 
   return (
-    <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '860px' }}>
+    <div className="container page-container-mobile" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '860px' }}>
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Pesanan Saya</h1>
         <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem' }}>Pantau status semua pesanan Anda</p>

@@ -106,7 +106,7 @@ export default function SellerOrdersPage() {
   );
 
   return (
-    <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '900px' }}>
+    <div className="container page-container-mobile" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '900px' }}>
       {/* Toast */}
       {toast && (
         <div style={{ position: 'fixed', top: '80px', right: '24px', zIndex: 3000, padding: '14px 20px', borderRadius: '12px', background: toast.ok ? 'rgba(5, 150, 105, 0.1)' : 'rgba(220, 38, 38, 0.1)', border: `1px solid ${toast.ok ? 'rgba(5, 150, 105, 0.2)' : 'rgba(220, 38, 38, 0.2)'}`, color: toast.ok ? 'var(--success)' : 'var(--danger)', fontWeight: 600, fontSize: '0.9rem', boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', gap: '8px' }}>

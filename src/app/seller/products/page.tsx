@@ -98,8 +98,8 @@ export default function SellerProductsDashboard() {
       </div>
 
       {/* Quick links */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
-        <Link href="/seller/orders" className="w-full-mobile" style={{
+      <div className="quick-links-mobile" style={{ display: 'flex', gap: '12px', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+        <Link href="/seller/orders" style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '12px 24px', borderRadius: '12px',
           background: pendingOrders > 0 ? 'var(--warning)' : 'var(--input)',
@@ -111,7 +111,7 @@ export default function SellerProductsDashboard() {
           <Icons.ShoppingBag size={16} color={pendingOrders > 0 ? "#fff" : "var(--foreground)"} />
           Pesanan Masuk {pendingOrders > 0 && `(${pendingOrders})`}
         </Link>
-        <Link href="/seller/promotions" className="w-full-mobile" style={{
+        <Link href="/seller/promotions" style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '12px 24px', borderRadius: '12px',
           background: 'var(--input)', color: 'var(--foreground)', border: '1px solid var(--border)',
