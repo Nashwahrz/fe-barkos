@@ -49,11 +49,20 @@ export default function Navbar() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
         reg.pushManager.getSubscription().then(sub => {
-          if (sub) setIsPushEnabled(true);
+          if (sub) {
+            setIsPushEnabled(true);
+            
+            // Auto-sync token push di background (sekali per sesi)
+            if (user && !sessionStorage.getItem('pushSynced')) {
+              subscribeToPushNotifications(sub)
+                .then(() => sessionStorage.setItem('pushSynced', 'true'))
+                .catch(err => console.error('Gagal sync push token:', err));
+            }
+          }
         });
       });
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';

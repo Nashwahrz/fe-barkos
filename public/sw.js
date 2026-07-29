@@ -22,12 +22,22 @@ self.addEventListener('push', function (e) {
       body: data.body,
       icon: data.icon || '/icon-192x192.png',
       badge: '/icon-192x192.png',
-      vibrate: [200, 100, 200, 100, 200, 100, 200],
+      requireInteraction: true, // Notif tidak akan hilang sendiri sebelum diklik/ditutup (bagus untuk PWA)
       data: data.data || {}
     };
 
     e.waitUntil(self.registration.showNotification(title, options));
   }
+});
+
+// Dengarkan perubahan token dari browser untuk menghindari token kadaluarsa
+self.addEventListener('pushsubscriptionchange', function(event) {
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription.options)
+      .then(function(subscription) {
+        // Akan disinkronkan saat web dibuka (via Navbar.tsx)
+      })
+  );
 });
 
 self.addEventListener('notificationclick', function (e) {
