@@ -65,33 +65,33 @@ export default function SellerProductsDashboard() {
   const revenue = orders.filter(o => o.status === 'completed').reduce((s, o) => s + Number(o.agreed_price), 0);
 
   return (
-    <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '1200px' }}>
+    <div className="container page-container-mobile" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '1200px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <div className="header-actions-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Lapak Saya</h1>
+          <h1 className="text-h1" style={{ marginBottom: '0.5rem', color: 'var(--foreground)' }}>Lapak Saya</h1>
           <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem' }}>Kelola barang jualan dan pantau pesanan Anda</p>
         </div>
-        <Button href="/seller/products/create" variant="primary" size="lg">
+        <Button className="w-full-mobile" href="/seller/products/create" variant="primary" size="lg">
           + Jual Barang Baru
         </Button>
       </div>
 
       {/* Stats Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '3rem' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '3rem' }}>
         {[
           { label: 'Barang Aktif', value: activeCount, Icon: Icons.Package, color: 'var(--primary)', bg: 'var(--primary-light)', borderColor: 'var(--primary)' },
           { label: 'Terjual', value: soldCount, Icon: Icons.CheckCircle, color: 'var(--primary)', bg: 'var(--primary-light)', borderColor: 'var(--primary)' },
           { label: 'Pesanan Baru', value: pendingOrders, Icon: Icons.Clock, color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)', borderColor: 'var(--warning)' },
           { label: 'Total Pendapatan', value: `Rp ${revenue.toLocaleString('id-ID')}`, Icon: Icons.DollarSign, color: 'var(--primary)', bg: 'var(--primary-light)', borderColor: 'var(--primary)' },
         ].map(s => (
-          <div key={s.label} style={{ background: 'var(--card)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid var(--border)', borderTop: `4px solid ${s.borderColor}` }}>
-            <div style={{ width: '48px', height: '48px', background: s.bg, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div key={s.label} className="stats-card" style={{ background: 'var(--card)', borderRadius: '16px', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid var(--border)', borderTop: `4px solid ${s.borderColor}` }}>
+            <div className="stats-icon" style={{ width: '48px', height: '48px', background: s.bg, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <s.Icon size={24} color={s.color} />
             </div>
             <div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', lineHeight: 1.2 }}>{s.value}</div>
-              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.6, letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: '4px' }}>{s.label}</div>
+              <div className="stats-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', lineHeight: 1.2 }}>{s.value}</div>
+              <div className="stats-label" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.6, letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: '4px' }}>{s.label}</div>
             </div>
           </div>
         ))}
@@ -99,8 +99,8 @@ export default function SellerProductsDashboard() {
 
       {/* Quick links */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
-        <Link href="/seller/orders" style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
+        <Link href="/seller/orders" className="w-full-mobile" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '12px 24px', borderRadius: '12px',
           background: pendingOrders > 0 ? 'var(--warning)' : 'var(--input)',
           border: '1px solid var(--border)',
@@ -111,8 +111,8 @@ export default function SellerProductsDashboard() {
           <Icons.ShoppingBag size={16} color={pendingOrders > 0 ? "#fff" : "var(--foreground)"} />
           Pesanan Masuk {pendingOrders > 0 && `(${pendingOrders})`}
         </Link>
-        <Link href="/seller/promotions" style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
+        <Link href="/seller/promotions" className="w-full-mobile" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '12px 24px', borderRadius: '12px',
           background: 'var(--input)', color: 'var(--foreground)', border: '1px solid var(--border)',
           fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none', opacity: 0.8

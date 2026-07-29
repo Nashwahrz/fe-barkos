@@ -463,6 +463,40 @@ input, textarea, select {
     border-top: 1px solid var(--border) !important;
     padding-top: 12px !important;
   }
+  .page-container-mobile {
+    padding-top: 1.5rem !important;
+    padding-bottom: 6rem !important;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  .stats-card {
+    padding: 1rem !important;
+    gap: 0.5rem !important;
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  .stats-card .stats-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .stats-card .stats-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .stats-card .stats-value {
+    font-size: 1.15rem !important;
+  }
+  .stats-card .stats-label {
+    font-size: 0.7rem !important;
+    margin-top: 0 !important;
+  }
+  .header-actions-mobile {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
 }
 
 /* PWA Install Banner */
