@@ -30,16 +30,6 @@ self.addEventListener('push', function (e) {
   }
 });
 
-self.addEventListener('pushsubscriptionchange', function(event) {
-  event.waitUntil(
-    self.registration.pushManager.subscribe(event.oldSubscription.options)
-      .then(function(subscription) {
-        // Token push otomatis diperbarui di browser. 
-        // Token ini nantinya akan disinkronkan ke backend saat user membuka web app
-      })
-  );
-});
-
 self.addEventListener('notificationclick', function (e) {
   e.notification.close();
   const urlToOpen = new URL(e.notification.data?.url || '/', self.location.origin).href;
