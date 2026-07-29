@@ -49,11 +49,18 @@ export default function Navbar() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
         reg.pushManager.getSubscription().then(sub => {
-          if (sub) setIsPushEnabled(true);
+          if (sub) {
+            setIsPushEnabled(true);
+            // Sinkronisasi ulang token di background saat user login
+            // Ini mencegah masalah notifikasi kadang tidak masuk karena token kadaluarsa
+            if (user) {
+              subscribeToPushNotifications(sub).catch(console.error);
+            }
+          }
         });
       });
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
