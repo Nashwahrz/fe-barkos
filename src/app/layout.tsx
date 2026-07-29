@@ -34,7 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <RouteGuard>
             <Navbar />
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%' }}>
               {children}
             </main>
             <Footer />
