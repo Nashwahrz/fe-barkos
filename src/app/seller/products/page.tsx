@@ -141,7 +141,7 @@ export default function SellerProductsDashboard() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {products.map(p => (
-            <div key={p.id} className="card" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', padding: '1.5rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
+            <div key={p.id} className="card flex-wrap-mobile" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', padding: '1.5rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
               {/* Image */}
               <div style={{ width: '88px', height: '88px', borderRadius: '16px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, position: 'relative', border: '1px solid var(--border)' }}>
                 {p.foto
@@ -153,7 +153,7 @@ export default function SellerProductsDashboard() {
               </div>
 
               {/* Info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: '160px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
                   <h3 style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--foreground)' }}>{p.nama_barang}</h3>
                   <span style={{
@@ -171,7 +171,7 @@ export default function SellerProductsDashboard() {
               </div>
 
               {/* Actions */}
-              <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+              <div className="w-full-mobile border-t-mobile" style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                 {!p.status_terjual && (
                   <Link href="/seller/promotions" title="Promosikan" style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
                     <Icons.Zap size={16} color="var(--warning)" />

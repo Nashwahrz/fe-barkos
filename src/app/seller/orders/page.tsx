@@ -192,7 +192,7 @@ export default function SellerOrdersPage() {
             return (
               <div key={order.id} className="card" style={{ padding: '1.75rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
                 {/* Top Row */}
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+                <div className="flex-wrap-mobile" style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
                   {/* Image */}
                   <div style={{ width: '88px', height: '88px', borderRadius: '16px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
                     {order.product?.foto
@@ -201,7 +201,7 @@ export default function SellerOrdersPage() {
                   </div>
 
                   {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: 1, minWidth: '160px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '12px' }}>
                       <h3 style={{ fontWeight: 700, fontSize: '1.1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--foreground)' }}>
                         {order.product?.nama_barang}
@@ -243,10 +243,10 @@ export default function SellerOrdersPage() {
                 <div style={{ marginTop: '1.5rem', display: 'flex', gap: '12px', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
                   {order.status === 'pending' && (
                     <>
-                      <Button onClick={() => handleConfirm(order.id, 'confirm')} disabled={isBusy} variant="primary" size="md">
+                      <Button className="w-full-mobile" onClick={() => handleConfirm(order.id, 'confirm')} disabled={isBusy} variant="primary" size="md">
                         {isBusy ? 'Memproses...' : <><Icons.Check size={16} /> Konfirmasi</>}
                       </Button>
-                      <Button onClick={() => handleConfirm(order.id, 'reject')} disabled={isBusy} variant="danger" size="md">
+                      <Button className="w-full-mobile" onClick={() => handleConfirm(order.id, 'reject')} disabled={isBusy} variant="danger" size="md">
                         {isBusy ? 'Memproses...' : <><Icons.X size={16} /> Tolak</>}
                       </Button>
                     </>
@@ -255,12 +255,12 @@ export default function SellerOrdersPage() {
                   {order.status === 'confirmed' && (
                     <>
                       {order.payment_method === 'bank_transfer' && order.has_payment_proof && (
-                        <Button onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
+                        <Button className="w-full-mobile" onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
                           {isBusy ? 'Memproses...' : <><Icons.CheckCircle size={16} /> Konfirmasi Selesai</>}
                         </Button>
                       )}
                       {order.payment_method === 'cod' && (
-                        <Button onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
+                        <Button className="w-full-mobile" onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
                           {isBusy ? 'Memproses...' : <><Icons.Handshake size={16} /> COD Selesai</>}
                         </Button>
                       )}

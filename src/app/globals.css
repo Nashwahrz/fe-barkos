@@ -451,6 +451,20 @@ input, textarea, select {
   }
 }
 
+@media (max-width: 640px) {
+  .flex-wrap-mobile {
+    flex-wrap: wrap !important;
+  }
+  .w-full-mobile {
+    width: 100% !important;
+    justify-content: flex-end !important;
+  }
+  .border-t-mobile {
+    border-top: 1px solid var(--border) !important;
+    padding-top: 12px !important;
+  }
+}
+
 /* PWA Install Banner */
 .install-banner-inner {
   display: flex;

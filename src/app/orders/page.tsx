@@ -93,7 +93,7 @@ export default function BuyerOrdersPage() {
           {filtered.map(order => {
             const s = STATUS_MAP[order.status] || STATUS_MAP.pending;
             return (
-              <Link href={`/orders/${order.id}`} key={order.id} className="card" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', textDecoration: 'none', color: 'inherit', padding: '1.25rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
+              <Link href={`/orders/${order.id}`} key={order.id} className="card flex-wrap-mobile" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', textDecoration: 'none', color: 'inherit', padding: '1.25rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
                 {/* Product Image */}
                 <div style={{ width: '80px', height: '80px', borderRadius: '16px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
                   {order.product?.foto
