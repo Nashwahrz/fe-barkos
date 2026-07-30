@@ -36,6 +36,7 @@ export default function EditProduct() {
     longitude: '',
     minimum_offer_price: '',
   });
+  const [isOfferEnabled, setIsOfferEnabled] = useState(true);
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
@@ -72,6 +73,7 @@ export default function EditProduct() {
         longitude: p.longitude?.toString() || '',
         minimum_offer_price: p.minimum_offer_price?.toString() || '',
       });
+      setIsOfferEnabled(p.is_offer_enabled !== false);
       setCurrentFoto(p.foto);
 
     } catch (err) {
@@ -198,12 +200,11 @@ export default function EditProduct() {
         submitData.append('longitude', formData.longitude);
       }
 
-      if (formData.minimum_offer_price !== undefined) {
-        // even if it's empty string, we can send it or omit it, but backend might need null
-        // Let's only send if it has a value, or empty string if cleared
+      submitData.append('is_offer_enabled', isOfferEnabled ? '1' : '0');
+      if (isOfferEnabled && formData.minimum_offer_price !== undefined) {
         submitData.append('minimum_offer_price', formData.minimum_offer_price);
       }
-      
+
       if (foto) {
         submitData.append('foto', foto);
       }
@@ -277,16 +278,36 @@ export default function EditProduct() {
                onChange={handleInputChange}
             />
             
-            <Input 
-               type="number" 
-               name="minimum_offer_price" 
-               label="Minimal Harga Tawar (Rp)"
-               placeholder="Opsional, misal: 450000" 
-               min={0}
-               value={formData.minimum_offer_price}
-               onChange={handleInputChange}
-            />
-            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Terima Tawaran?</label>
+              <label style={{
+                display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px',
+                borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--input)', cursor: 'pointer'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={isOfferEnabled}
+                  onChange={(e) => setIsOfferEnabled(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: '0.875rem', color: 'var(--foreground)' }}>
+                  {isOfferEnabled ? 'Ya, pembeli boleh menawar harga' : 'Tidak, harga sudah pas (fixed)'}
+                </span>
+              </label>
+            </div>
+
+            {isOfferEnabled && (
+              <Input
+                 type="number"
+                 name="minimum_offer_price"
+                 label="Minimal Harga Tawar (Rp)"
+                 placeholder="Opsional, misal: 450000"
+                 min={0}
+                 value={formData.minimum_offer_price}
+                 onChange={handleInputChange}
+              />
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kategori Pilihan</label>
               <select 

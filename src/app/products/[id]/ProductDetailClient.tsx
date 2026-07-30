@@ -327,15 +327,17 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                     <Icons.ShoppingBag size={18} />
                     Beli
                   </Button>
-                  <Button
-                    onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowOfferModal(true); }}
-                    variant="secondary"
-                    size="lg"
-                    style={{ flex: 1 }}
-                  >
-                    <Icons.Zap size={18} />
-                    Tawar
-                  </Button>
+                  {product.is_offer_enabled !== false && (
+                    <Button
+                      onClick={() => { if (!user) { router.push('/auth/login'); return; } setShowOfferModal(true); }}
+                      variant="secondary"
+                      size="lg"
+                      style={{ flex: 1 }}
+                    >
+                      <Icons.Zap size={18} />
+                      Tawar
+                    </Button>
+                  )}
                 </div>
                 <Button
                   onClick={() => {
