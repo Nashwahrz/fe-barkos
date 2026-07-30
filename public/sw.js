@@ -20,8 +20,8 @@ self.addEventListener('push', function (e) {
     const title = data.title || 'Pemberitahuan Baru';
     const options = {
       body: data.body,
-      icon: data.icon || '/icon-192x192.png',
-      badge: '/icon-192x192.png',
+      icon: data.icon || '/logo-lapak-kos.png',
+      badge: '/logo-lapak-kos.png',
       requireInteraction: true, // Notif tidak akan hilang sendiri sebelum diklik/ditutup (bagus untuk PWA)
       data: data.data || {}
     };
