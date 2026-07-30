@@ -24,7 +24,11 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
       display: 'flex',
       flexDirection: 'column',
       gap: '4px',
-      height: '100%'
+      position: 'sticky',
+      top: '70px',
+      alignSelf: 'flex-start',
+      maxHeight: 'calc(100vh - 70px)',
+      overflowY: 'auto'
     }}>
       <div style={{
         fontWeight: 700, fontSize: '0.7rem', color: 'var(--foreground)', opacity: 0.5,
