@@ -517,11 +517,17 @@ export default function SellerPromotions() {
               </div>
             )}
 
+            {paymentSettings && !paymentSettings.midtrans_enabled && !paymentSettings.manual_transfer_enabled && (
+              <div style={{ padding: '0.9rem 1rem', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.85rem', color: '#ef4444', fontWeight: 600 }}>
+                ⚠️ Belum ada metode pembayaran yang aktif. Hubungi admin untuk mengaktifkan Midtrans atau Transfer Manual.
+              </div>
+            )}
+
             <button
               type="submit"
               className="btn btn-primary"
               style={{ padding: '1.125rem', fontWeight: 800, fontSize: '1.05rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)', marginTop: '0.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-              disabled={actionLoading || myProducts.length === 0}
+              disabled={actionLoading || myProducts.length === 0 || (paymentSettings ? (!paymentSettings.midtrans_enabled && !paymentSettings.manual_transfer_enabled) : false)}
             >
               {actionLoading ? <><Icons.Loader size={20} color="white" /> Memproses...</> : <><Icons.Zap size={20} color="white" /> Aktifkan Boost Sekarang</>}
             </button>
