@@ -18,11 +18,13 @@ self.addEventListener('push', function (e) {
   if (e.data) {
     const data = e.data.json();
     const title = data.title || 'Pemberitahuan Baru';
+    const tag = data.data?.url || title;
     const options = {
       body: data.body,
       icon: data.icon || '/logo-lapak-kos.png',
       badge: '/logo-lapak-kos.png',
-      requireInteraction: true, // Notif tidak akan hilang sendiri sebelum diklik/ditutup (bagus untuk PWA)
+      tag, // Notif baru dengan konteks sama akan menggantikan yang lama, bukan menumpuk
+      renotify: true, // Tetap alert (getar/suara) walau tag-nya sama
       data: data.data || {}
     };
 
