@@ -10,6 +10,7 @@ const menus = [
   { name: 'Pemantauan Transaksi',path: '/admin/transactions',Icon: Icons.DollarSign },
   { name: 'Akun Pengguna',       path: '/admin/users',       Icon: Icons.Users      },
   { name: 'Manajemen Promosi',   path: '/admin/promotions',  Icon: Icons.Tag        },
+  { name: 'Pengaturan Pembayaran', path: '/admin/settings/payments', Icon: Icons.CreditCard },
   { name: 'Laporan Pelanggaran', path: '/admin/reports',     Icon: Icons.Flag       },
 ];
 

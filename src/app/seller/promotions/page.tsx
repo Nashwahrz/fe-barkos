@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
 import { Icons } from '@/components/Icons';
 import Script from 'next/script';
+import { paymentSettingsApi } from '@/services/api/paymentSettings.api';
+import { PaymentSettings } from '@/types/paymentSettings';
 
 declare global {
   interface Window {
@@ -28,6 +30,15 @@ export default function SellerPromotions() {
 
   const [selectedProduct, setSelectedProduct] = useState('');
   const [selectedPackage, setSelectedPackage] = useState('');
+
+  // Payment method
+  const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'midtrans' | 'manual_transfer'>('midtrans');
+
+  // Manual transfer proof upload (per pending promotion)
+  const proofInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const [proofFiles, setProofFiles] = useState<Record<number, File | null>>({});
+  const [uploadingProofId, setUploadingProofId] = useState<number | null>(null);
 
   // Iklan fields
   const [adType, setAdType] = useState<'none' | 'image' | 'video'>('none');
@@ -72,15 +83,22 @@ export default function SellerPromotions() {
 
   async function loadData() {
     try {
-      const [packagesRes, productsRes, promosRes] = await Promise.all([
+      const [packagesRes, productsRes, promosRes, settingsRes] = await Promise.all([
         fetchApi('/promotions/packages'),
         fetchApi('/my-products'),
-        fetchApi('/promotions/my')
+        fetchApi('/promotions/my'),
+        paymentSettingsApi.get(),
       ]);
       setPackages(packagesRes.data || packagesRes);
       const activeProducts = (productsRes.data || productsRes).filter((p: any) => !p.status_terjual);
       setMyProducts(activeProducts);
       setMyPromotions(promosRes.data || promosRes);
+      setPaymentSettings(settingsRes.data);
+      if (!settingsRes.data.midtrans_enabled && settingsRes.data.manual_transfer_enabled) {
+        setPaymentMethod('manual_transfer');
+      } else {
+        setPaymentMethod('midtrans');
+      }
     } catch (err) {
       console.error('Failed to load promotion data:', err);
     } finally {
@@ -108,6 +126,7 @@ export default function SellerPromotions() {
       const formData = new FormData();
       formData.append('product_id', selectedProduct);
       formData.append('package_id', selectedPackage);
+      formData.append('payment_method', paymentMethod);
       formData.append('ad_type', adType);
       if (adTitle.trim()) {
         formData.append('ad_title', adTitle.trim());
@@ -125,10 +144,18 @@ export default function SellerPromotions() {
         method: 'POST',
         body: formData
       });
-      
+
+      if (paymentMethod === 'manual_transfer') {
+        showMessage('Promosi dibuat. Silakan upload bukti transfer di daftar Riwayat Boost.', 'success');
+        resetForm();
+        await loadData();
+        setActionLoading(false);
+        return;
+      }
+
       const snapToken = res.data?.snap_token;
       const orderId = res.data?.order_id;
-      
+
       if (snapToken && window.snap) {
         window.snap.pay(snapToken, {
           onSuccess: async function (result: any) {
@@ -463,6 +490,33 @@ export default function SellerPromotions() {
               )}
             </div>
 
+            {/* Step 4: Metode Pembayaran — only shown if both methods are enabled */}
+            {paymentSettings && paymentSettings.midtrans_enabled && paymentSettings.manual_transfer_enabled && (
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>4. Pilih Metode Pembayaran</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  {([
+                    { value: 'midtrans' as const, label: 'Midtrans', desc: 'Bayar otomatis (kartu, e-wallet, dll.)' },
+                    { value: 'manual_transfer' as const, label: 'Transfer Manual', desc: 'QRIS / transfer bank, verifikasi admin' },
+                  ]).map(opt => {
+                    const sel = paymentMethod === opt.value;
+                    return (
+                      <button type="button" key={opt.value} onClick={() => setPaymentMethod(opt.value)}
+                        style={{
+                          padding: '0.9rem', borderRadius: '10px', border: '2px solid',
+                          borderColor: sel ? 'var(--primary)' : 'var(--border)',
+                          background: sel ? 'var(--primary-light)' : 'white',
+                          cursor: 'pointer', textAlign: 'left', transition: 'all 0.18s',
+                        }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.9rem', color: sel ? 'var(--primary)' : '#111827' }}>{opt.label}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>{opt.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
               className="btn btn-primary"
@@ -512,7 +566,19 @@ export default function SellerPromotions() {
 
                       {/* Status badge */}
                       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                        {promo.payment_status === 'pending' ? (
+                        {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' ? (
+                          <>
+                            {promo.manual_review_status === 'rejected' ? (
+                              <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>BUKTI DITOLAK</span>
+                            ) : promo.manual_review_status === 'ocr_checked' ? (
+                              <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(59, 130, 246, 0.1)', color: '#2563eb', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>DITINJAU ADMIN</span>
+                            ) : promo.manual_proof_path ? (
+                              <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MEMERIKSA BUKTI</span>
+                            ) : (
+                              <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU BUKTI TRANSFER</span>
+                            )}
+                          </>
+                        ) : promo.payment_status === 'pending' ? (
                           <>
                             <span style={{ padding: '5px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.05em' }}>MENUNGGU PEMBAYARAN</span>
                             {promo.snap_token && (
@@ -599,6 +665,73 @@ export default function SellerPromotions() {
                         )}
                       </div>
                     </div>
+
+                    {/* Manual transfer panel */}
+                    {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' && (
+                      <div style={{ marginTop: '0.9rem', paddingTop: '0.9rem', borderTop: '1px solid var(--border)' }}>
+                        {paymentSettings && (paymentSettings.qris_image_url || paymentSettings.bank_accounts.length > 0) && (
+                          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                            {paymentSettings.qris_image_url && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={getStorageUrl(paymentSettings.qris_image_url) || ''} alt="QRIS" style={{ width: '90px', height: '90px', objectFit: 'contain', border: '1px solid var(--border)', borderRadius: '8px', background: 'white' }} />
+                            )}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.78rem', color: '#374151' }}>
+                              {paymentSettings.bank_accounts.map(acc => (
+                                <div key={acc.id}><strong>{acc.bank_name}</strong> — {acc.account_number} a.n. {acc.account_name}</div>
+                              ))}
+                              <div style={{ fontWeight: 700, color: 'var(--primary)' }}>Total: Rp {Number(promo.amount_paid).toLocaleString('id-ID')}</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {promo.manual_review_status === 'ocr_checked' && promo.ocr_note && (
+                          <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.5rem', fontStyle: 'italic' }}>
+                            Catatan sistem: {promo.ocr_note.startsWith('[MATCH]') ? 'Nominal terdeteksi cocok, menunggu review admin.' : 'Nominal tidak terdeteksi cocok otomatis, admin akan meninjau manual.'}
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={el => { proofInputRefs.current[promo.id] = el; }}
+                            style={{ display: 'none' }}
+                            onChange={e => setProofFiles(prev => ({ ...prev, [promo.id]: e.target.files?.[0] || null }))}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => proofInputRefs.current[promo.id]?.click()}
+                            style={{ fontSize: '0.75rem', background: '#f3f4f6', color: '#374151', padding: '6px 10px', borderRadius: '6px', border: '1px solid #d1d5db', cursor: 'pointer', fontWeight: 700 }}
+                          >
+                            {proofFiles[promo.id] ? proofFiles[promo.id]?.name : 'Pilih Bukti Transfer'}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!proofFiles[promo.id] || uploadingProofId === promo.id}
+                            onClick={async () => {
+                              const file = proofFiles[promo.id];
+                              if (!file) return;
+                              setUploadingProofId(promo.id);
+                              try {
+                                const fd = new FormData();
+                                fd.append('proof_image', file);
+                                await fetchApi(`/promotions/${promo.id}/upload-proof`, { method: 'POST', body: fd });
+                                showMessage('Bukti transfer berhasil diupload dan sedang diperiksa.', 'success');
+                                setProofFiles(prev => ({ ...prev, [promo.id]: null }));
+                                await loadData();
+                              } catch (err: any) {
+                                showMessage(err.message || 'Gagal upload bukti transfer.', 'error');
+                              } finally {
+                                setUploadingProofId(null);
+                              }
+                            }}
+                            style={{ fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '6px 10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 700, opacity: (!proofFiles[promo.id] || uploadingProofId === promo.id) ? 0.5 : 1 }}
+                          >
+                            {uploadingProofId === promo.id ? 'Mengupload...' : 'Upload Bukti'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Ad media badge */}
                     {hasAd && (

@@ -10,6 +10,7 @@ import AdminSidebar from '@/components/AdminSidebar';
 import { Icons } from '@/components/Icons';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
+import { Button } from '@/components/ui/Button';
 
 export default function AdminPromotions() {
   const { user, loading: authLoading } = useAuth();
@@ -17,6 +18,8 @@ export default function AdminPromotions() {
   const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewBanner, setPreviewBanner] = useState<any | null>(null);
+  const [previewProof, setPreviewProof] = useState<any | null>(null);
+  const [reviewLoadingId, setReviewLoadingId] = useState<string | number | null>(null);
 
   const {
     searchQuery, setSearchQuery,
@@ -53,6 +56,32 @@ export default function AdminPromotions() {
     } catch (err) {
       console.error('Gagal menghapus promosi:', err);
       alert('Gagal menghapus promosi');
+    }
+  }
+
+  async function handleApprovePayment(id: string | number) {
+    if (!confirm('Setujui pembayaran transfer manual ini? Promosi akan langsung diaktifkan.')) return;
+    setReviewLoadingId(id);
+    try {
+      await fetchApi(`/admin/promotions/${id}/approve-payment`, { method: 'PATCH' });
+      await loadPromotions();
+    } catch (err: any) {
+      alert(err.message || 'Gagal menyetujui pembayaran');
+    } finally {
+      setReviewLoadingId(null);
+    }
+  }
+
+  async function handleRejectPayment(id: string | number) {
+    if (!confirm('Tolak bukti transfer ini?')) return;
+    setReviewLoadingId(id);
+    try {
+      await fetchApi(`/admin/promotions/${id}/reject-payment`, { method: 'PATCH' });
+      await loadPromotions();
+    } catch (err: any) {
+      alert(err.message || 'Gagal menolak pembayaran');
+    } finally {
+      setReviewLoadingId(null);
     }
   }
 
@@ -143,6 +172,7 @@ export default function AdminPromotions() {
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>PENJUAL</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>PAKET</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>BIAYA</th>
+                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>METODE</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>IKLAN</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>BERAKHIR</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
@@ -152,7 +182,7 @@ export default function AdminPromotions() {
               <tbody style={{ fontSize: '0.95rem' }}>
                 {paginatedData.length === 0 ? (
                   <tr>
-                    <td colSpan={8} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
+                    <td colSpan={9} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
                       <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                       <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Tidak ada promosi ditemukan.</div>
                     </td>
@@ -176,6 +206,39 @@ export default function AdminPromotions() {
                       </td>
                       <td style={{ padding: '1.25rem', fontWeight: 800, color: 'var(--foreground)' }}>
                         Rp {Number(promo.amount_paid || 0).toLocaleString('id-ID')}
+                      </td>
+                      <td style={{ padding: '1.25rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: promo.payment_method === 'manual_transfer' ? 'rgba(217, 119, 6, 0.1)' : 'var(--input)', color: promo.payment_method === 'manual_transfer' ? '#d97706' : 'var(--foreground)' }}>
+                            {promo.payment_method === 'manual_transfer' ? 'Transfer Manual' : 'Midtrans'}
+                          </span>
+                          {promo.payment_method === 'manual_transfer' && promo.manual_proof_path && (
+                            <button
+                              onClick={() => setPreviewProof(promo)}
+                              style={{ fontSize: '0.7rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, padding: 0 }}
+                            >
+                              Lihat Bukti
+                            </button>
+                          )}
+                          {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' && promo.manual_proof_path && (
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button
+                                onClick={() => handleApprovePayment(promo.id)}
+                                disabled={reviewLoadingId === promo.id}
+                                style={{ fontSize: '0.68rem', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+                              >
+                                Setujui
+                              </button>
+                              <button
+                                onClick={() => handleRejectPayment(promo.id)}
+                                disabled={reviewLoadingId === promo.id}
+                                style={{ fontSize: '0.68rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td style={{ padding: '1.25rem' }}>
                         {hasAd ? (
@@ -300,6 +363,58 @@ export default function AdminPromotions() {
             <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewBanner.product?.nama_barang || '-'}</div>
               <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewBanner.product?.user?.name || '-'}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Preview Bukti Transfer ── */}
+      {previewProof && (
+        <div
+          onClick={() => setPreviewProof(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 3000,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem'
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', maxWidth: '600px', width: '100%', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
+          >
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--foreground)' }}>Bukti Transfer Manual</div>
+              <button
+                onClick={() => setPreviewProof(null)}
+                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              ><Icons.X size={18} /></button>
+            </div>
+
+            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={getStorageUrl(previewProof.manual_proof_path) || ''}
+                alt="Bukti transfer"
+                style={{ width: '100%', maxHeight: '450px', display: 'block', objectFit: 'contain' }}
+              />
+            </div>
+
+            <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewProof.product?.nama_barang || '-'}</div>
+              <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewProof.product?.user?.name || '-'}</div>
+              <div><strong style={{ opacity: 0.6 }}>Nominal:</strong> Rp {Number(previewProof.amount_paid || 0).toLocaleString('id-ID')}</div>
+              {previewProof.ocr_note && (
+                <div style={{ marginTop: '4px', padding: '0.75rem', background: 'var(--input)', borderRadius: '8px', fontSize: '0.8rem' }}>
+                  <strong style={{ opacity: 0.6 }}>Hasil OCR:</strong> {previewProof.ocr_note.startsWith('[MATCH]') ? '✅ Nominal cocok' : previewProof.ocr_note.startsWith('[GAGAL DICEK]') ? '⚠️ Gagal diperiksa otomatis' : '❌ Nominal tidak cocok otomatis'}
+                  <div style={{ marginTop: '4px', opacity: 0.7, fontStyle: 'italic', maxHeight: '80px', overflowY: 'auto' }}>{previewProof.ocr_note.replace(/^\[.*?\]\s*/, '')}</div>
+                </div>
+              )}
+              {previewProof.payment_status === 'pending' && (
+                <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                  <Button variant="primary" onClick={() => { handleApprovePayment(previewProof.id); setPreviewProof(null); }}>Setujui</Button>
+                  <Button variant="secondary" onClick={() => { handleRejectPayment(previewProof.id); setPreviewProof(null); }}>Tolak</Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
