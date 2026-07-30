@@ -172,7 +172,7 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Bukti Bayar (jika Bank Transfer) */}
-      {order.payment_method === 'bank_transfer' && order.status !== 'pending' && order.status !== 'cancelled' && (
+      {order.payment_method === 'bank_transfer' && order.status !== 'cancelled' && (
         <div className="card" style={{ padding: '2rem', marginBottom: '2rem', border: '1px solid var(--border)', background: 'var(--card)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--foreground)' }}>
             <Icons.Image size={20} color="var(--primary)" /> Bukti Pembayaran

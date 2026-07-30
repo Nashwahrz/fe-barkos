@@ -123,7 +123,9 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
           <s.Icon size={20} color={s.color} />
         </div>
         <p style={{ color: s.color, fontWeight: 700, fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
-          {order.status === 'pending' && 'Pesananmu sudah masuk. Menunggu penjual mengkonfirmasi.'}
+          {order.status === 'pending' && order.payment_method === 'bank_transfer' && !order.has_payment_proof && 'Sudah chat & dapat konfirmasi dari penjual? Silakan upload bukti transfer di bawah.'}
+          {order.status === 'pending' && order.payment_method === 'bank_transfer' && order.has_payment_proof && 'Bukti bayar sudah dikirim. Menunggu penjual meninjau & mengkonfirmasi pesanan.'}
+          {order.status === 'pending' && order.payment_method === 'cod' && 'Pesananmu sudah masuk. Menunggu penjual mengkonfirmasi.'}
           {order.status === 'confirmed' && order.payment_method === 'bank_transfer' && !order.has_payment_proof && 'Pesanan dikonfirmasi! Silakan upload bukti transfer di bawah.'}
           {order.status === 'confirmed' && order.payment_method === 'bank_transfer' && order.has_payment_proof && 'Bukti bayar sudah dikirim. Menunggu penjual memverifikasi.'}
           {order.status === 'confirmed' && order.payment_method === 'cod' && 'Pesanan dikonfirmasi! Hubungi penjual untuk mengatur tempat COD.'}
@@ -222,7 +224,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
       </div>
 
       {/* ── Rekening Penjual ──────────────────────────── */}
-      {order.payment_method === 'bank_transfer' && order.status === 'confirmed' && order.seller?.bank_accounts && order.seller.bank_accounts.length > 0 && (
+      {order.payment_method === 'bank_transfer' && (order.status === 'pending' || order.status === 'confirmed') && order.seller?.bank_accounts && order.seller.bank_accounts.length > 0 && (
         <div style={{ padding: '1.5rem', background: '#eff6ff', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid #bfdbfe' }}>
           <h3 style={{ fontWeight: 800, marginBottom: '1rem', color: '#1e3a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Icons.CreditCard size={20} /> Rekening Tujuan Transfer
@@ -241,7 +243,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
       )}
 
       {/* ── Upload Bukti Bayar ────────────────────────── */}
-      {order.payment_method === 'bank_transfer' && order.status === 'confirmed' && (
+      {order.payment_method === 'bank_transfer' && (order.status === 'pending' || order.status === 'confirmed') && (
         <div style={{ padding: '1.5rem', background: 'var(--card)', borderRadius: '16px', marginBottom: '1.5rem' }}>
           <h3 style={{ fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Icons.Upload size={20} /> Upload Bukti Pembayaran
