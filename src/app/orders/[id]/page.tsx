@@ -100,7 +100,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
       )}
 
       {/* Back */}
-      <Link href="/orders" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#6b7280', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', marginBottom: '2rem' }}>
+      <Link href="/orders" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', marginBottom: '2rem' }}>
         ← Kembali ke Pesanan
       </Link>
 
@@ -108,7 +108,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900 }}>Detail Pesanan</h1>
-          <div style={{ fontSize: '0.8rem', color: '#6b7280', fontFamily: 'monospace', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, fontFamily: 'monospace', marginTop: '4px' }}>
             #{String(order.id).padStart(6, '0')}
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
 
       {/* Product Card */}
       <div style={{ paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: '1rem' }}>Ringkasan Pesanan</h3>
+        <h3 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--foreground)', opacity: 0.6, marginBottom: '1rem' }}>Ringkasan Pesanan</h3>
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
           <div style={{ width: '100px', height: '100px', borderRadius: '12px', background: 'var(--card)', overflow: 'hidden', flexShrink: 0 }}>
             {order.product?.foto
@@ -145,11 +145,11 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
             <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '4px' }}>{order.product?.nama_barang}</h3>
             <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Total</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Total</div>
                 <div style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '1.25rem' }}>Rp {Number(order.agreed_price).toLocaleString('id-ID')}</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Metode</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Metode</div>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     {order.payment_method === 'cod' ? <><Icons.Handshake size={14}/> COD</> : <><Icons.CreditCard size={14}/> Transfer Bank</>}
@@ -182,15 +182,15 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Tanggal</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Tanggal</div>
                 <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
               </div>
             </div>
           </div>
         </div>
         {order.notes && (
-          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--card)', borderRadius: '12px', fontSize: '0.875rem', color: '#6b7280', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-            <div style={{ marginTop: '2px', flexShrink: 0 }}><Icons.MessageCircle size={16} color="#6b7280" /></div>
+          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--card)', borderRadius: '12px', fontSize: '0.875rem', color: 'var(--foreground)', opacity: 0.7, display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+            <div style={{ marginTop: '2px', flexShrink: 0 }}><Icons.MessageCircle size={16} color="var(--foreground)" /></div>
             <span style={{ lineHeight: 1.5 }}>Catatan: {order.notes}</span>
           </div>
         )}
@@ -198,14 +198,14 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
 
       {/* Seller Info */}
       <div style={{ paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', marginBottom: '1.25rem' }}>Informasi Penjual</h3>
+        <h3 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--foreground)', opacity: 0.6, marginBottom: '1.25rem' }}>Informasi Penjual</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: order.status === 'confirmed' ? '1.25rem' : 0 }}>
           <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.1rem' }}>
             {order.seller?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
             <div style={{ fontWeight: 700 }}>{order.seller?.name}</div>
-            <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{order.seller?.phone || 'Nomor tidak tersedia'}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6 }}>{order.seller?.phone || 'Nomor tidak tersedia'}</div>
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem' }}>
@@ -246,7 +246,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
           <h3 style={{ fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Icons.Upload size={20} /> Upload Bukti Pembayaran
           </h3>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '0.875rem', marginBottom: '1.5rem' }}>
             Upload foto/screenshot bukti transfer agar penjual bisa memverifikasi pembayaranmu.
           </p>
 

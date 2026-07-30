@@ -230,7 +230,7 @@ export default function SellerPromotions() {
       />
       <div className="container" style={{ padding: '60px 1rem', maxWidth: '1100px' }}>
         <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#111827', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
           <Icons.Zap size={36} color="#f59e0b" /> Pusat Promosi
         </h1>
         <p style={{ opacity: 0.7, maxWidth: '650px', margin: '0 auto', fontSize: '1.05rem', lineHeight: 1.6 }}>
@@ -256,15 +256,15 @@ export default function SellerPromotions() {
 
         {/* ── Form Beli Promosi ── */}
         <div className="card" style={{ padding: '2.5rem', height: 'fit-content' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
-            <Icons.ShoppingBag size={24} color="#111827" /> Beli Paket Promosi
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)' }}>
+            <Icons.ShoppingBag size={24} color="var(--foreground)" /> Beli Paket Promosi
           </h2>
 
           <form onSubmit={handlePurchase} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
             {/* Step 1: Produk */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>1. Pilih Produk</label>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: 'var(--foreground)' }}>1. Pilih Produk</label>
               <select className="input-field" style={{ height: '48px', borderRadius: '8px' }} value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)} required>
                 <option value="">-- Pilih Produk Aktif --</option>
                 {myProducts.map(p => (
@@ -278,7 +278,7 @@ export default function SellerPromotions() {
 
             {/* Step 2: Paket */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>2. Pilih Paket Durasi</label>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: 'var(--foreground)' }}>2. Pilih Paket Durasi</label>
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {packages.map(pkg => {
                   const isSelected = selectedPackage === pkg.id.toString();
@@ -309,8 +309,8 @@ export default function SellerPromotions() {
 
             {/* Step 3: Pasang Iklan (opsional) */}
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>
-                3. Pasang Iklan <span style={{ fontWeight: 500, color: '#9ca3af' }}>(opsional)</span>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: 'var(--foreground)' }}>
+                3. Pasang Iklan <span style={{ fontWeight: 500, color: 'var(--foreground)', opacity: 0.5 }}>(opsional)</span>
               </label>
 
               {/* Ad type picker */}
@@ -334,7 +334,7 @@ export default function SellerPromotions() {
                   );
                 })}
               </div>
-              <p style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: '1rem', fontStyle: 'italic' }}>
+              <p style={{ fontSize: '0.78rem', color: 'var(--foreground)', opacity: 0.6, marginBottom: '1rem', fontStyle: 'italic' }}>
                 {adTypeOptions.find(o => o.value === adType)?.desc}
               </p>
               {/* URL or File upload choice & preview — only shown if image or video */}
@@ -349,7 +349,7 @@ export default function SellerPromotions() {
                       style={{
                         padding: '6px 12px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '6px',
                         background: mediaSource === 'file' ? 'var(--primary-light)' : 'transparent',
-                        color: mediaSource === 'file' ? 'var(--primary)' : '#6b7280',
+                        color: mediaSource === 'file' ? 'var(--primary)' : 'var(--foreground)',
                       }}
                     >
                       📁 Upload File
@@ -360,7 +360,7 @@ export default function SellerPromotions() {
                       style={{
                         padding: '6px 12px', fontSize: '0.85rem', fontWeight: 700, borderRadius: '6px',
                         background: mediaSource === 'url' ? 'var(--primary-light)' : 'transparent',
-                        color: mediaSource === 'url' ? 'var(--primary)' : '#6b7280',
+                        color: mediaSource === 'url' ? 'var(--primary)' : 'var(--foreground)',
                       }}
                     >
                       🔗 URL Publik
@@ -369,7 +369,7 @@ export default function SellerPromotions() {
 
                   {mediaSource === 'file' ? (
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.5rem' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '0.5rem' }}>
                         Pilih {adType === 'image' ? 'Gambar' : 'Video'} dari Komputer Anda
                         <span style={{ color: '#ef4444' }}> *</span>
                       </label>
@@ -421,7 +421,7 @@ export default function SellerPromotions() {
                     </div>
                   ) : (
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '0.4rem' }}>
                         {adType === 'image' ? 'URL Gambar Iklan' : 'URL Video Iklan'}
                         <span style={{ color: '#ef4444' }}> *</span>
                       </label>
@@ -437,7 +437,7 @@ export default function SellerPromotions() {
                   )}
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>Judul Iklan (opsional)</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '0.4rem' }}>Judul Iklan (opsional)</label>
                     <input
                       type="text"
                       className="input-field"
@@ -493,7 +493,7 @@ export default function SellerPromotions() {
             {/* Step 4: Metode Pembayaran — only shown if both methods are enabled */}
             {paymentSettings && paymentSettings.midtrans_enabled && paymentSettings.manual_transfer_enabled && (
               <div>
-                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: '#374151' }}>4. Pilih Metode Pembayaran</label>
+                <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: 'var(--foreground)' }}>4. Pilih Metode Pembayaran</label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                   {([
                     { value: 'midtrans' as const, label: 'Midtrans', desc: 'Bayar otomatis (kartu, e-wallet, dll.)' },
@@ -530,8 +530,8 @@ export default function SellerPromotions() {
 
         {/* ── Riwayat Promosi ── */}
         <div className="card" style={{ padding: '2.5rem', background: '#ffffff', height: 'fit-content' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#111827' }}>
-            <Icons.Clock size={24} color="#111827" /> Riwayat Boost
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--foreground)' }}>
+            <Icons.Clock size={24} color="var(--foreground)" /> Riwayat Boost
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
