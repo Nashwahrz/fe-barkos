@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" style={{ overflowX: 'hidden' }}>
+    <html lang="id">
       <body className={`${inter.className} ${inter.variable}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
         <AuthProvider>
           <RouteGuard>
