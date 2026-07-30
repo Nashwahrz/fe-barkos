@@ -10,6 +10,23 @@ self.addEventListener('fetch', (e) => {
   // Pass-through fetch handler is required for PWA beforeinstallprompt to fire
 });
 
+const CONFIG_CACHE = 'lapak-kos-sw-config';
+const API_URL_KEY = 'https://sw-config.local/api-url';
+
+self.addEventListener('message', (e) => {
+  if (e.data?.type === 'SET_API_URL' && e.data.url) {
+    e.waitUntil(
+      caches.open(CONFIG_CACHE).then((cache) => cache.put(API_URL_KEY, new Response(e.data.url)))
+    );
+  }
+});
+
+async function getApiUrl() {
+  const cache = await caches.open(CONFIG_CACHE);
+  const res = await cache.match(API_URL_KEY);
+  return res ? res.text() : null;
+}
+
 self.addEventListener('push', function (e) {
   if (!(self.Notification && self.Notification.permission === 'granted')) {
     return;
@@ -35,10 +52,28 @@ self.addEventListener('push', function (e) {
 // Dengarkan perubahan token dari browser untuk menghindari token kadaluarsa
 self.addEventListener('pushsubscriptionchange', function(event) {
   event.waitUntil(
-    self.registration.pushManager.subscribe(event.oldSubscription.options)
-      .then(function(subscription) {
-        // Akan disinkronkan saat web dibuka (via Navbar.tsx)
-      })
+    (async () => {
+      const oldEndpoint = event.oldSubscription?.endpoint;
+      const newSubscription = await self.registration.pushManager.subscribe(
+        event.oldSubscription?.options || { userVisibleOnly: true, applicationServerKey: event.oldSubscription?.options?.applicationServerKey }
+      );
+
+      if (!oldEndpoint) return;
+
+      const apiUrl = await getApiUrl();
+      if (!apiUrl) return; // Belum pernah sync — akan disinkronkan saat web dibuka (via Navbar.tsx)
+
+      const json = newSubscription.toJSON();
+      try {
+        await fetch(`${apiUrl}/push-resubscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ old_endpoint: oldEndpoint, endpoint: json.endpoint, keys: json.keys }),
+        });
+      } catch (e) {
+        // Offline saat rotasi terjadi — fallback resync tetap terjadi saat web dibuka berikutnya
+      }
+    })()
   );
 });
 

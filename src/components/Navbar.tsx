@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { APP_NAME, USER_ROLES } from '@/lib/constants';
+import { APP_NAME, USER_ROLES, API_BASE_URL } from '@/lib/constants';
 import { useAuth } from '@/components/AuthProvider';
 import { usePathname } from 'next/navigation';
 import { Icons } from '@/components/Icons';
@@ -48,6 +48,12 @@ export default function Navbar() {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
+        // Beri tahu service worker alamat API supaya ia bisa lapor sendiri
+        // kalau browser merotasi push subscription di background (lihat sw.js pushsubscriptionchange).
+        navigator.serviceWorker.ready.then(readyReg => {
+          readyReg.active?.postMessage({ type: 'SET_API_URL', url: API_BASE_URL });
+        });
+
         reg.pushManager.getSubscription().then(sub => {
           if (sub) {
             setIsPushEnabled(true);
