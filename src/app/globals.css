@@ -561,6 +561,10 @@ input, textarea, select {
 }
 
 /* Print Styles */
+.print-area {
+  display: none;
+}
+
 @media print {
   @page {
     margin: 0;
@@ -573,6 +577,7 @@ input, textarea, select {
     visibility: visible;
   }
   .print-area {
+    display: block;
     position: absolute;
     left: 0;
     top: 0;

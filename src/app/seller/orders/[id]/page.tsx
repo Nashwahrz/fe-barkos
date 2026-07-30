@@ -232,7 +232,7 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
       </div>
 
       {/* Hidden Print Receipt Layout */}
-      <div className="print-area no-print" style={{ color: '#000', background: '#fff', padding: '40px', fontFamily: 'monospace', maxWidth: '400px', margin: '0 auto', border: '1px dashed #ccc' }}>
+      <div className="print-area" style={{ color: '#000', background: '#fff', padding: '40px', fontFamily: 'monospace', maxWidth: '400px', margin: '0 auto', border: '1px dashed #ccc' }}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <img src="/logo-lapak-kos.png" alt="Lapak Kos" style={{ height: '40px', margin: '0 auto 10px', filter: 'grayscale(100%)' }} />
           <h2 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: 'bold' }}>LAPAK KOS</h2>
