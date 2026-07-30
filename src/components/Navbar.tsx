@@ -413,6 +413,7 @@ export default function Navbar() {
                   { href: '/seller/products', icon: <Icons.Package size={17} />, title: 'Lapak Saya' },
                   { href: '/seller/orders', icon: <Icons.ShoppingBag size={17} />, title: 'Pesanan' },
                   { href: '/seller/offers', icon: <Icons.Zap size={17} />, title: 'Tawaran' },
+                  { href: '/seller/promotions', icon: <Icons.Megaphone size={17} />, title: 'Promosi' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} title={item.title} style={{
                     width: '34px', height: '34px', borderRadius: '8px', display: 'flex', alignItems: 'center',
