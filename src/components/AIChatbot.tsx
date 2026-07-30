@@ -411,7 +411,7 @@ export default function AIChatbot() {
                     <div style={{
                       padding: '10px 14px',
                       borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      background: msg.sender === 'user' ? 'var(--primary)' : 'white',
+                      background: msg.sender === 'user' ? 'var(--primary)' : 'var(--card)',
                       color: msg.sender === 'user' ? 'white' : 'var(--foreground)',
                       boxShadow: msg.sender === 'user' ? 'none' : '0 2px 8px rgba(0,0,0,0.05)',
                       border: msg.sender === 'user' ? 'none' : '1px solid var(--border)',
@@ -456,11 +456,11 @@ export default function AIChatbot() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={CAT_IMAGES.thinking} alt="" width={24} height={24} style={{ objectFit: 'cover' }} />
                   </div>
-                  <div style={{ background: 'white', padding: '12px 14px', borderRadius: '16px 16px 16px 4px', border: '1px solid var(--border)', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  <div style={{ background: 'var(--card)', padding: '12px 14px', borderRadius: '16px 16px 16px 4px', border: '1px solid var(--border)', display: 'flex', gap: '4px', alignItems: 'center' }}>
                     <div className="typing-dot" style={{ width: '6px', height: '6px', background: 'var(--primary)', borderRadius: '50%' }}></div>
                     <div className="typing-dot" style={{ width: '6px', height: '6px', background: 'var(--primary)', borderRadius: '50%', animationDelay: '0.2s' }}></div>
                     <div className="typing-dot" style={{ width: '6px', height: '6px', background: 'var(--primary)', borderRadius: '50%', animationDelay: '0.4s' }}></div>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--muted-foreground)', marginLeft: '6px', fontWeight: 500 }}>Mikir dulu...</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--foreground)', opacity: 0.6, marginLeft: '6px', fontWeight: 500 }}>Mikir dulu...</span>
                   </div>
                 </div>
               )}
@@ -509,7 +509,7 @@ export default function AIChatbot() {
             position: 'absolute',
             bottom: '75px',
             right: '0',
-            background: 'white',
+            background: 'var(--card)',
             padding: '10px 16px',
             borderRadius: '12px',
             boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
@@ -529,7 +529,7 @@ export default function AIChatbot() {
               style={{
                 background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: '50%',
                 width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'var(--muted-foreground)'
+                cursor: 'pointer', color: 'var(--foreground)', opacity: 0.6
               }}
             >
               <Icons.X size={12} />
@@ -541,7 +541,7 @@ export default function AIChatbot() {
               right: '24px',
               width: '12px',
               height: '12px',
-              background: 'white',
+              background: 'var(--card)',
               transform: 'rotate(45deg)',
               borderBottom: '1px solid var(--border)',
               borderRight: '1px solid var(--border)',

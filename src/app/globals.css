@@ -13,6 +13,7 @@
   --foreground: #111827; /* Very dark gray for text, better readability than pure black */
   --card: #FFFFFF;
   --card-foreground: #374151; /* Medium dark gray for secondary text */
+  --muted-foreground: rgba(17, 24, 39, 0.6); /* Muted/secondary text, theme-aware */
   --border: #E5E7EB; /* Very light gray border */
   --input: #FFFFFF;
   --input-border: #D1D5DB;
@@ -34,6 +35,7 @@
   --foreground: #F9FAFB;
   --card: #1F2937;
   --card-foreground: #D1D5DB;
+  --muted-foreground: rgba(249, 250, 251, 0.6);
   --border: #374151;
   --input: #1F2937;
   --input-border: #4B5563;
