@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Circle, CircleMarker, Popup, useMap } from 'react-leaflet';
 
 interface LocationMapModalProps {
@@ -21,6 +21,26 @@ function MapCenterUpdater({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
+function ItemSearchFitBounds({ products }: { products: any[] }) {
+  const map = useMap();
+  useEffect(() => {
+    const coords = products
+      .map(p => [parseFloat(p.latitude), parseFloat(p.longitude)] as [number, number])
+      .filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng));
+
+    if (coords.length === 0) return;
+
+    if (coords.length === 1) {
+      map.setView(coords[0], 15);
+    } else {
+      import('leaflet').then(L => {
+        map.fitBounds(L.latLngBounds(coords), { padding: [40, 40], maxZoom: 15 });
+      });
+    }
+  }, [products, map]);
+  return null;
+}
+
 export default function LocationMapModal({ lat, lng, products = [], onClose, onSearch }: LocationMapModalProps) {
   const [radius, setRadius] = useState(5000); // 5km default
   const [showMap, setShowMap] = useState(false);
@@ -31,6 +51,14 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const [itemQuery, setItemQuery] = useState('');
+
+  const filteredProducts = useMemo(() => {
+    const q = itemQuery.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter(p => (p.nama_barang || '').toLowerCase().includes(q));
+  }, [itemQuery, products]);
 
   // Delay map rendering slightly to avoid React StrictMode double-mount crashes with Leaflet
   useEffect(() => {
@@ -188,6 +216,43 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
           )}
         </div>
 
+        {/* Item Name Search */}
+        <div style={{ width: '100%', marginBottom: '1rem' }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={itemQuery}
+              onChange={(e) => setItemQuery(e.target.value)}
+              placeholder="Cari nama barang di peta (misal: kipas angin)..."
+              style={{
+                width: '100%',
+                padding: '8px 30px 8px 12px',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                background: 'var(--background)',
+                color: 'var(--foreground)',
+                fontSize: '0.85rem'
+              }}
+            />
+            {itemQuery && (
+              <button
+                type="button"
+                onClick={() => setItemQuery('')}
+                style={{ position: 'absolute', right: '8px', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.6, fontSize: '0.9rem', color: 'var(--foreground)' }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {itemQuery.trim() && (
+            <p style={{ fontSize: '0.75rem', opacity: 0.7, marginTop: '6px' }}>
+              {filteredProducts.length > 0
+                ? `${filteredProducts.length} barang ditemukan cocok dengan "${itemQuery.trim()}"`
+                : `Tidak ada barang yang cocok dengan "${itemQuery.trim()}"`}
+            </p>
+          )}
+        </div>
+
         <div style={{ width: '100%', height: '300px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid var(--border)', position: 'relative' }}>
           {!showMap && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)', zIndex: 10 }}>
@@ -197,6 +262,9 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
           {showMap && (
             <MapContainer center={[currentLat, currentLng]} zoom={13} style={{ width: '100%', height: '100%', zIndex: 1 }}>
               <MapCenterUpdater lat={currentLat} lng={currentLng} />
+              {itemQuery.trim() && filteredProducts.length > 0 && (
+                <ItemSearchFitBounds products={filteredProducts} />
+              )}
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -206,18 +274,20 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
               <Circle center={[currentLat, currentLng]} pathOptions={{ fillColor: 'var(--primary)', color: 'var(--primary)' }} radius={radius} />
 
               {/* Product Markers */}
-              {products.map(p => {
+              {filteredProducts.map(p => {
                 if (!p.latitude || !p.longitude) return null;
                 const pLat = parseFloat(p.latitude);
                 const pLng = parseFloat(p.longitude);
                 if (isNaN(pLat) || isNaN(pLng)) return null;
 
+                const isMatch = !!itemQuery.trim();
+
                 return (
-                  <CircleMarker 
-                    key={p.id} 
+                  <CircleMarker
+                    key={p.id}
                     center={[pLat, pLng]}
-                    radius={7}
-                    pathOptions={{ color: 'white', fillColor: 'var(--primary)', fillOpacity: 0.9, weight: 2 }}
+                    radius={isMatch ? 9 : 7}
+                    pathOptions={{ color: 'white', fillColor: isMatch ? '#f97316' : 'var(--primary)', fillOpacity: 0.9, weight: 2 }}
                   >
                     <Popup>
                     <div style={{ padding: '4px', textAlign: 'left', minWidth: '180px' }}>
