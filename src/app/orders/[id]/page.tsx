@@ -256,7 +256,7 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
             <div style={{ padding: '1rem', background: '#D8F3DC', borderRadius: '8px', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: '#2D6A4F', fontWeight: 700, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Icons.CheckCircle size={16} color="#2D6A4F" /> Bukti sudah diunggah</span>
               {order.payment_proof_url && (
-                <a href={order.payment_proof_url} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 700 }}>Lihat →</a>
+                <a href={getStorageUrl(order.payment_proof_url) || '#'} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 700 }}>Lihat →</a>
               )}
             </div>
           )}

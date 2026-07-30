@@ -184,7 +184,7 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
               </div>
               <div style={{ border: '1px solid var(--border)', borderRadius: '16px', padding: '12px', background: 'var(--input)', display: 'inline-block' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={order.payment_proof_url} alt="Bukti Transfer" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', display: 'block' }} />
+                <img src={getStorageUrl(order.payment_proof_url) || ''} alt="Bukti Transfer" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', display: 'block' }} />
               </div>
             </div>
           ) : (
