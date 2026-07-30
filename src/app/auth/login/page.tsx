@@ -86,24 +86,31 @@ export default function Login() {
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
 
-          <Input 
-            type={showPassword ? 'text' : 'password'}
-            label="Password"
-            placeholder="••••••••" 
-            required
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            endIcon={
-              <button 
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
-                tabIndex={-1}
-              >
-                {showPassword ? <Icons.EyeOff size={18} /> : <Icons.Eye size={18} />}
-              </button>
-            }
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              label="Password"
+              placeholder="••••••••"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              endIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <Icons.EyeOff size={18} /> : <Icons.Eye size={18} />}
+                </button>
+              }
+            />
+            <div style={{ textAlign: 'right' }}>
+              <Link href="/auth/forgot-password" style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500, textDecoration: 'none' }}>
+                Lupa password?
+              </Link>
+            </div>
+          </div>
 
           <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
 
