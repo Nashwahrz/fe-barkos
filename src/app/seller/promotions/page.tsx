@@ -9,6 +9,7 @@ import { Icons } from '@/components/Icons';
 import Script from 'next/script';
 import { paymentSettingsApi } from '@/services/api/paymentSettings.api';
 import { PaymentSettings } from '@/types/paymentSettings';
+import AdImageCropModal from '@/components/AdImageCropModal';
 
 declare global {
   interface Window {
@@ -51,16 +52,33 @@ export default function SellerPromotions() {
   const [mediaSource, setMediaSource] = useState<'file' | 'url'>('file');
   const [adMediaFile, setAdMediaFile] = useState<File | null>(null);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string>('');
+  const [cropTargetFile, setCropTargetFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    if (adType === 'image') {
+      // Let the seller crop the image to the banner's aspect ratio before it's used.
+      setCropTargetFile(file);
+    } else {
       setAdMediaFile(file);
       if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
       const url = URL.createObjectURL(file);
       setFilePreviewUrl(url);
       setPreviewError(false);
     }
+    // Allow re-selecting the same file later (e.g. after cancelling crop)
+    e.target.value = '';
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    setAdMediaFile(croppedFile);
+    if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
+    const url = URL.createObjectURL(croppedFile);
+    setFilePreviewUrl(url);
+    setPreviewError(false);
+    setCropTargetFile(null);
   };
 
   useEffect(() => {
@@ -778,6 +796,15 @@ export default function SellerPromotions() {
 
       </div>
     </div>
+
+    {cropTargetFile && (
+      <AdImageCropModal
+        file={cropTargetFile}
+        aspect={16 / 9}
+        onCancel={() => setCropTargetFile(null)}
+        onConfirm={handleCropConfirm}
+      />
+    )}
   </>
   );
 }
