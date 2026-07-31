@@ -162,9 +162,11 @@ export default function ChatDetailPage() {
     }
   }
 
+  const isChatClosed = activeOrder?.status === 'completed' || activeOrder?.status === 'cancelled';
+
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || isChatClosed) return;
 
     const tempMessage = newMessage;
     setNewMessage('');
@@ -202,6 +204,7 @@ export default function ChatDetailPage() {
   }
 
   async function sendTemplate(text: string) {
+    if (isChatClosed) return;
     // Optimistic Update
     const optimisticMsg = {
       id: 'temp-' + Date.now(),
@@ -233,6 +236,7 @@ export default function ChatDetailPage() {
   }
 
   async function handleSendLocation() {
+    if (isChatClosed) return;
     if (!navigator.geolocation) {
       alert('Browser Anda tidak mendukung fitur lokasi.');
       return;
@@ -263,6 +267,7 @@ export default function ChatDetailPage() {
   }
 
   async function handleRequestPhone() {
+    if (isChatClosed) return;
     setSending(true);
     try {
       await fetchApi(`/products/${productId}/chats`, {
@@ -592,13 +597,27 @@ export default function ChatDetailPage() {
 
       {/* Input Area */}
       <div style={{ background: 'white', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
-        
+
+        {isChatClosed ? (
+          activeOrder?.status === 'cancelled' ? (
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#991b1b' }}>
+              <Icons.X size={20} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan ini telah dibatalkan. Sesi chat ini telah berakhir.</span>
+            </div>
+          ) : (
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
+              <Icons.CheckCheck size={20} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan telah selesai. Sesi chat ini telah berakhir.</span>
+            </div>
+          )
+        ) : (
+        <>
         {/* Chat Templates */}
-        <div style={{ 
-          padding: '0.75rem 1.5rem 0', 
-          display: 'flex', 
-          gap: '8px', 
-          overflowX: 'auto', 
+        <div style={{
+          padding: '0.75rem 1.5rem 0',
+          display: 'flex',
+          gap: '8px',
+          overflowX: 'auto',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}>
@@ -641,23 +660,25 @@ export default function ChatDetailPage() {
         </div>
 
         <form onSubmit={handleSendMessage} className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 1rem', display: 'flex', gap: '0.75rem' }}>
-          <input 
-            type="text" 
-            className="input-field" 
-            style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: '#f3f4f6', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }} 
-            placeholder="Tulis pesan..." 
+          <input
+            type="text"
+            className="input-field"
+            style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: '#f3f4f6', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }}
+            placeholder="Tulis pesan..."
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
           />
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
+          <button
+            type="submit"
+            className="btn btn-primary"
             style={{ borderRadius: '50%', width: '48px', height: '48px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)' }}
             disabled={!newMessage.trim()}
           >
             <Icons.Send size={20} color="white" />
           </button>
         </form>
+        </>
+        )}
       </div>
 
       {/* Upload Proof Modal */}
