@@ -376,11 +376,22 @@ export default function Home() {
                       flex: '0 0 100%',
                       height: '100%',
                       position: 'relative',
+                      background: '#111827',
+                      overflow: 'hidden',
                     }}>
+                      {/* Blurred backdrop fills the box while the real image stays uncropped */}
+                      {banner.ad_type === 'image' && (
+                        <img
+                          src={getStorageUrl(banner.ad_media_url) || undefined}
+                          alt=""
+                          aria-hidden="true"
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.6)', transform: 'scale(1.1)' }}
+                        />
+                      )}
                       {banner.ad_type === 'image' ? (
-                        <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }} />
                       ) : (
-                        <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }} />
                       )}
                       
                       {/* Overlay */}
