@@ -162,7 +162,9 @@ export default function ChatDetailPage() {
     }
   }
 
-  const isChatClosed = activeOrder?.status === 'completed' || activeOrder?.status === 'cancelled';
+  const isOrderCancelled = activeOrder?.status === 'cancelled';
+  const isProductSold = Boolean(product?.status_terjual) && activeOrder?.status !== 'cancelled';
+  const isChatClosed = isOrderCancelled || isProductSold;
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -599,15 +601,20 @@ export default function ChatDetailPage() {
       <div style={{ background: 'white', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
 
         {isChatClosed ? (
-          activeOrder?.status === 'cancelled' ? (
+          isOrderCancelled ? (
             <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#991b1b' }}>
               <Icons.X size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan ini telah dibatalkan. Sesi chat ini telah berakhir.</span>
             </div>
-          ) : (
+          ) : activeOrder?.status === 'completed' ? (
             <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
               <Icons.CheckCheck size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan telah selesai. Sesi chat ini telah berakhir.</span>
+            </div>
+          ) : (
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#374151' }}>
+              <Icons.Package size={20} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Produk ini sudah terjual. Sesi chat ini telah berakhir.</span>
             </div>
           )
         ) : (
