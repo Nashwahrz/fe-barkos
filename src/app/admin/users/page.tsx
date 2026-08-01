@@ -5,11 +5,12 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
+import { Badge } from '@/components/ui/Badge';
 
 export default function AdminUsers() {
   const { user, loading: authLoading } = useAuth();
@@ -81,14 +82,11 @@ export default function AdminUsers() {
   );
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/users" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+    <AdminLayout currentPath="/admin/users">
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
           <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Manajemen User</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Lihat dan kelola basis pengguna platform Lapak Kos.</p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Manajemen User</h1>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Lihat dan kelola basis pengguna platform Lapak Kos.</p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', flex: '0 0 auto' }}>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -139,15 +137,7 @@ export default function AdminUsers() {
                       </div>
                     </td>
                     <td style={{ padding: '1.25rem' }}>
-                      <span style={{ 
-                        padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700,
-                        background: u.role === 'super_admin' ? 'rgba(139, 92, 246, 0.1)' : 'var(--input)',
-                        color: u.role === 'super_admin' ? 'var(--accent)' : 'var(--foreground)',
-                        border: `1px solid ${u.role === 'super_admin' ? 'rgba(139, 92, 246, 0.2)' : 'var(--border)'}`,
-                        letterSpacing: '0.05em'
-                      }}>
-                        {u.role.toUpperCase()}
-                      </span>
+                      <Badge tone={u.role === 'super_admin' ? 'primary' : 'neutral'}>{u.role.replace('_', ' ')}</Badge>
                     </td>
                     <td style={{ padding: '1.25rem' }}>
                       {u.is_active ? (
@@ -201,7 +191,6 @@ export default function AdminUsers() {
           </div>
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

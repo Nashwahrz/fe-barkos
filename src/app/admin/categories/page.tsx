@@ -5,7 +5,7 @@ import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -107,14 +107,11 @@ export default function AdminCategories() {
   );
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/categories" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+    <AdminLayout currentPath="/admin/categories">
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
           <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Manajemen Kategori</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Kelola kategori produk untuk memudahkan pencarian pengguna.</p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Manajemen Kategori</h1>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Kelola kategori produk untuk memudahkan pencarian pengguna.</p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', flex: '0 0 auto' }}>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -222,7 +219,6 @@ export default function AdminCategories() {
           </div>
 
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

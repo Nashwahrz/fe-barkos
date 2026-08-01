@@ -27,11 +27,16 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${baseUrl}${cleanEndpoint}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: 'include',
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
+  } catch (err) {
+    throw new Error('Server sedang bermasalah. Silakan coba lagi beberapa saat lagi.');
+  }
 
   const contentType = response.headers.get('content-type');
   let data;

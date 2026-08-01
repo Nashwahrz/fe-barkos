@@ -5,10 +5,11 @@ import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
+import { Badge } from '@/components/ui/Badge';
 
 export default function AdminTransactions() {
   const { user, loading: authLoading } = useAuth();
@@ -46,10 +47,10 @@ export default function AdminTransactions() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending': return <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(245, 158, 11, 0.2)' }}>PENDING</span>;
-      case 'confirmed': return <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--primary-light)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(13, 148, 136, 0.2)' }}>CONFIRMED</span>;
-      case 'completed': return <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(16, 185, 129, 0.2)' }}>COMPLETED</span>;
-      case 'cancelled': return <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 700, border: '1px solid rgba(220, 38, 38, 0.2)' }}>CANCELLED</span>;
+      case 'pending': return <Badge tone="warning">Pending</Badge>;
+      case 'confirmed': return <Badge tone="primary">Confirmed</Badge>;
+      case 'completed': return <Badge tone="success">Completed</Badge>;
+      case 'cancelled': return <Badge tone="danger">Cancelled</Badge>;
       default: return null;
     }
   };
@@ -62,14 +63,11 @@ export default function AdminTransactions() {
   );
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/transactions" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+    <AdminLayout currentPath="/admin/transactions">
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
           <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitoring Transaksi</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Lihat semua alur transaksi yang terjadi di platform.</p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitoring Transaksi</h1>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Lihat semua alur transaksi yang terjadi di platform.</p>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', flex: '0 0 auto' }}>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -143,7 +141,6 @@ export default function AdminTransactions() {
           </table>
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

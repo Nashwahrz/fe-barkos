@@ -5,10 +5,13 @@ import { getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
+import { Toggle } from '@/components/ui/Toggle';
+import { Badge } from '@/components/ui/Badge';
 import { paymentSettingsApi } from '@/services/api/paymentSettings.api';
 import { PaymentBankAccount, PaymentSettings } from '@/types/paymentSettings';
 
@@ -159,13 +162,10 @@ export default function AdminPaymentSettings() {
   );
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/settings/payments" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '900px', margin: '0 auto', width: '100%' }}>
-        <header style={{ marginBottom: '3rem' }}>
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Pengaturan Pembayaran</h1>
-          <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Atur metode pembayaran yang tersedia untuk pembelian paket promosi.</p>
+    <AdminLayout currentPath="/admin/settings/payments" maxWidth={900}>
+        <header style={{ marginBottom: '2.5rem' }}>
+          <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Pengaturan Pembayaran</h1>
+          <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem' }}>Atur metode pembayaran yang tersedia untuk pembelian paket promosi.</p>
         </header>
 
         {message && (
@@ -184,33 +184,29 @@ export default function AdminPaymentSettings() {
           <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--foreground)' }}>Metode Pembayaran Aktif</h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.1rem 1.25rem', border: '1px solid var(--border)', borderRadius: '14px', transition: 'border-color 0.2s ease' }}>
               <div>
                 <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>Midtrans</div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>Pembayaran otomatis via Midtrans Snap.</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>Pembayaran otomatis via Midtrans Snap.</div>
               </div>
-              <input
-                type="checkbox"
+              <Toggle
                 checked={settings.midtrans_enabled}
-                onChange={e => saveSettings({ midtrans_enabled: e.target.checked })}
+                onChange={(checked) => saveSettings({ midtrans_enabled: checked })}
                 disabled={savingToggles}
-                style={{ width: '20px', height: '20px' }}
               />
-            </label>
+            </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', border: '1px solid var(--border)', borderRadius: '12px', cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.1rem 1.25rem', border: '1px solid var(--border)', borderRadius: '14px', transition: 'border-color 0.2s ease' }}>
               <div>
                 <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>Transfer Manual</div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>Seller upload bukti transfer, diverifikasi OCR + admin.</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>Seller upload bukti transfer, diverifikasi OCR + admin.</div>
               </div>
-              <input
-                type="checkbox"
+              <Toggle
                 checked={settings.manual_transfer_enabled}
-                onChange={e => saveSettings({ manual_transfer_enabled: e.target.checked })}
+                onChange={(checked) => saveSettings({ manual_transfer_enabled: checked })}
                 disabled={savingToggles}
-                style={{ width: '20px', height: '20px' }}
               />
-            </label>
+            </div>
           </div>
         </div>
 
@@ -284,15 +280,8 @@ export default function AdminPaymentSettings() {
                     <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>{acc.account_number}</td>
                     <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>{acc.account_name}</td>
                     <td style={{ padding: '1.25rem' }}>
-                      <button
-                        onClick={() => toggleActive(acc)}
-                        style={{
-                          padding: '5px 12px', borderRadius: '20px', border: 'none', cursor: 'pointer',
-                          background: acc.is_active ? 'rgba(22, 163, 74, 0.1)' : 'rgba(107, 114, 128, 0.1)',
-                          color: acc.is_active ? '#16a34a' : '#6b7280', fontWeight: 700, fontSize: '0.75rem',
-                        }}
-                      >
-                        {acc.is_active ? 'AKTIF' : 'NONAKTIF'}
+                      <button onClick={() => toggleActive(acc)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                        <Badge tone={acc.is_active ? 'success' : 'neutral'}>{acc.is_active ? 'Aktif' : 'Nonaktif'}</Badge>
                       </button>
                     </td>
                     <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
@@ -311,55 +300,44 @@ export default function AdminPaymentSettings() {
             </table>
           </div>
         </div>
-      </main>
 
       {/* Modal */}
-      {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', padding: '1rem' }}>
-          <div style={{ background: 'var(--card)', width: '100%', maxWidth: '500px', borderRadius: '24px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{editingAccount ? 'Edit Rekening' : 'Tambah Rekening'}</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'var(--input)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--foreground)' }}>
-                <Icons.X size={16} />
-              </button>
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingAccount ? 'Edit Rekening' : 'Tambah Rekening'}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {formError && (
+            <div style={{ padding: '1rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600 }}>
+              {formError}
             </div>
-            <form onSubmit={handleSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {formError && (
-                <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
-                  {formError}
-                </div>
-              )}
-              <Input
-                label="Nama Bank"
-                placeholder="Mis. BCA, Mandiri, BRI"
-                value={formData.bank_name}
-                onChange={e => setFormData({ ...formData, bank_name: e.target.value })}
-                required
-              />
-              <Input
-                label="Nomor Rekening"
-                placeholder="Mis. 1234567890"
-                value={formData.account_number}
-                onChange={e => setFormData({ ...formData, account_number: e.target.value })}
-                required
-              />
-              <Input
-                label="Atas Nama"
-                placeholder="Mis. PT Lapak Kos Indonesia"
-                value={formData.account_name}
-                onChange={e => setFormData({ ...formData, account_name: e.target.value })}
-                required
-              />
-              <div style={{ marginTop: '0.5rem', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>Batal</Button>
-                <Button type="submit" variant="primary" disabled={formLoading}>
-                  {formLoading ? 'Menyimpan...' : 'Simpan Rekening'}
-                </Button>
-              </div>
-            </form>
+          )}
+          <Input
+            label="Nama Bank"
+            placeholder="Mis. BCA, Mandiri, BRI"
+            value={formData.bank_name}
+            onChange={e => setFormData({ ...formData, bank_name: e.target.value })}
+            required
+          />
+          <Input
+            label="Nomor Rekening"
+            placeholder="Mis. 1234567890"
+            value={formData.account_number}
+            onChange={e => setFormData({ ...formData, account_number: e.target.value })}
+            required
+          />
+          <Input
+            label="Atas Nama"
+            placeholder="Mis. PT Lapak Kos Indonesia"
+            value={formData.account_name}
+            onChange={e => setFormData({ ...formData, account_name: e.target.value })}
+            required
+          />
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>Batal</Button>
+            <Button type="submit" variant="primary" disabled={formLoading}>
+              {formLoading ? 'Menyimpan...' : 'Simpan Rekening'}
+            </Button>
           </div>
-        </div>
-      )}
-    </div>
+        </form>
+      </Modal>
+    </AdminLayout>
   );
 }

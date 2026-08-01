@@ -5,10 +5,11 @@ import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
 
 export default function PromotionPackages() {
   const { user, loading: authLoading } = useAuth();
@@ -108,17 +109,14 @@ export default function PromotionPackages() {
   );
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/promotions" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header className="admin-header-flex" style={{ marginBottom: '3rem' }}>
+    <AdminLayout currentPath="/admin/promotions">
+        <header className="admin-header-flex" style={{ marginBottom: '2.5rem' }}>
           <div>
             <button onClick={() => router.push('/admin/promotions')} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Icons.ArrowLeft size={16} /> Kembali ke Promosi
             </button>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Kelola Paket Promosi</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem' }}>Atur opsi paket promosi yang dapat dibeli oleh penjual.</p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Kelola Paket Promosi</h1>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem' }}>Atur opsi paket promosi yang dapat dibeli oleh penjual.</p>
           </div>
           <div>
             <Button onClick={() => handleOpenModal()} variant="primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -173,57 +171,46 @@ export default function PromotionPackages() {
             </table>
           </div>
         </div>
-      </main>
 
       {/* Modal */}
-      {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', padding: '1rem' }}>
-          <div style={{ background: 'var(--card)', width: '100%', maxWidth: '500px', borderRadius: '24px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{editingPackage ? 'Edit Paket' : 'Tambah Paket Baru'}</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'var(--input)', border: 'none', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--foreground)' }}>
-                <Icons.X size={16} />
-              </button>
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingPackage ? 'Edit Paket' : 'Tambah Paket Baru'}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {error && (
+            <div style={{ padding: '1rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600 }}>
+              {error}
             </div>
-            <form onSubmit={handleSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {error && (
-                <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
-                  {error}
-                </div>
-              )}
-              <Input
-                label="Nama Paket"
-                placeholder="Mis. Paket Premium, Promo Weekend"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-              <Input
-                label="Harga (Rp)"
-                type="number"
-                placeholder="Mis. 50000"
-                value={formData.price}
-                onChange={e => setFormData({ ...formData, price: e.target.value })}
-                required
-              />
-              <Input
-                label="Durasi (Hari)"
-                type="number"
-                placeholder="Mis. 7"
-                value={formData.duration_days}
-                onChange={e => setFormData({ ...formData, duration_days: e.target.value })}
-                required
-              />
-              <div style={{ marginTop: '0.5rem', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>Batal</Button>
-                <Button type="submit" variant="primary" disabled={formLoading}>
-                  {formLoading ? 'Menyimpan...' : 'Simpan Paket'}
-                </Button>
-              </div>
-            </form>
+          )}
+          <Input
+            label="Nama Paket"
+            placeholder="Mis. Paket Premium, Promo Weekend"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          <Input
+            label="Harga (Rp)"
+            type="number"
+            placeholder="Mis. 50000"
+            value={formData.price}
+            onChange={e => setFormData({ ...formData, price: e.target.value })}
+            required
+          />
+          <Input
+            label="Durasi (Hari)"
+            type="number"
+            placeholder="Mis. 7"
+            value={formData.duration_days}
+            onChange={e => setFormData({ ...formData, duration_days: e.target.value })}
+            required
+          />
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>Batal</Button>
+            <Button type="submit" variant="primary" disabled={formLoading}>
+              {formLoading ? 'Menyimpan...' : 'Simpan Paket'}
+            </Button>
           </div>
-        </div>
-      )}
-    </div>
+        </form>
+      </Modal>
+    </AdminLayout>
   );
 }

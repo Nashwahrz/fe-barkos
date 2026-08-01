@@ -6,11 +6,12 @@ import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { USER_ROLES } from '@/lib/constants';
-import AdminSidebar from '@/components/AdminSidebar';
+import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 export default function AdminPromotions() {
   const { user, loading: authLoading } = useAuth();
@@ -97,14 +98,11 @@ export default function AdminPromotions() {
   const totalRevenue = promotions.reduce((acc, p) => acc + Number(p.amount_paid || 0), 0);
 
   return (
-    <div className="flex md-flex-col" style={{ minHeight: 'calc(100vh - 70px)', background: 'var(--background)' }}>
-      <AdminSidebar currentPath="/admin/promotions" />
-
-      <main className="page-padding" style={{ flex: 1, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '3rem' }}>
+    <AdminLayout currentPath="/admin/promotions">
+        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
           <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
-            <p style={{ color: 'var(--foreground)', opacity: 0.6, fontSize: '1.05rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
+            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
+            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end', flex: '0 0 auto' }}>
@@ -264,21 +262,13 @@ export default function AdminPromotions() {
                       </td>
                       <td style={{ padding: '1.25rem 2rem' }}>
                         {promo.payment_status === 'pending' ? (
-                          <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(245, 158, 11, 0.2)', display: 'inline-flex' }}>
-                            PENDING
-                          </span>
+                          <Badge tone="warning">Pending</Badge>
                         ) : promo.payment_status === 'failed' ? (
-                          <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'inline-flex' }}>
-                            GAGAL
-                          </span>
+                          <Badge tone="danger">Gagal</Badge>
                         ) : isActive ? (
-                          <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(16, 185, 129, 0.2)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <Icons.CheckCircle size={12} /> AKTIF
-                          </span>
+                          <Badge tone="success" icon={<Icons.CheckCircle size={12} />}>Aktif</Badge>
                         ) : (
-                          <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--input)', color: 'var(--foreground)', opacity: 0.7, fontWeight: 700, fontSize: '0.75rem', border: '1px solid var(--border)' }}>
-                            EXPIRED
-                          </span>
+                          <Badge tone="neutral">Expired</Badge>
                         )}
                       </td>
                       <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
@@ -305,7 +295,6 @@ export default function AdminPromotions() {
           </div>
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
-      </main>
 
       {/* ── Modal Preview Iklan ── */}
       {previewBanner && (
@@ -419,6 +408,6 @@ export default function AdminPromotions() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

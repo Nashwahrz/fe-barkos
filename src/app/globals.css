@@ -250,6 +250,10 @@ input, textarea, select {
   padding: 2rem;
 }
 
+.hover-bg-input:hover {
+  background: var(--input);
+}
+
 .section-padding {
   padding: 6rem 0;
 }
