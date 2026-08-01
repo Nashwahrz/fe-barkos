@@ -29,7 +29,7 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   return (
     <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
+      <table style={{ width: '100%', minWidth: 'max-content', borderCollapse: 'collapse', background: 'var(--card)' }}>
         <thead style={{
           background: 'var(--input)',
           textAlign: 'left',
