@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export interface TrendSeries {
   key: string;
@@ -10,7 +10,20 @@ export interface TrendSeries {
   data: { month: string; value: number }[];
 }
 
-function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
+interface TrendTooltipPayloadItem {
+  dataKey?: string | number;
+  color?: string;
+  name?: React.ReactNode;
+  value?: React.ReactNode;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  label?: React.ReactNode;
+  payload?: TrendTooltipPayloadItem[];
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
@@ -23,7 +36,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
     }}>
       <div style={{ fontWeight: 700, color: 'var(--foreground)', marginBottom: '4px' }}>{label}</div>
       {payload.map((p) => (
-        <div key={p.dataKey} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted-foreground)' }}>
+        <div key={String(p.dataKey)} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted-foreground)' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '999px', background: p.color, display: 'inline-block' }} />
           {p.name}: <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>{p.value}</span>
         </div>
@@ -65,7 +78,7 @@ export function TrendChart({ series, height = 280 }: { series: TrendSeries[]; he
           tickLine={false}
           width={36}
         />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={(props) => <CustomTooltip {...(props as unknown as CustomTooltipProps)} />} />
         {series.map(s => (
           <Area
             key={s.key}
