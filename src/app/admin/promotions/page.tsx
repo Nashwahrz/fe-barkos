@@ -12,6 +12,22 @@ import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
+
+interface Promotion {
+  id: string | number;
+  product_id: number;
+  status: string;
+  end_at: string;
+  amount_paid?: number;
+  payment_method: string;
+  payment_status: string;
+  ad_type?: string | null;
+  ad_media_url?: string | null;
+  manual_proof_path?: string | null;
+  product?: { nama_barang?: string; user?: { name?: string } };
+  package?: { name?: string };
+}
 
 export default function AdminPromotions() {
   const { user, loading: authLoading } = useAuth();
@@ -86,7 +102,7 @@ export default function AdminPromotions() {
     }
   }
 
-  if (loading || authLoading) return (
+  if (authLoading) return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
       <Icons.Loader size={32} />
       <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data promosi...</div>
@@ -96,6 +112,122 @@ export default function AdminPromotions() {
   const activeCount = promotions.filter(p => p.status === 'active' && new Date(p.end_at) > new Date()).length;
   const withAdCount = promotions.filter(p => p.ad_type && p.ad_type !== 'none').length;
   const totalRevenue = promotions.reduce((acc, p) => acc + Number(p.amount_paid || 0), 0);
+
+  const columns: DataTableColumn<Promotion>[] = [
+    {
+      key: 'produk', header: 'Produk', render: promo => (
+        <>
+          <div style={{ fontWeight: 800, color: 'var(--foreground)' }}>{promo.product?.nama_barang || '-'}</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>ID: #{promo.product_id}</div>
+        </>
+      ),
+    },
+    { key: 'penjual', header: 'Penjual', render: promo => <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>{promo.product?.user?.name || '-'}</span> },
+    {
+      key: 'paket', header: 'Paket', render: promo => (
+        <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--primary-light)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(13, 148, 136, 0.2)' }}>
+          {promo.package?.name || '-'}
+        </span>
+      ),
+    },
+    { key: 'biaya', header: 'Biaya', render: promo => <span style={{ fontWeight: 800, color: 'var(--foreground)' }}>Rp {Number(promo.amount_paid || 0).toLocaleString('id-ID')}</span> },
+    {
+      key: 'metode', header: 'Metode', render: promo => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+          <span style={{ padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: promo.payment_method === 'manual_transfer' ? 'rgba(217, 119, 6, 0.1)' : 'var(--input)', color: promo.payment_method === 'manual_transfer' ? '#d97706' : 'var(--foreground)' }}>
+            {promo.payment_method === 'manual_transfer' ? 'Transfer Manual' : 'Midtrans'}
+          </span>
+          {promo.payment_method === 'manual_transfer' && promo.manual_proof_path && (
+            <button
+              onClick={() => setPreviewProof(promo)}
+              style={{ fontSize: '0.7rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, padding: 0 }}
+            >
+              Lihat Bukti
+            </button>
+          )}
+          {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' && promo.manual_proof_path && (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                onClick={() => handleApprovePayment(promo.id)}
+                disabled={reviewLoadingId === promo.id}
+                style={{ fontSize: '0.68rem', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+              >
+                Setujui
+              </button>
+              <button
+                onClick={() => handleRejectPayment(promo.id)}
+                disabled={reviewLoadingId === promo.id}
+                style={{ fontSize: '0.68rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+              >
+                Tolak
+              </button>
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'iklan', header: 'Iklan', render: promo => {
+        const hasAd = promo.ad_type && promo.ad_type !== 'none' && promo.ad_media_url;
+        return hasAd ? (
+          <button
+            onClick={() => setPreviewBanner(promo)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 12px', borderRadius: '8px', border: `1px solid ${promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`, cursor: 'pointer',
+              background: promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+              color: promo.ad_type === 'video' ? 'var(--accent)' : '#2563eb',
+              fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s'
+            }}
+          >
+            {promo.ad_type === 'video' ? <Icons.Film size={14} /> : <Icons.Image size={14} />}
+            {promo.ad_type === 'video' ? 'Video' : 'Gambar'}
+          </button>
+        ) : (
+          <span style={{ color: 'var(--foreground)', opacity: 0.3, fontSize: '0.85rem' }}>—</span>
+        );
+      },
+    },
+    {
+      key: 'berakhir', header: 'Berakhir', render: promo => (
+        <span style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', fontWeight: 500 }}>
+          {new Date(promo.end_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </span>
+      ),
+    },
+    {
+      key: 'status', header: 'Status', render: promo => {
+        const isActive = promo.status === 'active' && new Date(promo.end_at) > new Date();
+        return promo.payment_status === 'pending' ? (
+          <Badge tone="warning">Pending</Badge>
+        ) : promo.payment_status === 'failed' ? (
+          <Badge tone="danger">Gagal</Badge>
+        ) : isActive ? (
+          <Badge tone="success" icon={<Icons.CheckCircle size={12} />}>Aktif</Badge>
+        ) : (
+          <Badge tone="neutral">Expired</Badge>
+        );
+      },
+    },
+    {
+      key: 'aksi', header: 'Aksi', align: 'right', render: promo => (
+        <button
+          onClick={() => handleDelete(promo.id as string)}
+          style={{
+            background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none',
+            padding: '8px', borderRadius: '8px', cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+          title="Hapus Promosi"
+        >
+          <Icons.Trash size={16} />
+        </button>
+      ),
+    },
+  ];
 
   return (
     <AdminLayout currentPath="/admin/promotions">
@@ -162,137 +294,13 @@ export default function AdminPromotions() {
           <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
             <h3 style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--foreground)' }}>Daftar Pembelian Promosi</h3>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
-              <thead style={{ background: 'var(--input)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <tr>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>PRODUK</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>PENJUAL</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>PAKET</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>BIAYA</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>METODE</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>IKLAN</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>BERAKHIR</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody style={{ fontSize: '0.95rem' }}>
-                {paginatedData.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
-                      <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                      <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Tidak ada promosi ditemukan.</div>
-                    </td>
-                  </tr>
-                ) : paginatedData.map(promo => {
-                  const isActive = promo.status === 'active' && new Date(promo.end_at) > new Date();
-                  const hasAd = promo.ad_type && promo.ad_type !== 'none' && promo.ad_media_url;
-                  return (
-                    <tr key={promo.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover-bg-input">
-                      <td style={{ padding: '1.25rem 2rem' }}>
-                        <div style={{ fontWeight: 800, color: 'var(--foreground)' }}>{promo.product?.nama_barang || '-'}</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>ID: #{promo.product_id}</div>
-                      </td>
-                      <td style={{ padding: '1.25rem', color: 'var(--foreground)', fontWeight: 500 }}>
-                        {promo.product?.user?.name || '-'}
-                      </td>
-                      <td style={{ padding: '1.25rem' }}>
-                        <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--primary-light)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(13, 148, 136, 0.2)' }}>
-                          {promo.package?.name || '-'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '1.25rem', fontWeight: 800, color: 'var(--foreground)' }}>
-                        Rp {Number(promo.amount_paid || 0).toLocaleString('id-ID')}
-                      </td>
-                      <td style={{ padding: '1.25rem' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
-                          <span style={{ padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: promo.payment_method === 'manual_transfer' ? 'rgba(217, 119, 6, 0.1)' : 'var(--input)', color: promo.payment_method === 'manual_transfer' ? '#d97706' : 'var(--foreground)' }}>
-                            {promo.payment_method === 'manual_transfer' ? 'Transfer Manual' : 'Midtrans'}
-                          </span>
-                          {promo.payment_method === 'manual_transfer' && promo.manual_proof_path && (
-                            <button
-                              onClick={() => setPreviewProof(promo)}
-                              style={{ fontSize: '0.7rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, padding: 0 }}
-                            >
-                              Lihat Bukti
-                            </button>
-                          )}
-                          {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' && promo.manual_proof_path && (
-                            <div style={{ display: 'flex', gap: '6px' }}>
-                              <button
-                                onClick={() => handleApprovePayment(promo.id)}
-                                disabled={reviewLoadingId === promo.id}
-                                style={{ fontSize: '0.68rem', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
-                              >
-                                Setujui
-                              </button>
-                              <button
-                                onClick={() => handleRejectPayment(promo.id)}
-                                disabled={reviewLoadingId === promo.id}
-                                style={{ fontSize: '0.68rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
-                              >
-                                Tolak
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td style={{ padding: '1.25rem' }}>
-                        {hasAd ? (
-                          <button
-                            onClick={() => setPreviewBanner(promo)}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: '6px',
-                              padding: '8px 12px', borderRadius: '8px', border: `1px solid ${promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`, cursor: 'pointer',
-                              background: promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                              color: promo.ad_type === 'video' ? 'var(--accent)' : '#2563eb',
-                              fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s'
-                            }}
-                          >
-                            {promo.ad_type === 'video' ? <Icons.Film size={14} /> : <Icons.Image size={14} />}
-                            {promo.ad_type === 'video' ? 'Video' : 'Gambar'}
-                          </button>
-                        ) : (
-                          <span style={{ color: 'var(--foreground)', opacity: 0.3, fontSize: '0.85rem' }}>—</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '1.25rem', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', fontWeight: 500 }}>
-                        {new Date(promo.end_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td style={{ padding: '1.25rem 2rem' }}>
-                        {promo.payment_status === 'pending' ? (
-                          <Badge tone="warning">Pending</Badge>
-                        ) : promo.payment_status === 'failed' ? (
-                          <Badge tone="danger">Gagal</Badge>
-                        ) : isActive ? (
-                          <Badge tone="success" icon={<Icons.CheckCircle size={12} />}>Aktif</Badge>
-                        ) : (
-                          <Badge tone="neutral">Expired</Badge>
-                        )}
-                      </td>
-                      <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                        <button
-                          onClick={() => handleDelete(promo.id)}
-                          style={{
-                            background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none',
-                            padding: '8px', borderRadius: '8px', cursor: 'pointer',
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            transition: 'all 0.2s'
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
-                          title="Hapus Promosi"
-                        >
-                          <Icons.Trash size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<Promotion>
+            columns={columns}
+            data={paginatedData}
+            keyExtractor={promo => promo.id}
+            loading={loading}
+            emptyMessage="Tidak ada promosi ditemukan."
+          />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
 

@@ -14,6 +14,7 @@ import { Toggle } from '@/components/ui/Toggle';
 import { Badge } from '@/components/ui/Badge';
 import { paymentSettingsApi } from '@/services/api/paymentSettings.api';
 import { PaymentBankAccount, PaymentSettings } from '@/types/paymentSettings';
+import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
 
 export default function AdminPaymentSettings() {
   const { user, loading: authLoading } = useAuth();
@@ -161,6 +162,31 @@ export default function AdminPaymentSettings() {
     </div>
   );
 
+  const bankColumns: DataTableColumn<PaymentBankAccount>[] = [
+    { key: 'bank', header: 'Bank', render: acc => <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>{acc.bank_name}</span> },
+    { key: 'nomor', header: 'No. Rekening', render: acc => <span style={{ color: 'var(--foreground)' }}>{acc.account_number}</span> },
+    { key: 'nama', header: 'Atas Nama', render: acc => <span style={{ color: 'var(--foreground)' }}>{acc.account_name}</span> },
+    {
+      key: 'status', header: 'Status', render: acc => (
+        <button onClick={() => toggleActive(acc)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+          <Badge tone={acc.is_active ? 'success' : 'neutral'}>{acc.is_active ? 'Aktif' : 'Nonaktif'}</Badge>
+        </button>
+      ),
+    },
+    {
+      key: 'aksi', header: 'Aksi', align: 'right', render: acc => (
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <button onClick={() => handleOpenModal(acc)} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563eb', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }} title="Edit">
+            <Icons.Edit size={16} />
+          </button>
+          <button onClick={() => handleDelete(acc.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }} title="Hapus">
+            <Icons.Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <AdminLayout currentPath="/admin/settings/payments" maxWidth={900}>
         <header style={{ marginBottom: '2.5rem' }}>
@@ -256,49 +282,12 @@ export default function AdminPaymentSettings() {
             </Button>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
-              <thead style={{ background: 'var(--input)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <tr>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>BANK</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>NO. REKENING</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>ATAS NAMA</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody style={{ fontSize: '0.95rem' }}>
-                {bankAccounts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
-                      Belum ada rekening bank ditambahkan.
-                    </td>
-                  </tr>
-                ) : bankAccounts.map(acc => (
-                  <tr key={acc.id} style={{ borderBottom: '1px solid var(--border)' }} className="hover-bg-input">
-                    <td style={{ padding: '1.25rem 2rem', fontWeight: 700, color: 'var(--foreground)' }}>{acc.bank_name}</td>
-                    <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>{acc.account_number}</td>
-                    <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>{acc.account_name}</td>
-                    <td style={{ padding: '1.25rem' }}>
-                      <button onClick={() => toggleActive(acc)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
-                        <Badge tone={acc.is_active ? 'success' : 'neutral'}>{acc.is_active ? 'Aktif' : 'Nonaktif'}</Badge>
-                      </button>
-                    </td>
-                    <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        <button onClick={() => handleOpenModal(acc)} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#2563eb', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }} title="Edit">
-                          <Icons.Edit size={16} />
-                        </button>
-                        <button onClick={() => handleDelete(acc.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer' }} title="Hapus">
-                          <Icons.Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<PaymentBankAccount>
+            columns={bankColumns}
+            data={bankAccounts}
+            keyExtractor={acc => acc.id}
+            emptyMessage="Belum ada rekening bank ditambahkan."
+          />
         </div>
 
       {/* Modal */}

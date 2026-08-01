@@ -11,6 +11,13 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
+import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
+
+interface Category {
+  id: number;
+  name: string;
+  description?: string | null;
+}
 
 export default function AdminCategories() {
   const { user, loading: authLoading } = useAuth();
@@ -99,12 +106,35 @@ export default function AdminCategories() {
     }
   }
 
-  if (loading || authLoading) return (
+  if (authLoading) return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
       <Icons.Loader size={32} />
       <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data...</div>
     </div>
   );
+
+  const columns: DataTableColumn<Category>[] = [
+    { key: 'name', header: 'Kategori', render: c => <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>{c.name}</span> },
+    { key: 'description', header: 'Deskripsi', render: c => <span style={{ color: 'var(--foreground)', opacity: 0.7 }}>{c.description || '-'}</span> },
+    {
+      key: 'aksi', header: 'Aksi', align: 'right', render: c => (
+        <div style={{ display: 'inline-flex', gap: '8px' }}>
+          <button onClick={() => handleEdit(c)} style={{
+            padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
+            color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+          }}>
+            <Icons.Edit size={14} /> Edit
+          </button>
+          <button onClick={() => handleDelete(c.id)} style={{
+            padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
+            color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+          }}>
+            <Icons.Trash2 size={14} /> Hapus
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <AdminLayout currentPath="/admin/categories">
@@ -136,49 +166,13 @@ export default function AdminCategories() {
           
           {/* Table */}
           <div className="card" style={{ flex: '1 1 600px', padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
-                <thead style={{ background: 'var(--input)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <tr>
-                    <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>KATEGORI</th>
-                    <th style={{ padding: '1.25rem', fontWeight: 700 }}>DESKRIPSI</th>
-                    <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
-                  </tr>
-                </thead>
-                <tbody style={{ fontSize: '0.95rem' }}>
-                  {paginatedData.map((c) => (
-                    <tr key={c.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover-bg-input">
-                      <td style={{ padding: '1.25rem 2rem', fontWeight: 700, color: 'var(--foreground)' }}>{c.name}</td>
-                      <td style={{ padding: '1.25rem', color: 'var(--foreground)', opacity: 0.7 }}>{c.description || '-'}</td>
-                      <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                        <div style={{ display: 'inline-flex', gap: '8px' }}>
-                          <button onClick={() => handleEdit(c)} style={{ 
-                            padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
-                            color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
-                          }}>
-                            <Icons.Edit size={14} /> Edit
-                          </button>
-                          <button onClick={() => handleDelete(c.id)} style={{ 
-                            padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
-                            color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
-                          }}>
-                            <Icons.Trash2 size={14} /> Hapus
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {paginatedData.length === 0 && (
-                    <tr>
-                      <td colSpan={3} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
-                        <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                        <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Kategori tidak ditemukan.</div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DataTable<Category>
+              columns={columns}
+              data={paginatedData}
+              keyExtractor={c => c.id}
+              loading={loading}
+              emptyMessage="Kategori tidak ditemukan."
+            />
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </div>
 

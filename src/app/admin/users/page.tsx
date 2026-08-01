@@ -11,6 +11,16 @@ import { Button } from '@/components/ui/Button';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Badge } from '@/components/ui/Badge';
+import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
+
+interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  foto?: string | null;
+}
 
 export default function AdminUsers() {
   const { user, loading: authLoading } = useAuth();
@@ -74,12 +84,74 @@ export default function AdminUsers() {
     }
   }
 
-  if (loading || authLoading) return (
+  if (authLoading) return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
       <Icons.Loader size={32} />
       <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data...</div>
     </div>
   );
+
+  const columns: DataTableColumn<AdminUser>[] = [
+    {
+      key: 'user', header: 'User', render: u => (
+        <div className="flex items-center gap-4">
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
+            {u.foto ? (
+              <img src={getStorageUrl(u.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              u.name.charAt(0).toUpperCase()
+            )}
+          </div>
+          <div className="flex-col">
+            <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{u.name}</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{u.email}</div>
+          </div>
+        </div>
+      ),
+    },
+    { key: 'role', header: 'Role', render: u => <Badge tone={u.role === 'super_admin' ? 'primary' : 'neutral'}>{u.role.replace('_', ' ')}</Badge> },
+    {
+      key: 'status', header: 'Status', render: u => (
+        u.is_active ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--success)', fontWeight: 600, fontSize: '0.9rem' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}></span> Aktif
+          </span>
+        ) : (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--danger)', fontWeight: 600, fontSize: '0.9rem' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--danger)' }}></span> Dinonaktifkan
+          </span>
+        )
+      ),
+    },
+    {
+      key: 'aksi', header: 'Aksi', align: 'right', render: u => (
+        u.role !== 'super_admin' ? (
+          <div style={{ display: 'inline-flex', gap: '8px' }}>
+            <button
+              onClick={() => handleToggleStatus(u.id)}
+              disabled={actionLoading === u.id}
+              style={{
+                padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
+                color: u.is_active ? 'var(--warning)' : 'var(--success)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+            >
+              {actionLoading === u.id ? <Icons.Loader size={14} /> : (u.is_active ? <><Icons.Power size={14} /> Nonaktifkan</> : <><Icons.Power size={14} /> Aktifkan</>)}
+            </button>
+            <button
+              onClick={() => handleDelete(u.id)}
+              disabled={actionLoading === u.id}
+              style={{
+                padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
+                color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+            >
+              {actionLoading === u.id ? <Icons.Loader size={14} /> : <><Icons.Trash2 size={14} /> Hapus</>}
+            </button>
+          </div>
+        ) : null
+      ),
+    },
+  ];
 
   return (
     <AdminLayout currentPath="/admin/users">
@@ -108,87 +180,13 @@ export default function AdminUsers() {
         </header>
 
         <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
-              <thead style={{ background: 'var(--input)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <tr>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>USER</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>ROLE</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody style={{ fontSize: '0.95rem' }}>
-                {paginatedData.map((u) => (
-                  <tr key={u.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover-bg-input">
-                    <td style={{ padding: '1.25rem 2rem' }}>
-                      <div className="flex items-center gap-4">
-                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
-                          {u.foto ? (
-                            <img src={getStorageUrl(u.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          ) : (
-                            u.name.charAt(0).toUpperCase()
-                          )}
-                        </div>
-                        <div className="flex-col">
-                          <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{u.name}</div>
-                          <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{u.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1.25rem' }}>
-                      <Badge tone={u.role === 'super_admin' ? 'primary' : 'neutral'}>{u.role.replace('_', ' ')}</Badge>
-                    </td>
-                    <td style={{ padding: '1.25rem' }}>
-                      {u.is_active ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--success)', fontWeight: 600, fontSize: '0.9rem' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}></span> Aktif
-                        </span>
-                      ) : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--danger)', fontWeight: 600, fontSize: '0.9rem' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--danger)' }}></span> Dinonaktifkan
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                      {u.role !== 'super_admin' && (
-                        <div style={{ display: 'inline-flex', gap: '8px' }}>
-                          <button 
-                            onClick={() => handleToggleStatus(u.id)}
-                            disabled={actionLoading === u.id}
-                            style={{ 
-                              padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
-                              color: u.is_active ? 'var(--warning)' : 'var(--success)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
-                            }}
-                          >
-                            {actionLoading === u.id ? <Icons.Loader size={14} /> : (u.is_active ? <><Icons.Power size={14} /> Nonaktifkan</> : <><Icons.Power size={14} /> Aktifkan</>)}
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(u.id)}
-                            disabled={actionLoading === u.id}
-                            style={{ 
-                              padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
-                              color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
-                            }}
-                          >
-                            {actionLoading === u.id ? <Icons.Loader size={14} /> : <><Icons.Trash2 size={14} /> Hapus</>}
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {paginatedData.length === 0 && (
-                  <tr>
-                    <td colSpan={4} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
-                      <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                      <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>User tidak ditemukan.</div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<AdminUser>
+            columns={columns}
+            data={paginatedData}
+            keyExtractor={u => u.id}
+            loading={loading}
+            emptyMessage="User tidak ditemukan."
+          />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
     </AdminLayout>

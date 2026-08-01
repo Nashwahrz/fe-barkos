@@ -8,6 +8,7 @@ import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
+import { Skeleton } from '@/components/Skeleton';
 
 export default function AdminReports() {
   const [reports, setReports] = useState<any[]>([]);
@@ -51,13 +52,6 @@ export default function AdminReports() {
     }
   }
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
-      <Icons.Loader size={32} />
-      <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data laporan...</div>
-    </div>
-  );
-
   return (
     <AdminLayout currentPath="/admin/reports">
         <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -88,7 +82,20 @@ export default function AdminReports() {
         </header>
 
         <div style={{ display: 'grid', gap: '1.5rem' }}>
-          {paginatedData.map((report) => (
+          {loading && Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid var(--border)', background: 'var(--card)', borderRadius: '20px', padding: '2rem' }}>
+              <div className="flex gap-4 items-center">
+                <Skeleton width="48px" height="48px" borderRadius="12px" />
+                <div style={{ flex: 1 }}>
+                  <Skeleton width="40%" height="1.2rem" style={{ marginBottom: '8px' }} />
+                  <Skeleton width="60%" height="0.85rem" />
+                </div>
+              </div>
+              <Skeleton width="100%" height="4rem" borderRadius="12px" />
+            </div>
+          ))}
+
+          {!loading && paginatedData.map((report) => (
             <div key={report.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1px solid var(--border)', background: 'var(--card)', borderRadius: '20px', padding: '2rem' }}>
               <div className="flex justify-between items-start" style={{ flexWrap: 'wrap', gap: '1rem' }}>
                 <div className="flex gap-4">
@@ -165,7 +172,7 @@ export default function AdminReports() {
             </div>
           ))}
 
-          {paginatedData.length === 0 && (
+          {!loading && paginatedData.length === 0 && (
             <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5, border: '1px dashed var(--border)', borderRadius: '20px' }}>
               <Icons.CheckCircle size={40} style={{ margin: '0 auto 1.5rem', color: 'var(--success)' }} />
               <div style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--foreground)' }}>Semua aman!</div>

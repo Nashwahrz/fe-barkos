@@ -10,6 +10,17 @@ import { Icons } from '@/components/Icons';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Badge } from '@/components/ui/Badge';
+import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
+
+interface AdminProduct {
+  id: number;
+  nama_barang: string;
+  harga: number | string;
+  foto?: string | null;
+  status_terjual: boolean;
+  user?: { name: string };
+  category?: { name: string };
+}
 
 export default function AdminProducts() {
   const { user, loading: authLoading } = useAuth();
@@ -59,12 +70,60 @@ export default function AdminProducts() {
     }
   }
 
-  if (loading || authLoading) return (
+  if (authLoading) return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
       <Icons.Loader size={32} />
       <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>Memuat data...</div>
     </div>
   );
+
+  const columns: DataTableColumn<AdminProduct>[] = [
+    {
+      key: 'produk', header: 'Produk', render: p => (
+        <div className="flex items-center gap-4">
+          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
+            {p.foto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={getStorageUrl(p.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={24} color="var(--border)" /></div>}
+          </div>
+          <div className="flex-col">
+            <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{p.nama_barang}</div>
+            <div style={{ fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.7, fontWeight: 600 }}>Rp {Number(p.harga).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+      ),
+    },
+    { key: 'penjual', header: 'Penjual', render: p => <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>{p.user?.name}</span> },
+    {
+      key: 'kategori', header: 'Kategori', render: p => (
+        <span style={{ background: 'var(--input)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.8, border: '1px solid var(--border)' }}>
+          {p.category?.name || 'Umum'}
+        </span>
+      ),
+    },
+    {
+      key: 'status', header: 'Status', render: p => (
+        p.status_terjual ? <Badge tone="danger">Terjual</Badge> : <Badge tone="primary">Tersedia</Badge>
+      ),
+    },
+    {
+      key: 'aksi', header: 'Aksi', align: 'right', render: p => (
+        <button
+          onClick={() => handleDelete(p.id)}
+          disabled={actionLoading === p.id}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem',
+            padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer', transition: 'all 0.2s'
+          }}
+        >
+          {actionLoading === p.id ? <Icons.Loader size={14} /> : <Icons.Trash2 size={14} />}
+          {actionLoading === p.id ? 'Menghapus...' : 'Hapus'}
+        </button>
+      ),
+    },
+  ];
 
   return (
     <AdminLayout currentPath="/admin/products">
@@ -93,74 +152,13 @@ export default function AdminProducts() {
         </header>
 
         <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--card)' }}>
-              <thead style={{ background: 'var(--input)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <tr>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>PRODUK</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>PENJUAL</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>KATEGORI</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody style={{ fontSize: '0.95rem' }}>
-                {paginatedData.map((p) => (
-                  <tr key={p.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.2s' }} className="hover-bg-input">
-                    <td style={{ padding: '1.25rem 2rem' }}>
-                      <div className="flex items-center gap-4">
-                        <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'var(--input)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
-                           {p.foto ? (
-                             // eslint-disable-next-line @next/next/no-img-element
-                             <img src={getStorageUrl(p.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                           ) : <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}><Icons.Package size={24} color="var(--border)" /></div>}
-                        </div>
-                        <div className="flex-col">
-                          <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{p.nama_barang}</div>
-                          <div style={{ fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.7, fontWeight: 600 }}>Rp {Number(p.harga).toLocaleString('id-ID')}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1.25rem', color: 'var(--foreground)', fontWeight: 500 }}>{p.user?.name}</td>
-                    <td style={{ padding: '1.25rem' }}>
-                      <span style={{ background: 'var(--input)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.8, border: '1px solid var(--border)' }}>
-                        {p.category?.name || 'Umum'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '1.25rem' }}>
-                      {p.status_terjual ? (
-                        <Badge tone="danger">Terjual</Badge>
-                      ) : (
-                        <Badge tone="primary">Tersedia</Badge>
-                      )}
-                    </td>
-                    <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
-                      <button 
-                        onClick={() => handleDelete(p.id)}
-                        disabled={actionLoading === p.id}
-                        style={{ 
-                          display: 'inline-flex', alignItems: 'center', gap: '6px', 
-                          color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem',
-                          padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer', transition: 'all 0.2s'
-                        }}
-                      >
-                        {actionLoading === p.id ? <Icons.Loader size={14} /> : <Icons.Trash2 size={14} />}
-                        {actionLoading === p.id ? 'Menghapus...' : 'Hapus'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {paginatedData.length === 0 && (
-                  <tr>
-                    <td colSpan={5} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
-                      <Icons.Inbox size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                      <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Tidak ada produk ditemukan.</div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<AdminProduct>
+            columns={columns}
+            data={paginatedData}
+            keyExtractor={p => p.id}
+            loading={loading}
+            emptyMessage="Tidak ada produk ditemukan."
+          />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
     </AdminLayout>
