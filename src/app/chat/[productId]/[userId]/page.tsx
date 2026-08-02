@@ -20,6 +20,7 @@ export default function ChatDetailPage() {
   const [otherUser, setOtherUser] = useState<any>(null);
   
   const [newMessage, setNewMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState<any>(null);
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState<any>(null);
@@ -162,6 +163,17 @@ export default function ChatDetailPage() {
     }
   }
 
+  function getMessagePreview(content: string): string {
+    if (!content) return '';
+    if (content.startsWith('[LOCATION:')) return 'Lokasi Dibagikan';
+    if (content === '[REQUEST_PHONE]') return 'Meminta Nomor WA';
+    if (content.startsWith('[PHONE:')) return 'Nomor WA Dibagikan';
+    if (content.startsWith('[ORDER_INFO:')) return 'Detail Pesanan';
+    if (content === '[TRANSFER_CHECK]') return 'Menanyakan ketersediaan barang';
+    if (content === '[TRANSFER_AVAILABLE]') return 'Info rekening pembayaran';
+    return content;
+  }
+
   const isOrderCancelled = activeOrder?.status === 'cancelled';
   const isProductSold = Boolean(product?.status_terjual) && activeOrder?.status !== 'cancelled';
   const isChatClosed = isOrderCancelled || isProductSold;
@@ -171,18 +183,21 @@ export default function ChatDetailPage() {
     if (!newMessage.trim() || isChatClosed) return;
 
     const tempMessage = newMessage;
+    const tempReplyTo = replyingTo;
     setNewMessage('');
+    setReplyingTo(null);
 
     // Optimistic Update
     const optimisticMsg = {
       id: 'temp-' + Date.now(),
       message: tempMessage,
+      reply_to: tempReplyTo,
       sender: user,
       created_at: new Date().toISOString(),
       is_read: false,
       is_optimistic: true
     };
-    
+
     setMessages(prev => [...prev, optimisticMsg]);
     setTimeout(scrollToBottom, 50);
 
@@ -192,15 +207,17 @@ export default function ChatDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: tempMessage,
-          receiver_id: otherUserId
+          receiver_id: otherUserId,
+          reply_to_id: tempReplyTo?.id
         })
       });
-      
+
       await loadMessages(false);
       markAsRead();
     } catch (err: any) {
       alert(err.message || 'Gagal mengirim pesan');
       setNewMessage(tempMessage); // Restore on fail
+      setReplyingTo(tempReplyTo);
       setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
     }
   }
@@ -452,12 +469,25 @@ export default function ChatDetailPage() {
         ) : (
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === user?.id;
+            const canReply = !msg.is_optimistic;
+            const replyButton = (
+              <button
+                onClick={() => canReply && setReplyingTo(msg)}
+                disabled={!canReply}
+                title="Balas pesan"
+                style={{ background: 'none', border: 'none', cursor: canReply ? 'pointer' : 'default', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: canReply ? 0.7 : 0.3 }}
+              >
+                <Icons.Reply size={16} />
+              </button>
+            );
             return (
-              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ 
-                  background: isMe ? 'var(--primary)' : 'white', 
+              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: '2px' }}>
+                {replyButton}
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <div style={{
+                  background: isMe ? 'var(--primary)' : 'white',
                   color: isMe ? 'white' : '#111827',
-                  padding: '0.7rem 1rem', 
+                  padding: '0.7rem 1rem',
                   borderRadius: '1.25rem',
                   borderTopRightRadius: isMe ? '4px' : '1.25rem',
                   borderTopLeftRadius: !isMe ? '4px' : '1.25rem',
@@ -465,6 +495,23 @@ export default function ChatDetailPage() {
                   position: 'relative',
                   border: isMe ? 'none' : '1px solid var(--border)'
                 }}>
+                  {msg.reply_to && (
+                    <div style={{
+                      background: isMe ? 'rgba(255,255,255,0.15)' : '#f3f4f6',
+                      borderLeft: `3px solid ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--primary)'}`,
+                      borderRadius: '6px',
+                      padding: '0.4rem 0.6rem',
+                      marginBottom: '0.5rem',
+                      maxWidth: '100%'
+                    }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.75rem', marginBottom: '2px', color: isMe ? 'white' : 'var(--primary)' }}>
+                        {msg.reply_to.sender?.id === user?.id ? 'Anda' : (msg.reply_to.sender?.name || otherUser?.name || 'Pengguna')}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.85, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {getMessagePreview(msg.reply_to.message)}
+                      </div>
+                    </div>
+                  )}
                   {(() => {
                     const content = msg.message;
                     if (content.startsWith('[LOCATION:')) {
@@ -590,6 +637,7 @@ export default function ChatDetailPage() {
                     {isMe && msg.is_optimistic && <span style={{ color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center' }}><Icons.Clock size={12} /></span>}
                   </div>
                 </div>
+                </div>
               </div>
             );
           })
@@ -665,6 +713,24 @@ export default function ChatDetailPage() {
             </button>
           )}
         </div>
+
+        {replyingTo && (
+          <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f3f4f6', borderLeft: '3px solid var(--primary)', borderRadius: '8px', padding: '0.5rem 0.75rem' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--primary)' }}>
+                  Membalas {replyingTo.sender?.id === user?.id ? 'diri sendiri' : (replyingTo.sender?.name || otherUser?.name || 'pengguna')}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#4b5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {getMessagePreview(replyingTo.message)}
+                </div>
+              </div>
+              <button onClick={() => setReplyingTo(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center', padding: '4px' }}>
+                <Icons.X size={18} />
+              </button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSendMessage} className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 1rem', display: 'flex', gap: '0.75rem' }}>
           <input
