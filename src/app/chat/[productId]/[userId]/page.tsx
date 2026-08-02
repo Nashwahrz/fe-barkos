@@ -21,6 +21,10 @@ export default function ChatDetailPage() {
   
   const [newMessage, setNewMessage] = useState('');
   const [replyingTo, setReplyingTo] = useState<any>(null);
+  const [swipeDx, setSwipeDx] = useState<{ id: any; dx: number } | null>(null);
+  const [contextMenuMsg, setContextMenuMsg] = useState<any>(null);
+  const swipeRef = useRef<{ id: any; startX: number; startY: number; dx: number; locked: boolean } | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState<any>(null);
@@ -176,6 +180,63 @@ export default function ChatDetailPage() {
     } catch (err: any) {
       alert(err.message || 'Gagal menghapus pesan');
       setMessages(prevMessages);
+    }
+  }
+
+  function handleBubblePointerDown(e: React.PointerEvent, msg: any) {
+    swipeRef.current = { id: msg.id, startX: e.clientX, startY: e.clientY, dx: 0, locked: false };
+    longPressTimerRef.current = setTimeout(() => {
+      if (swipeRef.current && swipeRef.current.id === msg.id && Math.abs(swipeRef.current.dx) < 10) {
+        setContextMenuMsg(msg);
+        swipeRef.current = null;
+        setSwipeDx(null);
+      }
+    }, 500);
+  }
+
+  function handleBubblePointerMove(e: React.PointerEvent, msg: any, isMe: boolean) {
+    const swipe = swipeRef.current;
+    if (!swipe || swipe.id !== msg.id) return;
+    const dx = e.clientX - swipe.startX;
+    const dy = e.clientY - swipe.startY;
+
+    if (!swipe.locked) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        // Vertical scroll intent — abandon swipe/long-press tracking for this touch.
+        if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+        swipeRef.current = null;
+        setSwipeDx(null);
+        return;
+      }
+      swipe.locked = true;
+    }
+
+    const clamped = isMe ? Math.min(0, Math.max(dx, -80)) : Math.max(0, Math.min(dx, 80));
+    swipe.dx = clamped;
+    setSwipeDx({ id: msg.id, dx: clamped });
+
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }
+
+  function handleBubblePointerUp(msg: any) {
+    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+    const swipe = swipeRef.current;
+    swipeRef.current = null;
+    setSwipeDx(null);
+    if (swipe && swipe.id === msg.id && Math.abs(swipe.dx) > 40) {
+      setReplyingTo(msg);
+    }
+  }
+
+  function handleBubblePointerCancel(msg: any) {
+    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+    if (swipeRef.current?.id === msg.id) {
+      swipeRef.current = null;
+      setSwipeDx(null);
     }
   }
 
@@ -506,32 +567,31 @@ export default function ChatDetailPage() {
         ) : (
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === user?.id;
-            const canReply = !msg.is_optimistic;
-            const messageActions = (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button
-                  onClick={() => canReply && setReplyingTo(msg)}
-                  disabled={!canReply}
-                  title="Balas pesan"
-                  style={{ background: 'none', border: 'none', cursor: canReply ? 'pointer' : 'default', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: canReply ? 0.7 : 0.3 }}
-                >
-                  <Icons.Reply size={16} />
-                </button>
-                {isMe && canReply && (
-                  <button
-                    onClick={() => handleDeleteMessage(msg)}
-                    title="Hapus pesan"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: 0.7 }}
-                  >
-                    <Icons.Trash2 size={16} />
-                  </button>
-                )}
-              </div>
-            );
+            const canInteract = !msg.is_optimistic;
+            const currentDx = swipeDx && swipeDx.id === msg.id ? swipeDx.dx : 0;
+            const replyIconOpacity = Math.min(Math.abs(currentDx) / 60, 1);
             return (
-              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: '2px' }}>
-                {messageActions}
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', position: 'relative' }}>
+                <div style={{
+                  position: 'absolute', top: 0, bottom: 0,
+                  [isMe ? 'right' : 'left']: '-32px',
+                  display: 'flex', alignItems: 'center',
+                  opacity: replyIconOpacity, color: 'var(--primary)', pointerEvents: 'none'
+                }}>
+                  <Icons.Reply size={18} />
+                </div>
+                <div
+                  onPointerDown={(e) => canInteract && handleBubblePointerDown(e, msg)}
+                  onPointerMove={(e) => handleBubblePointerMove(e, msg, isMe)}
+                  onPointerUp={() => handleBubblePointerUp(msg)}
+                  onPointerCancel={() => handleBubblePointerCancel(msg)}
+                  style={{
+                    display: 'flex', flexDirection: 'column', minWidth: 0,
+                    transform: `translateX(${currentDx}px)`,
+                    transition: swipeDx?.id === msg.id ? 'none' : 'transform 0.2s ease',
+                    touchAction: 'pan-y'
+                  }}
+                >
                 <div style={{
                   background: isMe ? 'var(--primary)' : 'white',
                   color: isMe ? 'white' : '#111827',
@@ -801,6 +861,40 @@ export default function ChatDetailPage() {
         </>
         )}
       </div>
+
+      {/* Message Context Menu (long-press) */}
+      {contextMenuMsg && (
+        <div
+          onClick={() => setContextMenuMsg(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9998, display: 'flex', alignItems: 'flex-end' }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: 'white', width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column' }}
+          >
+            <button
+              onClick={() => { setReplyingTo(contextMenuMsg); setContextMenuMsg(null); }}
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem 1.5rem', background: 'none', border: 'none', textAlign: 'left', fontSize: '1rem', fontWeight: 600, color: '#111827', cursor: 'pointer' }}
+            >
+              <Icons.Reply size={20} /> Balas
+            </button>
+            {contextMenuMsg.sender?.id === user?.id && !contextMenuMsg.is_optimistic && (
+              <button
+                onClick={() => { const m = contextMenuMsg; setContextMenuMsg(null); handleDeleteMessage(m); }}
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '1px solid #f3f4f6', textAlign: 'left', fontSize: '1rem', fontWeight: 600, color: '#dc2626', cursor: 'pointer' }}
+              >
+                <Icons.Trash2 size={20} /> Hapus
+              </button>
+            )}
+            <button
+              onClick={() => setContextMenuMsg(null)}
+              style={{ marginTop: '4px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '8px solid #f9fafb', textAlign: 'center', fontSize: '0.95rem', fontWeight: 700, color: '#6b7280', cursor: 'pointer' }}
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Upload Proof Modal */}
       {showUploadModal && (
