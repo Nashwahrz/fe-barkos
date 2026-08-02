@@ -370,9 +370,7 @@ input, textarea, select {
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--glass-surface);
-    backdrop-filter: saturate(180%) blur(14px);
-    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    background: var(--card);
     border-top: 1px solid var(--border);
     box-shadow: 0 -2px 20px rgba(0,0,0,0.06);
     z-index: 100;
