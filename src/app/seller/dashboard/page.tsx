@@ -586,7 +586,7 @@ export default function SellerDashboard() {
                 onClick={() => setActiveTab(tab)}
                 style={{
                   padding: '6px 16px', fontSize: '0.8rem', fontWeight: 600,
-                  background: activeTab === tab ? 'var(--primary)' : 'transparent',
+                  background: activeTab === tab ? 'var(--gradient-brand)' : 'transparent',
                   color: activeTab === tab ? 'white' : 'var(--muted-foreground)',
                   border: 'none', cursor: 'pointer', transition: 'all 0.2s',
                 }}
@@ -690,9 +690,9 @@ export default function SellerDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
 
         <Link href="/seller/products/create" className="card"
-          style={{ padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--primary)', color: 'white', transition: 'all 0.2s', gap: '12px', border: 'none', boxShadow: 'var(--shadow-md)', borderRadius: '14px' }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
+          style={{ padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', background: 'var(--gradient-brand)', color: 'white', transition: 'all 0.2s', gap: '12px', border: 'none', boxShadow: 'var(--shadow-brand)', borderRadius: 'var(--radius-lg)' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 16px 32px -8px rgba(13,148,136,0.45)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-brand)'; }}>
           <div style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.2)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={24} color="white" /></div>
           <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Tambah Produk</span>
         </Link>

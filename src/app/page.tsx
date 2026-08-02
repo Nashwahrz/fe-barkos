@@ -359,9 +359,12 @@ export default function Home() {
         {banners.length > 0 && (
           <section>
             <div className="container">
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '24px', letterSpacing: '-0.02em' }}>
-                Promo Spesial
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                <span style={{ width: '8px', height: '20px', borderRadius: '4px', background: 'var(--gradient-brand)', display: 'inline-block' }} />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', margin: 0 }}>
+                  Promo Spesial
+                </h2>
+              </div>
               
               <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                 {/* Carousel Tracks */}
@@ -502,9 +505,12 @@ export default function Home() {
         {/* ── Kategori ─────────────────────────────────────────────── */}
         <section>
           <div className="container">
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '32px', letterSpacing: '-0.02em' }}>
-              Jelajahi Kategori
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
+              <span style={{ width: '8px', height: '20px', borderRadius: '4px', background: 'var(--gradient-brand)', display: 'inline-block' }} />
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', margin: 0 }}>
+                Jelajahi Kategori
+              </h2>
+            </div>
             <style>{`
               .category-card {
                 display: flex;
@@ -639,14 +645,17 @@ export default function Home() {
         <section>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em' }}>
-                Rekomendasi
-              </h2>
-              <Link href="/products?promoted=true" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--foreground)', opacity: 0.6, textDecoration: 'none', transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '8px', height: '20px', borderRadius: '4px', background: 'var(--gradient-brand)', display: 'inline-block' }} />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', margin: 0 }}>
+                  Rekomendasi
+                </h2>
+              </div>
+              <Link href="/products?promoted=true" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none', transition: 'gap 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.gap = '8px'}
+              onMouseLeave={e => e.currentTarget.style.gap = '4px'}
               >
-                Lihat Semua
+                Lihat Semua <Icons.ArrowRight size={15} />
               </Link>
             </div>
             <div className="product-grid">
@@ -655,7 +664,14 @@ export default function Home() {
               ) : promotedProducts.length > 0 ? (
                 promotedProducts.map((p: any) => <ProductCard key={p.id} product={p} promoted />)
               ) : (
-                <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk rekomendasi saat ini.</div>
+                <div style={{
+                  gridColumn: '1/-1', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                  padding: '3rem 1rem', color: 'var(--muted-foreground)', fontSize: '0.9rem',
+                  border: '1px dashed var(--border)', borderRadius: 'var(--radius-lg)',
+                }}>
+                  <Icons.Sparkles size={26} style={{ opacity: 0.4 }} />
+                  Belum ada produk rekomendasi saat ini.
+                </div>
               )}
             </div>
           </div>
@@ -665,14 +681,17 @@ export default function Home() {
         <section>
           <div className="container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em' }}>
-                Produk Terbaru
-              </h2>
-              <Link href="/products" style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--foreground)', opacity: 0.6, textDecoration: 'none', transition: 'opacity 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ width: '8px', height: '20px', borderRadius: '4px', background: 'var(--gradient-brand)', display: 'inline-block' }} />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', margin: 0 }}>
+                  Produk Terbaru
+                </h2>
+              </div>
+              <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none', transition: 'gap 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.gap = '8px'}
+              onMouseLeave={e => e.currentTarget.style.gap = '4px'}
               >
-                Lihat Semua
+                Lihat Semua <Icons.ArrowRight size={15} />
               </Link>
             </div>
             <div className="product-grid">
@@ -681,7 +700,14 @@ export default function Home() {
               ) : products.length > 0 ? (
                 products.slice(0, 3).map((p: any) => <ProductCard key={p.id} product={p} />)
               ) : (
-                <div style={{ gridColumn: '1/-1', color: 'var(--foreground)', opacity: 0.5, fontSize: '0.9rem' }}>Belum ada produk.</div>
+                <div style={{
+                  gridColumn: '1/-1', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                  padding: '3rem 1rem', color: 'var(--muted-foreground)', fontSize: '0.9rem',
+                  border: '1px dashed var(--border)', borderRadius: 'var(--radius-lg)',
+                }}>
+                  <Icons.Package size={26} style={{ opacity: 0.4 }} />
+                  Belum ada produk.
+                </div>
               )}
             </div>
           </div>

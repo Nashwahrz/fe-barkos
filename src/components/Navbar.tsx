@@ -227,9 +227,11 @@ export default function Navbar() {
       {/* ── Top Navbar ──────────────────────────────────────────── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: navTransparent ? 'transparent' : 'var(--card)',
+        background: navTransparent ? 'transparent' : 'var(--glass-surface)',
+        backdropFilter: navTransparent ? 'none' : 'saturate(180%) blur(14px)',
+        WebkitBackdropFilter: navTransparent ? 'none' : 'saturate(180%) blur(14px)',
         borderBottom: navTransparent ? '1px solid transparent' : '1px solid var(--border)',
-        boxShadow: navTransparent ? 'none' : '0 2px 16px rgba(0,0,0,0.06)',
+        boxShadow: navTransparent ? 'none' : '0 2px 20px rgba(0,0,0,0.06)',
         transition: 'all 0.3s ease'
       }}>
         <div className="container flex items-center justify-between" style={{ height: '64px', gap: '12px' }}>
@@ -602,13 +604,13 @@ export default function Navbar() {
                     onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
                     >Masuk</Link>
                     <Link href="/auth/register" style={{
-                      padding: '7px 16px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700,
-                      background: navTransparent ? 'rgba(255,255,255,0.9)' : 'var(--primary)',
+                      padding: '7px 16px', borderRadius: '10px', fontSize: '0.9rem', fontWeight: 700,
+                      background: navTransparent ? 'rgba(255,255,255,0.92)' : 'var(--gradient-brand)',
                       color: navTransparent ? 'var(--primary)' : '#fff', textDecoration: 'none',
-                      transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,170,91,0.3)'
+                      transition: 'all 0.2s', boxShadow: '0 4px 14px rgba(13,148,136,0.35)'
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,170,91,0.4)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,170,91,0.3)'; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(13,148,136,0.45)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(13,148,136,0.35)'; }}
                     >Daftar</Link>
                   </div>
                 )}
@@ -629,9 +631,10 @@ export default function Navbar() {
           ].map(item => (
             <Link key={item.href} href={item.href} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-              padding: '6px 12px', textDecoration: 'none', minWidth: '56px',
+              padding: '6px 14px', textDecoration: 'none', minWidth: '56px', borderRadius: '10px',
               color: isActive(item.href) ? 'var(--primary)' : 'var(--foreground)',
-              opacity: isActive(item.href) ? 1 : 0.45,
+              background: isActive(item.href) ? 'var(--primary-light)' : 'transparent',
+              opacity: isActive(item.href) ? 1 : 0.5,
               transition: 'all 0.15s'
             }}>
               {item.icon}

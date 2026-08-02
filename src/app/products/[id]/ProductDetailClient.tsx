@@ -213,13 +213,13 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
         {/* ── Left: Image & Map ────────────────────────── */}
         <div className="product-detail-left">
-          <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: '24px', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--card)', position: 'relative' }}>
+          <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--card)', position: 'relative', boxShadow: 'var(--shadow)' }}>
             {product.foto
               ? <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={64} color="var(--border)" /></div>}
             {product.is_promoted && (
-              <span style={{ position: 'absolute', top: '16px', left: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--foreground)', color: 'var(--background)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 600 }}>
-                <Icons.Zap size={14} color="var(--background)" /> Rekomendasi
+              <span style={{ position: 'absolute', top: '16px', left: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--gradient-brand)', color: '#fff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, boxShadow: 'var(--shadow-brand)' }}>
+                <Icons.Zap size={14} color="#fff" /> Rekomendasi
               </span>
             )}
           </div>
@@ -297,8 +297,8 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           </div>
 
           {/* Seller Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1.5rem' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--gradient-brand-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '1.5rem' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--gradient-brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
               {product.user?.foto ? (
                 <img src={getStorageUrl(product.user.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -307,7 +307,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
             </div>
             <div>
               <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--foreground)' }}>{product.user?.name}</div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
             </div>
           </div>
 

@@ -263,7 +263,15 @@ function ProductCatalogContent() {
     <div className="container" style={{ paddingTop: '32px', paddingBottom: '140px' }}>
       
       {/* ── Page Title ─────────────────────────────────────────── */}
-      <h1 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Katalog Barang Bekas</h1>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+          <span style={{ width: '8px', height: '22px', borderRadius: '4px', background: 'var(--gradient-brand)', display: 'inline-block' }} />
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--foreground)', letterSpacing: '-0.02em', margin: 0 }}>Katalog Barang Bekas</h1>
+        </div>
+        <p style={{ fontSize: '0.9rem', color: 'var(--muted-foreground)', margin: '0 0 0 18px' }}>
+          {loading ? 'Memuat produk…' : `${products.length} barang tersedia di sekitarmu`}
+        </p>
+      </div>
 
       {/* ── Search + Filter Button Row ────────────────────────── */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '2rem' }}>
@@ -281,13 +289,13 @@ function ProductCatalogContent() {
           onClick={() => setShowFilterModal(true)}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
-            background: activeFilterCount > 0 ? 'var(--primary)' : 'var(--card)',
+            background: activeFilterCount > 0 ? 'var(--gradient-brand)' : 'var(--card)',
             color: activeFilterCount > 0 ? 'white' : 'var(--foreground)',
-            border: `1px solid ${activeFilterCount > 0 ? 'var(--primary)' : 'var(--border)'}`,
+            border: `1px solid ${activeFilterCount > 0 ? 'transparent' : 'var(--border)'}`,
             padding: '0 20px', borderRadius: '12px', fontWeight: 600, fontSize: '0.9rem',
             cursor: 'pointer', position: 'relative', height: '48px',
             transition: 'all 0.2s',
-            boxShadow: activeFilterCount > 0 ? 'var(--shadow-sm)' : 'none'
+            boxShadow: activeFilterCount > 0 ? 'var(--shadow-brand)' : 'none'
           }}
         >
           <Icons.LayoutGrid size={18} color={activeFilterCount > 0 ? 'white' : 'currentColor'} />
@@ -365,11 +373,11 @@ function ProductCatalogContent() {
 
       {/* ── Products Grid ─────────────────────────────────────── */}
       {loading ? (
-        <div style={{ padding: '6rem 0', textAlign: 'center', opacity: 0.5 }}>
-          <div style={{ width: '64px', height: '64px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--foreground)' }}>
+        <div style={{ padding: '6rem 0', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', background: 'var(--gradient-brand-soft)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--primary)' }}>
             <Icons.Loader size={32} />
           </div>
-          <h2 style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--foreground)' }}>Memuat katalog...</h2>
+          <h2 style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--foreground)', opacity: 0.6 }}>Memuat katalog...</h2>
         </div>
       ) : (
         <>
@@ -380,12 +388,12 @@ function ProductCatalogContent() {
           </div>
 
           {products.length === 0 && (
-            <div style={{ padding: '6rem 0', textAlign: 'center', opacity: 0.5 }}>
-              <div style={{ width: '64px', height: '64px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--foreground)' }}>
+            <div style={{ padding: '6rem 0', textAlign: 'center' }}>
+              <div style={{ width: '64px', height: '64px', background: 'var(--gradient-brand-soft)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--primary)' }}>
                 <Icons.Search size={32} />
               </div>
               <h2 style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--foreground)' }}>Tidak ada produk ditemukan</h2>
-              <p style={{ marginTop: '8px', fontSize: '0.95rem', color: 'var(--foreground)' }}>Coba sesuaikan filter atau gunakan kata kunci lain.</p>
+              <p style={{ marginTop: '8px', fontSize: '0.95rem', color: 'var(--muted-foreground)' }}>Coba sesuaikan filter atau gunakan kata kunci lain.</p>
             </div>
           )}
         </>

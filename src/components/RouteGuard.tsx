@@ -42,7 +42,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f8faf9' }}>
-        <div style={{ fontSize: '1.2rem', fontWeight: 600, color: '#16a34a' }}>Memuat...</div>
+        <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--primary)' }}>Memuat...</div>
       </div>
     );
   }
@@ -71,41 +71,41 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
       };
 
       return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f8faf9', padding: '2rem' }}>
-          <div style={{ background: 'white', padding: '2.5rem', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', maxWidth: '500px', width: '100%', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'var(--background)', padding: '2rem' }}>
+          <div style={{ background: 'var(--card)', padding: '2.5rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', maxWidth: '500px', width: '100%', textAlign: 'center' }}>
             <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>📧</div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827', marginBottom: '1rem' }}>Akun Anda Belum Terverifikasi</h1>
-            <p style={{ color: '#4b5563', lineHeight: 1.6, marginBottom: '2rem' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '1rem' }}>Akun Anda Belum Terverifikasi</h1>
+            <p style={{ color: 'var(--muted-foreground)', lineHeight: 1.6, marginBottom: '2rem' }}>
               Silakan verifikasi terlebih dahulu. Periksa kotak masuk email Anda dan klik tautan verifikasi.
             </p>
 
             {resendMessage && (
-              <div style={{ padding: '0.75rem', background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              <div style={{ padding: '0.75rem', background: 'rgba(5, 150, 105, 0.1)', color: 'var(--success)', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                 {resendMessage}
               </div>
             )}
 
             {resendError && (
-              <div style={{ padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+              <div style={{ padding: '0.75rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
                 {resendError}
               </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button 
+              <button
                 onClick={handleResend}
                 disabled={resendLoading}
+                className="btn btn-primary"
                 style={{
-                  background: '#16a34a', color: 'white', padding: '12px', borderRadius: '8px', fontWeight: 600, border: 'none', cursor: resendLoading ? 'not-allowed' : 'pointer', opacity: resendLoading ? 0.7 : 1
+                  padding: '12px', cursor: resendLoading ? 'not-allowed' : 'pointer', opacity: resendLoading ? 0.7 : 1
                 }}
               >
                 {resendLoading ? 'Mengirim...' : 'Kirim Ulang Verifikasi'}
               </button>
-              <button 
+              <button
                 onClick={logout}
-                style={{
-                  background: 'transparent', color: '#6b7280', padding: '12px', borderRadius: '8px', fontWeight: 600, border: '1px solid #d1d5db', cursor: 'pointer'
-                }}
+                className="btn btn-secondary"
+                style={{ padding: '12px' }}
               >
                 Keluar
               </button>
