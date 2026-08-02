@@ -121,7 +121,7 @@ export default function AdminReports() {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  {report.status === 'resolved' ? (
+                  {report.status === 'resolved' && !report.product ? (
                     <Badge tone="success" icon={<Icons.Trash2 size={12} />}>Produk Dihapus</Badge>
                   ) : report.status === 'dismissed' ? (
                     <Badge tone="neutral" icon={<Icons.X size={12} />}>Ditolak</Badge>
