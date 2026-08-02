@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
@@ -109,18 +110,30 @@ export default function AdminProducts() {
     },
     {
       key: 'aksi', header: 'Aksi', align: 'right', render: p => (
-        <button
-          onClick={() => handleDelete(p.id)}
-          disabled={actionLoading === p.id}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem',
-            padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer', transition: 'all 0.2s'
-          }}
-        >
-          {actionLoading === p.id ? <Icons.Loader size={14} /> : <Icons.Trash2 size={14} />}
-          {actionLoading === p.id ? 'Menghapus...' : 'Hapus'}
-        </button>
+        <div className="flex items-center justify-end gap-2">
+          <Link
+            href={`/admin/products/${p.id}`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              color: 'var(--foreground)', fontWeight: 600, fontSize: '0.85rem',
+              padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card)', textDecoration: 'none'
+            }}
+          >
+            <Icons.Eye size={14} /> Detail
+          </Link>
+          <button
+            onClick={() => handleDelete(p.id)}
+            disabled={actionLoading === p.id}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem',
+              padding: '8px 12px', borderRadius: '8px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer', transition: 'all 0.2s'
+            }}
+          >
+            {actionLoading === p.id ? <Icons.Loader size={14} /> : <Icons.Trash2 size={14} />}
+            {actionLoading === p.id ? 'Menghapus...' : 'Hapus'}
+          </button>
+        </div>
       ),
     },
   ];

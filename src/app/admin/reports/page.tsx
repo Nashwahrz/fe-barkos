@@ -164,7 +164,7 @@ export default function AdminReports() {
                     <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Produk yang dilaporkan</div>
                     <div style={{ fontWeight: 800, color: 'var(--foreground)', fontSize: '1.1rem' }}>{report.product.nama_barang}</div>
                   </div>
-                  <Button href={`/products/${report.product.id}`} variant="secondary" size="md">
+                  <Button href={`/admin/products/${report.product.id}`} variant="secondary" size="md">
                     Lihat Produk <Icons.ArrowRight size={16} />
                   </Button>
                 </div>
