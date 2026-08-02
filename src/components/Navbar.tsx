@@ -227,9 +227,7 @@ export default function Navbar() {
       {/* ── Top Navbar ──────────────────────────────────────────── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: navTransparent ? 'transparent' : 'var(--glass-surface)',
-        backdropFilter: navTransparent ? 'none' : 'saturate(180%) blur(14px)',
-        WebkitBackdropFilter: navTransparent ? 'none' : 'saturate(180%) blur(14px)',
+        background: navTransparent ? 'transparent' : 'var(--card)',
         borderBottom: navTransparent ? '1px solid transparent' : '1px solid var(--border)',
         boxShadow: navTransparent ? 'none' : '0 2px 20px rgba(0,0,0,0.06)',
         transition: 'all 0.3s ease'
