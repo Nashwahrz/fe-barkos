@@ -23,6 +23,7 @@ export default function ChatDetailPage() {
   const [replyingTo, setReplyingTo] = useState<any>(null);
   const [swipeDx, setSwipeDx] = useState<{ id: any; dx: number } | null>(null);
   const [contextMenuMsg, setContextMenuMsg] = useState<any>(null);
+  const [contextMenuPos, setContextMenuPos] = useState<{ x: number; y: number } | null>(null);
   const swipeRef = useRef<{ id: any; startX: number; startY: number; dx: number; locked: boolean } | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sending, setSending] = useState(false);
@@ -187,6 +188,7 @@ export default function ChatDetailPage() {
     swipeRef.current = { id: msg.id, startX: e.clientX, startY: e.clientY, dx: 0, locked: false };
     longPressTimerRef.current = setTimeout(() => {
       if (swipeRef.current && swipeRef.current.id === msg.id && Math.abs(swipeRef.current.dx) < 10) {
+        setContextMenuPos({ x: swipeRef.current.startX, y: swipeRef.current.startY });
         setContextMenuMsg(msg);
         swipeRef.current = null;
         setSwipeDx(null);
@@ -585,6 +587,15 @@ export default function ChatDetailPage() {
                   onPointerMove={(e) => handleBubblePointerMove(e, msg, isMe)}
                   onPointerUp={() => handleBubblePointerUp(msg)}
                   onPointerCancel={() => handleBubblePointerCancel(msg)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    if (!canInteract) return;
+                    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+                    swipeRef.current = null;
+                    setSwipeDx(null);
+                    setContextMenuPos({ x: e.clientX, y: e.clientY });
+                    setContextMenuMsg(msg);
+                  }}
                   style={{
                     display: 'flex', flexDirection: 'column', minWidth: 0,
                     transform: `translateX(${currentDx}px)`,
@@ -862,39 +873,66 @@ export default function ChatDetailPage() {
         )}
       </div>
 
-      {/* Message Context Menu (long-press) */}
-      {contextMenuMsg && (
-        <div
-          onClick={() => setContextMenuMsg(null)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9998, display: 'flex', alignItems: 'flex-end' }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ background: 'white', width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column' }}
+      {/* Message Context Menu (long-press on mobile, right-click on desktop) */}
+      {contextMenuMsg && contextMenuPos && (() => {
+        const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+        const canDelete = contextMenuMsg.sender?.id === user?.id && !contextMenuMsg.is_optimistic;
+
+        const replyBtn = (
+          <button
+            onClick={() => { setReplyingTo(contextMenuMsg); setContextMenuMsg(null); setContextMenuPos(null); }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: '#111827', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
-            <button
-              onClick={() => { setReplyingTo(contextMenuMsg); setContextMenuMsg(null); }}
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem 1.5rem', background: 'none', border: 'none', textAlign: 'left', fontSize: '1rem', fontWeight: 600, color: '#111827', cursor: 'pointer' }}
-            >
-              <Icons.Reply size={20} /> Balas
-            </button>
-            {contextMenuMsg.sender?.id === user?.id && !contextMenuMsg.is_optimistic && (
-              <button
-                onClick={() => { const m = contextMenuMsg; setContextMenuMsg(null); handleDeleteMessage(m); }}
-                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '1px solid #f3f4f6', textAlign: 'left', fontSize: '1rem', fontWeight: 600, color: '#dc2626', cursor: 'pointer' }}
+            <Icons.Reply size={isDesktop ? 16 : 20} /> Balas
+          </button>
+        );
+        const deleteBtn = canDelete && (
+          <button
+            onClick={() => { const m = contextMenuMsg; setContextMenuMsg(null); setContextMenuPos(null); handleDeleteMessage(m); }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', borderTop: isDesktop ? '1px solid var(--border)' : '1px solid #f3f4f6', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: '#dc2626', cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            <Icons.Trash2 size={isDesktop ? 16 : 20} /> Hapus
+          </button>
+        );
+
+        return (
+          <div
+            onClick={() => { setContextMenuMsg(null); setContextMenuPos(null); }}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ position: 'fixed', inset: 0, background: isDesktop ? 'transparent' : 'rgba(0,0,0,0.4)', zIndex: 9998, display: 'flex', alignItems: isDesktop ? 'flex-start' : 'flex-end' }}
+          >
+            {isDesktop ? (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'fixed',
+                  left: Math.min(contextMenuPos.x, window.innerWidth - 170),
+                  top: Math.min(contextMenuPos.y, window.innerHeight - 110),
+                  background: 'white', borderRadius: '10px', border: '1px solid var(--border)',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)', overflow: 'hidden', minWidth: '150px', display: 'flex', flexDirection: 'column'
+                }}
               >
-                <Icons.Trash2 size={20} /> Hapus
-              </button>
+                {replyBtn}
+                {deleteBtn}
+              </div>
+            ) : (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{ background: 'white', width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column' }}
+              >
+                {replyBtn}
+                {deleteBtn}
+                <button
+                  onClick={() => { setContextMenuMsg(null); setContextMenuPos(null); }}
+                  style={{ marginTop: '4px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '8px solid #f9fafb', textAlign: 'center', fontSize: '0.95rem', fontWeight: 700, color: '#6b7280', cursor: 'pointer' }}
+                >
+                  Batal
+                </button>
+              </div>
             )}
-            <button
-              onClick={() => setContextMenuMsg(null)}
-              style={{ marginTop: '4px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '8px solid #f9fafb', textAlign: 'center', fontSize: '0.95rem', fontWeight: 700, color: '#6b7280', cursor: 'pointer' }}
-            >
-              Batal
-            </button>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Upload Proof Modal */}
       {showUploadModal && (
