@@ -36,6 +36,19 @@ export default function ChatListPage() {
     }
   }
 
+  async function handleDeleteConversation(e: React.MouseEvent, productId: number, otherUserId: number) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm('Hapus percakapan ini? Semua pesan akan terhapus permanen untuk kedua pihak.')) return;
+
+    try {
+      await fetchApi(`/products/${productId}/chats/${otherUserId}`, { method: 'DELETE' });
+      setConversations(prev => prev.filter(c => !(c.last_message?.product?.id === productId && (c.other_user?.id === otherUserId))));
+    } catch (err: any) {
+      alert(err.message || 'Gagal menghapus percakapan');
+    }
+  }
+
   if (loading || authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ color: 'var(--foreground)' }}>
@@ -129,8 +142,17 @@ export default function ChatListPage() {
                 </div>
 
                 <div className="flex flex-col items-end gap-2" style={{ flexShrink: 0, minWidth: '60px' }}>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                    {new Date(lastMsg?.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                      {new Date(lastMsg?.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteConversation(e, product.id, otherUser.id)}
+                      title="Hapus percakapan"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: 'var(--foreground)', opacity: 0.4, display: 'flex', alignItems: 'center' }}
+                    >
+                      <Icons.Trash2 size={16} />
+                    </button>
                   </div>
                   {unreadCount > 0 && (
                     <div style={{ background: 'var(--danger)', color: 'white', fontWeight: 700, fontSize: '0.75rem', padding: '4px 8px', borderRadius: '12px', whiteSpace: 'nowrap' }}>

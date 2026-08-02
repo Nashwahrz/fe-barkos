@@ -163,6 +163,34 @@ export default function ChatDetailPage() {
     }
   }
 
+  async function handleDeleteMessage(msg: any) {
+    if (msg.is_optimistic) return;
+    if (!window.confirm('Hapus pesan ini? Pesan akan terhapus permanen untuk kedua pihak.')) return;
+
+    const prevMessages = messages;
+    setMessages(prev => prev.filter(m => m.id !== msg.id));
+    if (replyingTo?.id === msg.id) setReplyingTo(null);
+
+    try {
+      await fetchApi(`/chats/${msg.id}`, { method: 'DELETE' });
+    } catch (err: any) {
+      alert(err.message || 'Gagal menghapus pesan');
+      setMessages(prevMessages);
+    }
+  }
+
+  async function handleDeleteConversation() {
+    if (!otherUserId || otherUserId === 'undefined') return;
+    if (!window.confirm('Hapus seluruh percakapan ini? Semua pesan akan terhapus permanen untuk kedua pihak dan tidak bisa dikembalikan.')) return;
+
+    try {
+      await fetchApi(`/products/${productId}/chats/${otherUserId}`, { method: 'DELETE' });
+      router.push('/chat');
+    } catch (err: any) {
+      alert(err.message || 'Gagal menghapus percakapan');
+    }
+  }
+
   function getMessagePreview(content: string): string {
     if (!content) return '';
     if (content.startsWith('[LOCATION:')) return 'Lokasi Dibagikan';
@@ -454,6 +482,15 @@ export default function ChatDetailPage() {
             </Link>
           )}
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={handleDeleteConversation}
+            title="Hapus Percakapan"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}
+          >
+            <Icons.Trash2 size={20} />
+          </button>
+        )}
       </div>
 
       {/* Messages Area */}
@@ -470,19 +507,30 @@ export default function ChatDetailPage() {
           messages.map((msg, idx) => {
             const isMe = msg.sender?.id === user?.id;
             const canReply = !msg.is_optimistic;
-            const replyButton = (
-              <button
-                onClick={() => canReply && setReplyingTo(msg)}
-                disabled={!canReply}
-                title="Balas pesan"
-                style={{ background: 'none', border: 'none', cursor: canReply ? 'pointer' : 'default', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: canReply ? 0.7 : 0.3 }}
-              >
-                <Icons.Reply size={16} />
-              </button>
+            const messageActions = (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button
+                  onClick={() => canReply && setReplyingTo(msg)}
+                  disabled={!canReply}
+                  title="Balas pesan"
+                  style={{ background: 'none', border: 'none', cursor: canReply ? 'pointer' : 'default', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: canReply ? 0.7 : 0.3 }}
+                >
+                  <Icons.Reply size={16} />
+                </button>
+                {isMe && canReply && (
+                  <button
+                    onClick={() => handleDeleteMessage(msg)}
+                    title="Hapus pesan"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#9ca3af', flexShrink: 0, display: 'flex', alignItems: 'center', opacity: 0.7 }}
+                  >
+                    <Icons.Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             );
             return (
               <div key={idx} style={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '80%', display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: '2px' }}>
-                {replyButton}
+                {messageActions}
                 <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 <div style={{
                   background: isMe ? 'var(--primary)' : 'white',
