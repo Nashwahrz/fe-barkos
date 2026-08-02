@@ -6,6 +6,7 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Skeleton } from '@/components/Skeleton';
@@ -36,17 +37,27 @@ export default function AdminReports() {
     }
   }
 
-  async function updateStatus(id: number, status: string) {
+  async function handleRejectReport(id: number) {
+    if (!confirm('Tolak laporan ini? Produk tidak akan dihapus.')) return;
     setUpdating(id);
     try {
-      await fetchApi(`/reports/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ status }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await fetchApi(`/reports/${id}/reject`, { method: 'PATCH' });
       await loadReports();
     } catch (err) {
-      alert('Gagal memperbarui status laporan.');
+      alert('Gagal menolak laporan.');
+    } finally {
+      setUpdating(null);
+    }
+  }
+
+  async function handleDeleteReportedProduct(report: any) {
+    if (!confirm(`Hapus produk "${report.product?.nama_barang}"? Laporan akan ditandai selesai dan tindakan ini tidak bisa dibatalkan.`)) return;
+    setUpdating(report.id);
+    try {
+      await fetchApi(`/reports/${report.id}/product`, { method: 'DELETE' });
+      await loadReports();
+    } catch (err) {
+      alert('Gagal menghapus produk.');
     } finally {
       setUpdating(null);
     }
@@ -109,39 +120,42 @@ export default function AdminReports() {
                     </div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--foreground)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status:</label>
-                  <select 
-                    value={report.status} 
-                    onChange={(e) => updateStatus(report.id, e.target.value)}
-                    disabled={updating === report.id}
-                    style={{ 
-                      padding: '8px 32px 8px 16px', 
-                      borderRadius: '10px', 
-                      border: `1px solid ${
-                        report.status === 'pending' ? 'rgba(220, 38, 38, 0.3)' : 
-                        report.status === 'investigated' ? 'rgba(245, 158, 11, 0.3)' : 
-                        report.status === 'resolved' ? 'rgba(16, 185, 129, 0.3)' : 'var(--border)'
-                      }`,
-                      fontWeight: 700,
-                      fontSize: '0.9rem',
-                      background: updating === report.id ? 'var(--input)' : 'var(--card)',
-                      color: report.status === 'pending' ? 'var(--danger)' : 
-                             report.status === 'investigated' ? 'var(--warning)' : 
-                             report.status === 'resolved' ? 'var(--success)' : 'var(--foreground)',
-                      cursor: updating === report.id ? 'not-allowed' : 'pointer',
-                      appearance: 'none',
-                      backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'right 12px center',
-                      backgroundSize: '16px'
-                    }}
-                  >
-                    <option value="pending">PENDING</option>
-                    <option value="investigated">DALAM PROSES</option>
-                    <option value="resolved">SELESAI</option>
-                    <option value="dismissed">DITOLAK</option>
-                  </select>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  {report.status === 'resolved' ? (
+                    <Badge tone="success" icon={<Icons.Trash2 size={12} />}>Produk Dihapus</Badge>
+                  ) : report.status === 'dismissed' ? (
+                    <Badge tone="neutral" icon={<Icons.X size={12} />}>Ditolak</Badge>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleDeleteReportedProduct(report)}
+                        disabled={updating === report.id || !report.product}
+                        title={!report.product ? 'Produk sudah tidak tersedia' : undefined}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '6px',
+                          color: 'white', fontWeight: 700, fontSize: '0.85rem',
+                          padding: '8px 14px', borderRadius: '10px', border: 'none',
+                          background: 'var(--danger)', cursor: (updating === report.id || !report.product) ? 'not-allowed' : 'pointer',
+                          opacity: (updating === report.id || !report.product) ? 0.5 : 1,
+                        }}
+                      >
+                        {updating === report.id ? <Icons.Loader size={14} /> : <Icons.Trash2 size={14} />} Hapus Produk
+                      </button>
+                      <button
+                        onClick={() => handleRejectReport(report.id)}
+                        disabled={updating === report.id}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '6px',
+                          color: 'var(--foreground)', fontWeight: 700, fontSize: '0.85rem',
+                          padding: '8px 14px', borderRadius: '10px', border: '1px solid var(--border)',
+                          background: 'var(--card)', cursor: updating === report.id ? 'not-allowed' : 'pointer',
+                          opacity: updating === report.id ? 0.5 : 1,
+                        }}
+                      >
+                        <Icons.X size={14} /> Tolak
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -152,7 +166,7 @@ export default function AdminReports() {
                 </div>
               </div>
 
-              {report.product && (
+              {report.product ? (
                 <div className="flex items-center gap-4" style={{ padding: '1.25rem', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--card)' }}>
                   <div style={{ width: '64px', height: '64px', background: 'var(--input)', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border)' }}>
                      {report.product.foto ? (
@@ -167,6 +181,11 @@ export default function AdminReports() {
                   <Button href={`/admin/products/${report.product.id}`} variant="secondary" size="md">
                     Lihat Produk <Icons.ArrowRight size={16} />
                   </Button>
+                </div>
+              ) : report.status === 'resolved' && (
+                <div className="flex items-center gap-3" style={{ padding: '1.25rem', border: '1px dashed var(--border)', borderRadius: '12px', color: 'var(--foreground)', opacity: 0.6 }}>
+                  <Icons.Trash2 size={20} />
+                  <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Produk yang dilaporkan sudah dihapus.</span>
                 </div>
               )}
             </div>
