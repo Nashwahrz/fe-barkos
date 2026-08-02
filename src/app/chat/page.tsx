@@ -114,11 +114,16 @@ export default function ChatListPage() {
                 }}
               >
                 <div className="flex items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
-                    {otherUser?.foto ? (
-                      <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      otherUser?.name?.charAt(0).toUpperCase()
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--input)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '1.25rem', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                      {otherUser?.foto ? (
+                        <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        otherUser?.name?.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    {otherUser?.is_online && (
+                      <span style={{ position: 'absolute', bottom: '0', right: '0', width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e', border: '2px solid var(--card)' }} />
                     )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>

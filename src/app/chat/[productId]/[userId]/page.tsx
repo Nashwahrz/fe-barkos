@@ -143,14 +143,19 @@ export default function ChatDetailPage() {
         return newMessages;
       });
 
-      // Try to extract otherUser from messages if product info failed or we are the seller
+      // Try to extract otherUser from messages if product info failed or we are the seller.
+      // Also refresh presence fields (is_online/last_active_at) on every poll so the
+      // online indicator stays live, without clobbering fields (e.g. bank_accounts)
+      // that only came from loadProductInfo().
       setOtherUser((prev: any) => {
-        if (!prev && newMessages.length > 0) {
-          const sampleMsg = newMessages[0];
-          if (sampleMsg.sender?.id?.toString() === otherUserId) return sampleMsg.sender;
-          if (sampleMsg.receiver?.id?.toString() === otherUserId) return sampleMsg.receiver;
-        }
-        return prev;
+        if (newMessages.length === 0) return prev;
+        const sampleMsg = newMessages[newMessages.length - 1];
+        let candidate: any = null;
+        if (sampleMsg.sender?.id?.toString() === otherUserId) candidate = sampleMsg.sender;
+        else if (sampleMsg.receiver?.id?.toString() === otherUserId) candidate = sampleMsg.receiver;
+        if (!candidate) return prev;
+        if (!prev) return candidate;
+        return { ...prev, is_online: candidate.is_online, last_active_at: candidate.last_active_at };
       });
     } catch (err) {
       console.error('Failed to load messages', err);
@@ -252,6 +257,18 @@ export default function ChatDetailPage() {
     } catch (err: any) {
       alert(err.message || 'Gagal menghapus percakapan');
     }
+  }
+
+  function formatLastSeen(lastActiveAt?: string | null): string {
+    if (!lastActiveAt) return 'Offline';
+    const diffMs = Date.now() - new Date(lastActiveAt).getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'Terakhir dilihat baru saja';
+    if (diffMin < 60) return `Terakhir dilihat ${diffMin} menit lalu`;
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `Terakhir dilihat ${diffHour} jam lalu`;
+    const diffDay = Math.floor(diffHour / 24);
+    return `Terakhir dilihat ${diffDay} hari lalu`;
   }
 
   function getMessagePreview(content: string): string {
@@ -529,15 +546,25 @@ export default function ChatDetailPage() {
         <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
           <Icons.ArrowLeft size={24} />
         </button>
-        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-          {otherUser?.foto ? (
-            <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            otherUser?.name?.charAt(0).toUpperCase() || '?'
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+            {otherUser?.foto ? (
+              <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              otherUser?.name?.charAt(0).toUpperCase() || '?'
+            )}
+          </div>
+          {otherUser?.is_online && (
+            <span style={{ position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e', border: '2px solid white' }} />
           )}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
+          {otherUser && (
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: otherUser.is_online ? '#16a34a' : '#9ca3af', marginTop: '1px' }}>
+              {otherUser.is_online ? 'Online' : formatLastSeen(otherUser.last_active_at)}
+            </div>
+          )}
           {product && (
             <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
               <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}><Icons.Package size={14} /></span> 
