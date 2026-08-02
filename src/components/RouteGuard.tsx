@@ -4,11 +4,14 @@ import { useAuth } from '@/components/AuthProvider';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/lib/api';
+import { useHierarchicalBackButton } from '@/hooks/useHierarchicalBackButton';
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+
+  useHierarchicalBackButton();
 
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
