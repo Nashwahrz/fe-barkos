@@ -284,6 +284,18 @@ export default function ChatDetailPage() {
 
   const isOrderCancelled = activeOrder?.status === 'cancelled';
   const isProductSold = Boolean(product?.status_terjual) && activeOrder?.status !== 'cancelled';
+
+  const CHAT_EXPIRY_DAYS = 7;
+  const lastRealMessage = [...messages].reverse().find(m => !m.is_optimistic);
+  // Auto-expire an idle chat with no transaction attached, so old dead threads
+  // don't linger open forever. Any order (even pending) exempts it, since a
+  // transaction is already in motion.
+  const isExpired = !activeOrder && !!lastRealMessage &&
+    (Date.now() - new Date(lastRealMessage.created_at).getTime()) > CHAT_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+
+  // Note: isExpired intentionally does NOT block sending — a new message is what
+  // "revives" an idle chat (it becomes the newest message, so isExpired flips
+  // back to false). Only a sold product or cancelled order permanently closes it.
   const isChatClosed = isOrderCancelled || isProductSold;
 
   async function handleSendMessage(e: React.FormEvent) {
@@ -813,6 +825,12 @@ export default function ChatDetailPage() {
           )
         ) : (
         <>
+        {isExpired && (
+          <div style={{ margin: '1rem 1.5rem 0', padding: '0.85rem 1rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#6b7280' }}>
+            <Icons.Clock size={18} />
+            <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Chat ini sempat tidak aktif selama {CHAT_EXPIRY_DAYS} hari. Kirim pesan untuk melanjutkan obrolan.</span>
+          </div>
+        )}
         {/* Chat Templates */}
         <div style={{
           padding: '0.75rem 1.5rem 0',
