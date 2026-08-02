@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getParentRoute } from '@/lib/navigationHierarchy';
 
@@ -10,11 +10,18 @@ import { getParentRoute } from '@/lib/navigationHierarchy';
 export function useHierarchicalBackButton() {
   const pathname = usePathname();
   const router = useRouter();
+  // Tracks the pathname a guard entry has already been armed for, so the
+  // pathname-change effect below and the popstate handler never both push
+  // a guard for the same landing — that double-push is what previously
+  // desynced the history stack and made the back button exit the app.
+  const guardedPathRef = useRef<string | null>(null);
 
   // Keep a "guard" history entry on top of every non-home page so a single
   // back press can be intercepted before it actually leaves the page.
   useEffect(() => {
     if (pathname === '/') return;
+    if (guardedPathRef.current === pathname) return;
+    guardedPathRef.current = pathname;
     window.history.pushState({ __backGuard: true }, '', pathname);
   }, [pathname]);
 
@@ -24,8 +31,13 @@ export function useHierarchicalBackButton() {
       if (currentPath === '/') return; // let the browser exit the site normally
 
       const parent = getParentRoute(currentPath) ?? '/';
-      // Re-arm the guard so the *next* back press is also intercepted.
-      window.history.pushState({ __backGuard: true }, '', currentPath);
+      // Re-arm the guard so the *next* back press is also intercepted, unless
+      // the parent is home — home intentionally has no guard so the
+      // following back press exits normally.
+      guardedPathRef.current = parent;
+      if (parent !== '/') {
+        window.history.pushState({ __backGuard: true }, '', parent);
+      }
       router.replace(parent);
     };
 
