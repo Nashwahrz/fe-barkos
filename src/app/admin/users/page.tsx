@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,20 @@ interface AdminUser {
 function formatDateTime(value: string | null): string {
   if (!value) return 'Belum pernah';
   return new Date(value).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function StatTile({ icon, label, value, small }: { icon: ReactNode; label: string; value: string | number; small?: boolean }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.7rem 0.85rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+      <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {icon}
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        <div style={{ fontWeight: 800, fontSize: small ? '0.85rem' : '1rem', color: 'var(--foreground)' }}>{value}</div>
+      </div>
+    </div>
+  );
 }
 
 export default function AdminUsers() {
@@ -217,61 +231,80 @@ export default function AdminUsers() {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
 
-        <Modal open={!!selectedUser || detailLoading} onClose={() => setSelectedUser(null)} title="Aktivitas User" width={480}>
+        <Modal open={!!selectedUser || detailLoading} onClose={() => setSelectedUser(null)} title="Aktivitas User" width={520}>
           {detailLoading && !selectedUser ? (
-            <div className="flex items-center justify-center" style={{ padding: '2rem' }}>
+            <div className="flex items-center justify-center" style={{ padding: '3rem' }}>
               <Icons.Loader size={24} />
             </div>
           ) : selectedUser ? (
-            <div className="flex-col" style={{ gap: '1.25rem' }}>
+            <div className="flex-col" style={{ gap: '1.5rem' }}>
+              {/* Profile header */}
               <div className="flex items-center gap-4">
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0 }}>
-                  {selectedUser.avatar ? (
-                    <img src={getStorageUrl(selectedUser.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    selectedUser.name.charAt(0).toUpperCase()
-                  )}
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 800, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+                    {selectedUser.avatar ? (
+                      <img src={getStorageUrl(selectedUser.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      selectedUser.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <span
+                    title={selectedUser.is_online ? 'Online' : 'Offline'}
+                    style={{
+                      position: 'absolute', bottom: '2px', right: '2px', width: '13px', height: '13px', borderRadius: '50%',
+                      background: selectedUser.is_online ? 'var(--success)' : 'var(--muted-foreground)',
+                      border: '2.5px solid var(--card)',
+                    }}
+                  />
                 </div>
-                <div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.name}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>{selectedUser.email}</div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div className="flex items-center gap-2" style={{ flexWrap: 'wrap' }}>
+                    <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--foreground)' }}>{selectedUser.name}</div>
+                    <Badge tone={selectedUser.role === 'super_admin' ? 'primary' : 'neutral'}>{selectedUser.role.replace('_', ' ')}</Badge>
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedUser.email}</div>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.9rem' }}>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Status</div>
-                  <div style={{ fontWeight: 700, color: selectedUser.is_online ? 'var(--success)' : 'var(--foreground)' }}>
-                    {selectedUser.is_online ? 'Online sekarang' : 'Offline'}
+              {/* Status / last-seen banner */}
+              <div
+                className="flex items-center gap-3"
+                style={{
+                  padding: '0.9rem 1.1rem', borderRadius: '14px',
+                  background: selectedUser.is_online ? 'rgba(22, 163, 74, 0.08)' : 'var(--muted, rgba(0,0,0,0.03))',
+                  border: `1px solid ${selectedUser.is_online ? 'rgba(22, 163, 74, 0.25)' : 'var(--border)'}`,
+                }}
+              >
+                <div style={{
+                  width: '34px', height: '34px', borderRadius: '10px', flexShrink: 0,
+                  background: selectedUser.is_online ? 'rgba(22, 163, 74, 0.15)' : 'var(--card)',
+                  border: selectedUser.is_online ? 'none' : '1px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icons.Clock size={17} color={selectedUser.is_online ? 'var(--success)' : 'var(--muted-foreground)'} />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: selectedUser.is_online ? 'var(--success)' : 'var(--foreground)' }}>
+                    {selectedUser.is_online ? 'Online sekarang' : 'Sedang offline'}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>
+                    {selectedUser.is_online ? 'Aktif di web saat ini' : `Terakhir aktif ${formatDateTime(selectedUser.last_active_at)}`}
                   </div>
                 </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Terakhir Aktif</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{formatDateTime(selectedUser.last_active_at)}</div>
+              </div>
+
+              {/* Activity stats */}
+              <div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.6rem' }}>
+                  Ringkasan Aktivitas
                 </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Bergabung</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{formatDateTime(selectedUser.created_at)}</div>
-                </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Produk Diunggah</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.products_count}</div>
-                </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Produk Terjual</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.products_sold_count}</div>
-                </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Transaksi Selesai (Penjual)</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_completed_count}</div>
-                </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Total Transaksi (Penjual)</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_as_seller_count}</div>
-                </div>
-                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Transaksi Sebagai Pembeli</div>
-                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_as_buyer_count}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+                  <StatTile icon={<Icons.UserPlus size={16} color="var(--primary)" />} label="Bergabung" value={formatDateTime(selectedUser.created_at)} small />
+                  <StatTile icon={<Icons.Package size={16} color="var(--primary)" />} label="Produk Diunggah" value={selectedUser.activity.products_count} />
+                  <StatTile icon={<Icons.CheckCircle size={16} color="var(--success)" />} label="Produk Terjual" value={selectedUser.activity.products_sold_count} />
+                  <StatTile icon={<Icons.Handshake size={16} color="var(--success)" />} label="Transaksi Selesai" value={selectedUser.activity.transactions_completed_count} />
+                  <StatTile icon={<Icons.TrendingUp size={16} color="var(--primary)" />} label="Total Sbg Penjual" value={selectedUser.activity.transactions_as_seller_count} />
+                  <StatTile icon={<Icons.ShoppingBag size={16} color="var(--primary)" />} label="Total Sbg Pembeli" value={selectedUser.activity.transactions_as_buyer_count} />
                 </div>
               </div>
             </div>
