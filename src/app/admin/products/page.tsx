@@ -27,7 +27,12 @@ function AdminProductsContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userIdFilter = searchParams.get('user_id');
+  // Read once from the initial URL rather than reacting to `searchParams` on every
+  // render: Next's client-side soft navigation (next/link, router.push) has been
+  // observed dropping query-string-only changes on this route (RSC fetch includes
+  // the param, but the committed URL/searchParams don't), so filtering is driven by
+  // local state instead — seeded from the real URL on first load / hard navigation.
+  const [userIdFilter, setUserIdFilter] = useState<string | null>(() => searchParams.get('user_id'));
 
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +62,10 @@ function AdminProductsContent() {
 
   function handleSellerFilterChange(id: string) {
     setCurrentPage(1);
-    router.push(id ? `/admin/products?user_id=${id}` : '/admin/products');
+    setUserIdFilter(id || null);
+    // Keep the URL in sync for bookmarking/sharing; the filter itself no longer
+    // depends on this being read back reactively (see note above).
+    router.replace(id ? `/admin/products?user_id=${id}` : '/admin/products', { scroll: false });
   }
 
   useEffect(() => {

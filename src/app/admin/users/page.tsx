@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, ReactNode, CSSProperties } from 'react';
-import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
@@ -53,10 +52,14 @@ function StatTile({ icon, label, value, small, href }: { icon: ReactNode; label:
   };
 
   if (href) {
+    // Plain <a> (full browser navigation) instead of next/link: Next's client-side
+    // soft navigation was observed dropping the ?user_id= query string on this route
+    // (the RSC fetch included it, but the committed URL/search params did not), so a
+    // real page load is used to guarantee the target page reads the correct filter.
     return (
-      <Link href={href} className="stat-tile-link" style={{ ...style, textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s' }}>
+      <a href={href} className="stat-tile-link" style={{ ...style, textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s' }}>
         {content}
-      </Link>
+      </a>
     );
   }
 
