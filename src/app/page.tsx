@@ -80,21 +80,31 @@ export default function Home() {
 
   // Banner carousel state
   const [currentBannerIdx, setCurrentBannerIdx] = useState(0);
-  // Natural aspect ratio (width / height) of each banner's media, keyed by banner id —
-  // lets the carousel size itself to the uploaded image/video instead of a fixed box.
-  const [bannerAspects, setBannerAspects] = useState<Record<number, number>>({});
-  const DEFAULT_BANNER_ASPECT = 21 / 9;
   const currentBanner = banners[currentBannerIdx];
-  const currentBannerAspect = currentBanner ? (bannerAspects[currentBanner.id] || DEFAULT_BANNER_ASPECT) : DEFAULT_BANNER_ASPECT;
+  // Full-size lightbox: opened by clicking a banner, shows the media at its real size
+  // with horizontal scroll/swipe (or arrow buttons) between ads.
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const lightboxTrackRef = useRef<HTMLDivElement>(null);
 
-  // Auto-slide logic
+  // Jump the lightbox track to whichever banner was showing when it was opened,
+  // and lock page scroll while it's up.
   useEffect(() => {
-    if (!banners || banners.length <= 1) return;
+    if (!lightboxOpen) return;
+    document.body.style.overflow = 'hidden';
+    const track = lightboxTrackRef.current;
+    if (track) track.scrollTo({ left: currentBannerIdx * track.clientWidth, behavior: 'auto' });
+    return () => { document.body.style.overflow = ''; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxOpen]);
+
+  // Auto-slide logic (paused while the lightbox is open)
+  useEffect(() => {
+    if (!banners || banners.length <= 1 || lightboxOpen) return;
     const interval = setInterval(() => {
       setCurrentBannerIdx(prev => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [banners]);
+  }, [banners, lightboxOpen]);
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -376,49 +386,44 @@ export default function Home() {
                 </h2>
               </div>
               
-              <div style={{
-                position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                background: '#0b0f14', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {/* Active slide — sized to the media's own aspect ratio (both width and
-                    height follow the upload's real shape, clamped to a pleasant height
-                    range) instead of a fixed full-width box, so nothing gets cropped or
-                    letterboxed. Same treatment for photos and videos. */}
+              <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                 {currentBanner && (
-                  <div key={currentBanner.id} style={{
-                    position: 'relative',
-                    height: 'clamp(240px, 34vw, 420px)',
-                    width: 'auto',
-                    maxWidth: '100%',
-                    aspectRatio: currentBannerAspect,
-                    overflow: 'hidden',
-                    transition: 'aspect-ratio 0.3s ease',
-                  }}>
+                  <div
+                    key={currentBanner.id}
+                    onClick={() => setLightboxOpen(true)}
+                    style={{ position: 'relative', height: '320px', background: '#111827', overflow: 'hidden', cursor: 'zoom-in' }}
+                  >
+                    {/* Blurred backdrop fills the box while the real image/video stays uncropped */}
+                    {currentBanner.ad_type === 'image' && (
+                      <img
+                        src={getStorageUrl(currentBanner.ad_media_url) || undefined}
+                        alt=""
+                        aria-hidden="true"
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.6)', transform: 'scale(1.1)' }}
+                      />
+                    )}
                     {currentBanner.ad_type === 'image' ? (
                       <img
                         src={getStorageUrl(currentBanner.ad_media_url) || undefined}
                         alt={currentBanner.ad_title || 'Iklan'}
-                        onLoad={e => {
-                          const { naturalWidth, naturalHeight } = e.currentTarget;
-                          if (naturalWidth && naturalHeight) {
-                            setBannerAspects(prev => ({ ...prev, [currentBanner.id]: naturalWidth / naturalHeight }));
-                          }
-                        }}
                         style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }}
                       />
                     ) : (
                       <video
                         src={getStorageUrl(currentBanner.ad_media_url) || undefined}
                         autoPlay loop muted playsInline
-                        onLoadedMetadata={e => {
-                          const { videoWidth, videoHeight } = e.currentTarget;
-                          if (videoWidth && videoHeight) {
-                            setBannerAspects(prev => ({ ...prev, [currentBanner.id]: videoWidth / videoHeight }));
-                          }
-                        }}
                         style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }}
                       />
                     )}
+
+                    {/* Hint that the banner can be opened full-size */}
+                    <div style={{
+                      position: 'absolute', top: '16px', right: '16px', width: '36px', height: '36px', borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', color: 'white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none',
+                    }}>
+                      <Icons.Search size={16} />
+                    </div>
 
                     {/* Overlay */}
                     <div style={{
@@ -448,7 +453,7 @@ export default function Home() {
                         </div>
 
                         {currentBanner.product_id && (
-                          <Link href={`/products/${currentBanner.product_id}`} style={{
+                          <Link href={`/products/${currentBanner.product_id}`} onClick={e => e.stopPropagation()} style={{
                             background: 'white', color: 'black', padding: '12px 24px',
                             borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700,
                             textDecoration: 'none', transition: 'transform 0.2s',
@@ -522,6 +527,105 @@ export default function Home() {
               </div>
             </div>
           </section>
+        )}
+
+        {/* ── Banner Lightbox: full-size view, scroll/swipe sideways between ads ── */}
+        {lightboxOpen && banners.length > 0 && (
+          <div
+            onClick={() => setLightboxOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 5000, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <button
+              onClick={() => setLightboxOpen(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+            >
+              <Icons.X size={22} />
+            </button>
+
+            {banners.length > 1 && (
+              <>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    const track = lightboxTrackRef.current;
+                    if (!track) return;
+                    const idx = Math.max(0, currentBannerIdx - 1);
+                    track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+                    setCurrentBannerIdx(idx);
+                  }}
+                  style={{ position: 'absolute', top: '50%', left: '16px', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                >
+                  <Icons.ChevronLeft size={26} />
+                </button>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    const track = lightboxTrackRef.current;
+                    if (!track) return;
+                    const idx = Math.min(banners.length - 1, currentBannerIdx + 1);
+                    track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+                    setCurrentBannerIdx(idx);
+                  }}
+                  style={{ position: 'absolute', top: '50%', right: '16px', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', borderRadius: '50%', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                >
+                  <Icons.ChevronRight size={26} />
+                </button>
+              </>
+            )}
+
+            {/* Horizontally scrollable/swipeable track — one full-size media per screen */}
+            <div
+              ref={lightboxTrackRef}
+              onClick={e => e.stopPropagation()}
+              onScroll={e => {
+                const track = e.currentTarget;
+                const idx = Math.round(track.scrollLeft / track.clientWidth);
+                if (idx !== currentBannerIdx) setCurrentBannerIdx(idx);
+              }}
+              className="lightbox-scroll-track"
+              style={{ display: 'flex', width: '100%', height: '100%', overflowX: 'auto', scrollSnapType: 'x mandatory' }}
+            >
+              {banners.map((banner, idx) => (
+                <div key={banner.id} style={{ flex: '0 0 100%', height: '100%', scrollSnapAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+                  {banner.ad_type === 'image' ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={getStorageUrl(banner.ad_media_url) || undefined}
+                      alt={banner.ad_title || 'Iklan'}
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }}
+                    />
+                  ) : (
+                    <video
+                      src={getStorageUrl(banner.ad_media_url) || undefined}
+                      controls autoPlay={idx === currentBannerIdx} muted playsInline
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {banners.length > 1 && (
+              <div style={{ position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
+                {banners.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={e => {
+                      e.stopPropagation();
+                      const track = lightboxTrackRef.current;
+                      if (track) track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+                      setCurrentBannerIdx(idx);
+                    }}
+                    style={{
+                      width: currentBannerIdx === idx ? '24px' : '8px', height: '8px', borderRadius: '4px',
+                      background: currentBannerIdx === idx ? 'white' : 'rgba(255,255,255,0.4)',
+                      border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s ease'
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* ── Kategori ─────────────────────────────────────────────── */}

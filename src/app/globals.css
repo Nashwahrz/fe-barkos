@@ -1,5 +1,13 @@
 @import 'leaflet/dist/leaflet.css';
 
+.lightbox-scroll-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.lightbox-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+
 :root {
   /* Teal Brand Colors (Startup Aesthetic) */
   --primary: #0D9488;
