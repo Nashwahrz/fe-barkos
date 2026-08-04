@@ -406,26 +406,26 @@ export default function AdminPromotions() {
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', maxWidth: '600px', width: '100%', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', maxWidth: '480px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
           >
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--foreground)' }}>Bukti Transfer Manual</div>
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--foreground)' }}>Bukti Transfer Manual</div>
               <button
                 onClick={() => setPreviewProof(null)}
-                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '34px', height: '34px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
               ><Icons.X size={18} /></button>
             </div>
 
-            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflow: 'auto', flex: '1 1 auto', minHeight: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={getStorageUrl(previewProof.manual_proof_path) || ''}
                 alt="Bukti transfer"
-                style={{ width: '100%', maxHeight: '450px', display: 'block', objectFit: 'contain' }}
+                style={{ maxWidth: '100%', display: 'block', objectFit: 'contain' }}
               />
             </div>
 
-            <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ padding: '1.1rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0, maxHeight: '35vh', overflowY: 'auto' }}>
               <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewProof.product?.nama_barang || '-'}</div>
               <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewProof.seller?.name || '-'}</div>
               <div><strong style={{ opacity: 0.6 }}>Nominal:</strong> Rp {Number(previewProof.amount_paid || 0).toLocaleString('id-ID')}</div>
