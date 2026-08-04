@@ -156,7 +156,7 @@ export default function AdminCategories() {
           </div>
         </header>
 
-        <div className="flex gap-8 items-start flex-wrap">
+        <div className="flex items-start flex-wrap" style={{ gap: '2rem' }}>
           
           {/* Table */}
           <div className="card" style={{ flex: '1 1 600px', padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
