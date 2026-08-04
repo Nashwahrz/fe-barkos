@@ -80,6 +80,12 @@ export default function Home() {
 
   // Banner carousel state
   const [currentBannerIdx, setCurrentBannerIdx] = useState(0);
+  // Natural aspect ratio (width / height) of each banner's media, keyed by banner id —
+  // lets the carousel size itself to the uploaded image/video instead of a fixed box.
+  const [bannerAspects, setBannerAspects] = useState<Record<number, number>>({});
+  const DEFAULT_BANNER_ASPECT = 21 / 9;
+  const currentBanner = banners[currentBannerIdx];
+  const currentBannerAspect = currentBanner ? (bannerAspects[currentBanner.id] || DEFAULT_BANNER_ASPECT) : DEFAULT_BANNER_ASPECT;
 
   // Auto-slide logic
   useEffect(() => {
@@ -371,81 +377,99 @@ export default function Home() {
               </div>
               
               <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                {/* Carousel Tracks */}
-                <div style={{
-                  display: 'flex',
-                  transition: 'transform 0.5s ease-in-out',
-                  transform: `translateX(-${currentBannerIdx * 100}%)`,
-                  height: '300px'
-                }}>
-                  {banners.map((banner) => (
-                    <div key={banner.id} style={{
-                      flex: '0 0 100%',
-                      height: '100%',
-                      position: 'relative',
-                      background: '#111827',
-                      overflow: 'hidden',
+                {/* Active slide — sized to the media's own aspect ratio (clamped so it
+                    never gets absurdly short/tall) instead of a fixed box, so uploads
+                    aren't cropped or letterboxed. */}
+                {currentBanner && (
+                  <div key={currentBanner.id} style={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: currentBannerAspect,
+                    maxHeight: '460px',
+                    minHeight: '220px',
+                    background: '#111827',
+                    overflow: 'hidden',
+                    transition: 'aspect-ratio 0.3s ease',
+                  }}>
+                    {/* Blurred backdrop fills any leftover space while the real image stays uncropped */}
+                    {currentBanner.ad_type === 'image' && (
+                      <img
+                        src={getStorageUrl(currentBanner.ad_media_url) || undefined}
+                        alt=""
+                        aria-hidden="true"
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.6)', transform: 'scale(1.1)' }}
+                      />
+                    )}
+                    {currentBanner.ad_type === 'image' ? (
+                      <img
+                        src={getStorageUrl(currentBanner.ad_media_url) || undefined}
+                        alt={currentBanner.ad_title || 'Iklan'}
+                        onLoad={e => {
+                          const { naturalWidth, naturalHeight } = e.currentTarget;
+                          if (naturalWidth && naturalHeight) {
+                            setBannerAspects(prev => ({ ...prev, [currentBanner.id]: naturalWidth / naturalHeight }));
+                          }
+                        }}
+                        style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <video
+                        src={getStorageUrl(currentBanner.ad_media_url) || undefined}
+                        autoPlay loop muted playsInline
+                        onLoadedMetadata={e => {
+                          const { videoWidth, videoHeight } = e.currentTarget;
+                          if (videoWidth && videoHeight) {
+                            setBannerAspects(prev => ({ ...prev, [currentBanner.id]: videoWidth / videoHeight }));
+                          }
+                        }}
+                        style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }}
+                      />
+                    )}
+
+                    {/* Overlay */}
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                      padding: '32px'
                     }}>
-                      {/* Blurred backdrop fills the box while the real image stays uncropped */}
-                      {banner.ad_type === 'image' && (
-                        <img
-                          src={getStorageUrl(banner.ad_media_url) || undefined}
-                          alt=""
-                          aria-hidden="true"
-                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.6)', transform: 'scale(1.1)' }}
-                        />
-                      )}
-                      {banner.ad_type === 'image' ? (
-                        <img src={getStorageUrl(banner.ad_media_url) || undefined} alt={banner.ad_title || 'Iklan'} style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }} />
-                      ) : (
-                        <video src={getStorageUrl(banner.ad_media_url) || undefined} autoPlay loop muted playsInline style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain' }} />
-                      )}
-                      
-                      {/* Overlay */}
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
-                        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-                        padding: '32px'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
-                          <div style={{ color: 'white' }}>
-                            <span style={{ 
-                              background: 'var(--primary)', color: 'white', padding: '6px 12px', 
-                              borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, 
-                              marginBottom: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px',
-                              letterSpacing: '0.05em'
-                            }}>
-                              <Icons.Sparkles size={14} /> IKLAN SPONSOR
-                            </span>
-                            <h3 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 8px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                              {banner.ad_title || banner.product_name || 'Promo Spesial!'}
-                            </h3>
-                            {banner.product_price && (
-                              <div style={{ fontSize: '1.25rem', fontWeight: 600, opacity: 0.9 }}>
-                                Rp {parseInt(banner.product_price).toLocaleString('id-ID')}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {banner.product_id && (
-                            <Link href={`/products/${banner.product_id}`} style={{
-                              background: 'white', color: 'black', padding: '12px 24px', 
-                              borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700, 
-                              textDecoration: 'none', transition: 'transform 0.2s',
-                              display: 'flex', alignItems: 'center', gap: '8px'
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                              Lihat Detail <Icons.ArrowRight size={18} />
-                            </Link>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
+                        <div style={{ color: 'white' }}>
+                          <span style={{
+                            background: 'var(--primary)', color: 'white', padding: '6px 12px',
+                            borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700,
+                            marginBottom: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px',
+                            letterSpacing: '0.05em'
+                          }}>
+                            <Icons.Sparkles size={14} /> IKLAN SPONSOR
+                          </span>
+                          <h3 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '0 0 8px 0', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                            {currentBanner.ad_title || currentBanner.product_name || 'Promo Spesial!'}
+                          </h3>
+                          {currentBanner.product_price && (
+                            <div style={{ fontSize: '1.25rem', fontWeight: 600, opacity: 0.9 }}>
+                              Rp {parseInt(currentBanner.product_price).toLocaleString('id-ID')}
+                            </div>
                           )}
                         </div>
+
+                        {currentBanner.product_id && (
+                          <Link href={`/products/${currentBanner.product_id}`} style={{
+                            background: 'white', color: 'black', padding: '12px 24px',
+                            borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700,
+                            textDecoration: 'none', transition: 'transform 0.2s',
+                            display: 'flex', alignItems: 'center', gap: '8px'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                          >
+                            Lihat Detail <Icons.ArrowRight size={18} />
+                          </Link>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
 
                 {/* Navigation Buttons (Only if more than 1) */}
                 {banners.length > 1 && (
