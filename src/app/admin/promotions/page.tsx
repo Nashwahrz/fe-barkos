@@ -295,7 +295,7 @@ export default function AdminPromotions() {
               style={{
                 position: 'relative', padding: '1.4rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1.1rem',
                 border: '1px solid var(--border)', background: 'var(--card)', borderRadius: '18px', overflow: 'hidden',
-                transition: 'transform 0.18s ease, box-shadow 0.18s ease', boxShadow: 'var(--shadow-sm)',
+                transition: 'transform 0.18s ease, box-shadow 0.18s ease', boxShadow: 'var(--shadow-sm)', minWidth: 0,
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
