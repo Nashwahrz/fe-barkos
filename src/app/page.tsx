@@ -418,11 +418,12 @@ export default function Home() {
 
                     {/* Hint that the banner can be opened full-size */}
                     <div style={{
-                      position: 'absolute', top: '16px', right: '16px', width: '36px', height: '36px', borderRadius: '50%',
+                      position: 'absolute', top: '16px', right: '16px', padding: '7px 14px', borderRadius: '999px',
                       background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', color: 'white',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none',
+                      display: 'flex', alignItems: 'center', gap: '6px', pointerEvents: 'none',
+                      fontSize: '0.78rem', fontWeight: 600,
                     }}>
-                      <Icons.Search size={16} />
+                      <Icons.Search size={14} /> Klik untuk lihat ukuran penuh
                     </div>
 
                     {/* Overlay */}
