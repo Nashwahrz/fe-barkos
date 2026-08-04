@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { fetchApi, getStorageUrl, swrFetcher } from '@/lib/api';
@@ -209,6 +210,12 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
   return (
     <div className="container" style={{ paddingTop: '3rem', paddingBottom: '5rem', maxWidth: '1100px' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <Link href="/products" style={{ color: 'var(--primary)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+          <Icons.ArrowLeft size={16} /> Kembali ke Katalog
+        </Link>
+      </div>
+
       <div className="product-detail-layout">
 
         {/* ── Left: Image & Map ────────────────────────── */}
