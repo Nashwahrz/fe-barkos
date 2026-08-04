@@ -9,7 +9,6 @@ import { Icons } from '@/components/Icons';
 import Script from 'next/script';
 import { paymentSettingsApi } from '@/services/api/paymentSettings.api';
 import { PaymentSettings } from '@/types/paymentSettings';
-import AdImageCropModal from '@/components/AdImageCropModal';
 
 declare global {
   interface Window {
@@ -52,33 +51,19 @@ export default function SellerPromotions() {
   const [mediaSource, setMediaSource] = useState<'file' | 'url'>('file');
   const [adMediaFile, setAdMediaFile] = useState<File | null>(null);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string>('');
-  const [cropTargetFile, setCropTargetFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (adType === 'image') {
-      // Let the seller crop the image to the banner's aspect ratio before it's used.
-      setCropTargetFile(file);
-    } else {
-      setAdMediaFile(file);
-      if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
-      const url = URL.createObjectURL(file);
-      setFilePreviewUrl(url);
-      setPreviewError(false);
-    }
-    // Allow re-selecting the same file later (e.g. after cancelling crop)
-    e.target.value = '';
-  };
-
-  const handleCropConfirm = (croppedFile: File) => {
-    setAdMediaFile(croppedFile);
+    // Uploaded as-is, no forced crop/aspect ratio — the ad shows at its natural size.
+    setAdMediaFile(file);
     if (filePreviewUrl) URL.revokeObjectURL(filePreviewUrl);
-    const url = URL.createObjectURL(croppedFile);
+    const url = URL.createObjectURL(file);
     setFilePreviewUrl(url);
     setPreviewError(false);
-    setCropTargetFile(null);
+    // Allow re-selecting the same file later
+    e.target.value = '';
   };
 
   useEffect(() => {
@@ -484,7 +469,7 @@ export default function SellerPromotions() {
                             src={mediaSource === 'file' ? filePreviewUrl : adMediaUrl}
                             alt="Preview iklan"
                             onError={() => setPreviewError(true)}
-                            style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', display: 'block' }}
+                            style={{ width: '100%', maxHeight: '260px', objectFit: 'contain', display: 'block' }}
                           />
                         )
                       ) : (
@@ -502,7 +487,7 @@ export default function SellerPromotions() {
                   )}
 
                   <div style={{ padding: '0.75rem 1rem', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '0.78rem', color: '#92400e' }}>
-                    <strong>💡 Tips:</strong> Anda dapat mengunggah file media dari perangkat Anda atau menggunakan URL eksternal. Untuk gambar disarankan rasio 16:9 (misal 1280×720px). Untuk video, format MP4 paling kompatibel. Iklan ini akan tampil di halaman utama.
+                    <strong>💡 Tips:</strong> Anda dapat mengunggah file media dari perangkat Anda atau menggunakan URL eksternal. Foto/video akan ditampilkan apa adanya tanpa dipotong, jadi tidak perlu mengatur rasio tertentu. Untuk video, format MP4 paling kompatibel. Iklan ini akan tampil di halaman utama.
                   </div>
                 </div>
               )}
@@ -796,15 +781,6 @@ export default function SellerPromotions() {
 
       </div>
     </div>
-
-    {cropTargetFile && (
-      <AdImageCropModal
-        file={cropTargetFile}
-        aspect={16 / 9}
-        onCancel={() => setCropTargetFile(null)}
-        onConfirm={handleCropConfirm}
-      />
-    )}
   </>
   );
 }
