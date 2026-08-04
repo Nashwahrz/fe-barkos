@@ -12,6 +12,9 @@ import { useTablePagination } from '@/hooks/useTablePagination';
 import { Pagination } from '@/components/Pagination';
 import { Badge } from '@/components/ui/Badge';
 import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
+import { Modal } from '@/components/ui/Modal';
+import { userApi } from '@/services/api/user.api';
+import { UserDetail } from '@/types/user';
 
 interface AdminUser {
   id: number;
@@ -22,12 +25,19 @@ interface AdminUser {
   foto?: string | null;
 }
 
+function formatDateTime(value: string | null): string {
+  if (!value) return 'Belum pernah';
+  return new Date(value).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 export default function AdminUsers() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const {
     searchQuery, setSearchQuery,
@@ -70,6 +80,18 @@ export default function AdminUsers() {
     }
   }
 
+  async function handleViewDetail(id: number) {
+    setDetailLoading(true);
+    try {
+      const res = await userApi.getDetail(id);
+      setSelectedUser(res.data);
+    } catch (err) {
+      alert('Gagal memuat aktivitas user.');
+    } finally {
+      setDetailLoading(false);
+    }
+  }
+
   async function handleDelete(id: number) {
     if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data terkait akan dihapus permanen.')) return;
     
@@ -94,7 +116,12 @@ export default function AdminUsers() {
   const columns: DataTableColumn<AdminUser>[] = [
     {
       key: 'user', header: 'User', render: u => (
-        <div className="flex items-center gap-4">
+        <div
+          className="flex items-center gap-4"
+          onClick={() => handleViewDetail(u.id)}
+          style={{ cursor: 'pointer' }}
+          title="Lihat aktivitas user"
+        >
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
             {u.foto ? (
               <img src={getStorageUrl(u.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -189,6 +216,67 @@ export default function AdminUsers() {
           />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
+
+        <Modal open={!!selectedUser || detailLoading} onClose={() => setSelectedUser(null)} title="Aktivitas User" width={480}>
+          {detailLoading && !selectedUser ? (
+            <div className="flex items-center justify-center" style={{ padding: '2rem' }}>
+              <Icons.Loader size={24} />
+            </div>
+          ) : selectedUser ? (
+            <div className="flex-col" style={{ gap: '1.25rem' }}>
+              <div className="flex items-center gap-4">
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0 }}>
+                  {selectedUser.avatar ? (
+                    <img src={getStorageUrl(selectedUser.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    selectedUser.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.name}</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>{selectedUser.email}</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.9rem' }}>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Status</div>
+                  <div style={{ fontWeight: 700, color: selectedUser.is_online ? 'var(--success)' : 'var(--foreground)' }}>
+                    {selectedUser.is_online ? 'Online sekarang' : 'Offline'}
+                  </div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Terakhir Aktif</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{formatDateTime(selectedUser.last_active_at)}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Bergabung</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{formatDateTime(selectedUser.created_at)}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Produk Diunggah</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.products_count}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Produk Terjual</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.products_sold_count}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Transaksi Selesai (Penjual)</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_completed_count}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Total Transaksi (Penjual)</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_as_seller_count}</div>
+                </div>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--muted-foreground)', fontSize: '0.8rem', marginBottom: '2px' }}>Transaksi Sebagai Pembeli</div>
+                  <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{selectedUser.activity.transactions_as_buyer_count}</div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
     </AdminLayout>
   );
 }
