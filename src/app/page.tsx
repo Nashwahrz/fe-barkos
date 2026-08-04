@@ -68,8 +68,12 @@ export default function Home() {
 
   const allProducts: any[] = data?.data || data || [];
   const promotedProducts = allProducts.filter((p: any) => p.is_promoted);
-  // Remove the filter so 'Produk Terbaru' shows all products (including promoted ones)
-  const products = allProducts;
+  // 'Produk Terbaru' shows all products (including promoted ones), sorted strictly by
+  // creation date — the API's default order puts promoted items first, which isn't
+  // "terbaru" (newest), so re-sort here rather than trusting the fetch order.
+  const products = [...allProducts].sort(
+    (a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   const dbCategories: any[] = catData?.data || catData || [];
   const banners: any[] = bannerData?.data || [];
