@@ -16,7 +16,6 @@ import { DataTable, DataTableColumn } from '@/components/ui/DataTable';
 interface Category {
   id: number;
   name: string;
-  description?: string | null;
 }
 
 export default function AdminCategories() {
@@ -27,7 +26,6 @@ export default function AdminCategories() {
   
   // Form State
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -35,7 +33,7 @@ export default function AdminCategories() {
     searchQuery, setSearchQuery,
     currentPage, setCurrentPage,
     totalPages, paginatedData, totalItems
-  } = useTablePagination(categories, ['name', 'description'], 10);
+  } = useTablePagination(categories, ['name'], 10);
 
   useEffect(() => {
     if (!authLoading) {
@@ -65,16 +63,15 @@ export default function AdminCategories() {
       if (editingId) {
         await fetchApi(`/admin/categories/${editingId}`, {
           method: 'PUT',
-          body: JSON.stringify({ name, description })
+          body: JSON.stringify({ name })
         });
       } else {
         await fetchApi('/admin/categories', {
           method: 'POST',
-          body: JSON.stringify({ name, description })
+          body: JSON.stringify({ name })
         });
       }
       setName('');
-      setDescription('');
       setEditingId(null);
       await loadCategories();
     } catch (err: any) {
@@ -87,13 +84,11 @@ export default function AdminCategories() {
   function handleEdit(cat: any) {
     setEditingId(cat.id);
     setName(cat.name);
-    setDescription(cat.description || '');
   }
 
   function handleCancelEdit() {
     setEditingId(null);
     setName('');
-    setDescription('');
   }
 
   async function handleDelete(id: number) {
@@ -115,7 +110,6 @@ export default function AdminCategories() {
 
   const columns: DataTableColumn<Category>[] = [
     { key: 'name', header: 'Kategori', render: c => <span style={{ fontWeight: 700, color: 'var(--foreground)' }}>{c.name}</span> },
-    { key: 'description', header: 'Deskripsi', render: c => <span style={{ color: 'var(--foreground)', opacity: 0.7 }}>{c.description || '-'}</span> },
     {
       key: 'aksi', header: 'Aksi', align: 'right', render: c => (
         <div style={{ display: 'inline-flex', gap: '8px' }}>
@@ -182,23 +176,13 @@ export default function AdminCategories() {
               {editingId ? 'Edit Kategori' : 'Tambah Kategori'}
             </h2>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <Input 
+              <Input
                 label="Nama Kategori"
-                type="text" 
-                value={name} 
-                onChange={e => setName(e.target.value)} 
-                required 
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
               />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--foreground)' }}>Deskripsi (Opsional)</label>
-                <textarea 
-                  className="input-field" 
-                  value={description} 
-                  onChange={e => setDescription(e.target.value)} 
-                  rows={4} 
-                  style={{ height: 'auto', resize: 'vertical' }}
-                />
-              </div>
               <div className="flex gap-3" style={{ marginTop: '0.5rem' }}>
                 <Button type="submit" variant="primary" style={{ flex: 1 }} disabled={actionLoading}>
                   {actionLoading ? 'Menyimpan...' : 'Simpan'}
