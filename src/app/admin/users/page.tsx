@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, CSSProperties } from 'react';
+import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
@@ -30,21 +31,36 @@ function formatDateTime(value: string | null): string {
   return new Date(value).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-function StatTile({ icon, label, value, small }: { icon: ReactNode; label: string; value: string | number; small?: boolean }) {
-  return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', gap: '0.6rem', height: '100%',
-      padding: '0.85rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)',
-    }}>
-      <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        {icon}
+function StatTile({ icon, label, value, small, href }: { icon: ReactNode; label: string; value: string | number; small?: boolean; href?: string }) {
+  const content = (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          {icon}
+        </div>
+        {href && <Icons.ArrowRight size={14} color="var(--muted-foreground)" />}
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '2px', lineHeight: 1.3 }}>{label}</div>
         <div style={{ fontWeight: 800, fontSize: small ? '0.85rem' : '1.05rem', color: 'var(--foreground)', lineHeight: 1.3 }}>{value}</div>
       </div>
-    </div>
+    </>
   );
+
+  const style: CSSProperties = {
+    display: 'flex', flexDirection: 'column', gap: '0.6rem', height: '100%',
+    padding: '0.85rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)',
+  };
+
+  if (href) {
+    return (
+      <Link href={href} className="stat-tile-link" style={{ ...style, textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s' }}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div style={style}>{content}</div>;
 }
 
 export default function AdminUsers() {
@@ -303,7 +319,12 @@ export default function AdminUsers() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: '1fr', gap: '0.75rem' }}>
                   <StatTile icon={<Icons.UserPlus size={16} color="var(--primary)" />} label="Bergabung" value={formatDateTime(selectedUser.created_at)} small />
-                  <StatTile icon={<Icons.Package size={16} color="var(--primary)" />} label="Produk Diunggah" value={selectedUser.activity.products_count} />
+                  <StatTile
+                    icon={<Icons.Package size={16} color="var(--primary)" />}
+                    label="Produk Diunggah"
+                    value={selectedUser.activity.products_count}
+                    href={`/admin/products?user_id=${selectedUser.id}`}
+                  />
                   <StatTile icon={<Icons.CheckCircle size={16} color="var(--success)" />} label="Produk Terjual" value={selectedUser.activity.products_sold_count} />
                   <StatTile icon={<Icons.Handshake size={16} color="var(--success)" />} label="Transaksi Selesai" value={selectedUser.activity.transactions_completed_count} />
                   <StatTile icon={<Icons.TrendingUp size={16} color="var(--primary)" />} label="Total Sbg Penjual" value={selectedUser.activity.transactions_as_seller_count} />

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { USER_ROLES } from '@/lib/constants';
 import AdminLayout from '@/components/AdminLayout';
 import { Icons } from '@/components/Icons';
@@ -19,22 +19,46 @@ interface AdminProduct {
   harga: number | string;
   foto?: string | null;
   status_terjual: boolean;
-  user?: { name: string };
+  user?: { id: number; name: string };
   category?: { name: string };
 }
 
-export default function AdminProducts() {
+function AdminProductsContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const userIdFilter = searchParams.get('user_id');
+
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const filteredProducts = useMemo(() => {
+    if (!userIdFilter) return products;
+    return products.filter(p => String(p.user?.id) === String(userIdFilter));
+  }, [products, userIdFilter]);
+
+  const filteredSeller = useMemo(() => {
+    if (!userIdFilter) return null;
+    return products.find(p => String(p.user?.id) === String(userIdFilter))?.user ?? null;
+  }, [products, userIdFilter]);
+
+  const sellers = useMemo(() => {
+    const map = new Map<number, string>();
+    products.forEach(p => { if (p.user?.id) map.set(p.user.id, p.user.name); });
+    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [products]);
 
   const {
     searchQuery, setSearchQuery,
     currentPage, setCurrentPage,
     totalPages, paginatedData, totalItems
-  } = useTablePagination(products, ['nama_barang', 'user.name', 'category.name', 'deskripsi'], 10);
+  } = useTablePagination(filteredProducts, ['nama_barang', 'user.name', 'category.name', 'deskripsi'], 10);
+
+  function handleSellerFilterChange(id: string) {
+    setCurrentPage(1);
+    router.push(id ? `/admin/products?user_id=${id}` : '/admin/products');
+  }
 
   useEffect(() => {
     if (!authLoading) {
@@ -150,19 +174,47 @@ export default function AdminProducts() {
               <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
                 <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
               </div>
-              <input 
-                type="text" 
-                placeholder="Cari produk..." 
+              <input
+                type="text"
+                placeholder="Cari produk..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0 }}
               />
             </div>
+            <select
+              value={userIdFilter || ''}
+              onChange={(e) => handleSellerFilterChange(e.target.value)}
+              style={{ padding: '0.6rem 1rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', fontSize: '0.9rem', margin: 0, cursor: 'pointer' }}
+            >
+              <option value="">Semua Penjual</option>
+              {sellers.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
             <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
               Total: {totalItems} Produk
             </div>
           </div>
         </header>
+
+        {userIdFilter && (
+          <div
+            className="flex items-center gap-3"
+            style={{ marginBottom: '1.5rem', padding: '0.75rem 1.1rem', borderRadius: '12px', background: 'rgba(13, 148, 136, 0.08)', border: '1px solid rgba(13, 148, 136, 0.25)' }}
+          >
+            <Icons.Package size={16} color="var(--primary)" />
+            <span style={{ fontSize: '0.88rem', color: 'var(--foreground)' }}>
+              Menampilkan produk milik <strong>{filteredSeller?.name || `User #${userIdFilter}`}</strong>
+            </span>
+            <button
+              onClick={() => handleSellerFilterChange('')}
+              style={{ marginLeft: 'auto', fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}
+            >
+              Hapus Filter &times;
+            </button>
+          </div>
+        )}
 
         <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
           <DataTable<AdminProduct>
@@ -175,5 +227,17 @@ export default function AdminProducts() {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
     </AdminLayout>
+  );
+}
+
+export default function AdminProducts() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 70px)', gap: '12px', color: 'var(--foreground)', opacity: 0.5 }}>
+        <Icons.Loader size={32} />
+      </div>
+    }>
+      <AdminProductsContent />
+    </Suspense>
   );
 }
