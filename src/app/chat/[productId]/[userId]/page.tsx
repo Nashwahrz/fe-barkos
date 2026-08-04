@@ -551,11 +551,11 @@ export default function ChatDetailPage() {
   };
 
   return (
-    <div className="chat-container-mobile" style={{ display: 'flex', flexDirection: 'column', background: '#f0f2f1' }}>
-      
+    <div className="chat-container-mobile" style={{ display: 'flex', flexDirection: 'column', background: 'var(--background)' }}>
+
       {/* Chat Header */}
-      <div style={{ padding: '0.8rem 1.5rem', background: 'white', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+      <div style={{ padding: '0.8rem 1.5rem', background: 'var(--card)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
           <Icons.ArrowLeft size={24} />
         </button>
         <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -567,13 +567,13 @@ export default function ChatDetailPage() {
             )}
           </div>
           {otherUser?.is_online && (
-            <span style={{ position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e', border: '2px solid white' }} />
+            <span style={{ position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--success)', border: '2px solid var(--card)' }} />
           )}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#111827', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
+          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--foreground)', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
           {otherUser && (
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: otherUser.is_online ? '#16a34a' : '#9ca3af', marginTop: '1px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: otherUser.is_online ? 'var(--success)' : 'var(--muted-foreground)', marginTop: '1px' }}>
               {otherUser.is_online ? 'Online' : formatLastSeen(otherUser.last_active_at)}
             </div>
           )}
@@ -582,7 +582,7 @@ export default function ChatDetailPage() {
           <button
             onClick={handleDeleteConversation}
             title="Hapus Percakapan"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}
           >
             <Icons.Trash2 size={20} />
           </button>
@@ -595,33 +595,33 @@ export default function ChatDetailPage() {
           href={`/products/${product.id}`}
           style={{
             display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.75rem 1.5rem',
-            background: 'white', borderBottom: '1px solid var(--border)', textDecoration: 'none',
+            background: 'var(--card)', borderBottom: '1px solid var(--border)', textDecoration: 'none',
             boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
           }}
         >
-          <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', background: '#f3f4f6', flexShrink: 0, border: '1px solid var(--border)' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', background: 'var(--input)', flexShrink: 0, border: '1px solid var(--border)' }}>
             {product.foto ? (
               <img src={getStorageUrl(product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Icons.Package size={20} color="#9ca3af" />
+                <Icons.Package size={20} color="var(--muted-foreground)" />
               </div>
             )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {product.nama_barang}
             </div>
             <div style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--primary)', marginTop: '2px' }}>
               Rp {Number(product.harga).toLocaleString('id-ID')}
               {product.status_terjual && (
-                <span style={{ marginLeft: '8px', fontSize: '0.68rem', fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: '999px' }}>
+                <span style={{ marginLeft: '8px', fontSize: '0.68rem', fontWeight: 700, color: 'var(--danger)', background: 'rgba(220,38,38,0.1)', padding: '2px 8px', borderRadius: '999px' }}>
                   TERJUAL
                 </span>
               )}
             </div>
           </div>
-          <Icons.ChevronRight size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+          <Icons.ChevronRight size={18} color="var(--muted-foreground)" style={{ flexShrink: 0 }} />
         </Link>
       )}
 
@@ -630,9 +630,9 @@ export default function ChatDetailPage() {
         {loading || authLoading ? (
           <div style={{ margin: 'auto', opacity: 0.5, fontWeight: 600 }}>Memuat percakapan...</div>
         ) : messages.length === 0 ? (
-          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.6, background: 'white', padding: '2rem 3rem', borderRadius: '1.5rem', boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+          <div style={{ margin: 'auto', textAlign: 'center', opacity: 0.6, background: 'var(--card)', padding: '2rem 3rem', borderRadius: '1.5rem', boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}><Icons.MessageCircle size={48} color="var(--primary)" /></div>
-            <h3 style={{ fontWeight: 800, color: '#111827', marginBottom: '0.5rem' }}>Say Hello!</h3>
+            <h3 style={{ fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.5rem' }}>Say Hello!</h3>
             <p style={{ fontSize: '0.9rem' }}>Mulai obrolan dengan {otherUser?.name || 'penjual'}</p>
           </div>
         ) : (
@@ -673,8 +673,8 @@ export default function ChatDetailPage() {
                   }}
                 >
                 <div style={{
-                  background: isMe ? 'var(--primary)' : 'white',
-                  color: isMe ? 'white' : '#111827',
+                  background: isMe ? 'var(--primary)' : 'var(--card)',
+                  color: isMe ? 'white' : 'var(--foreground)',
                   padding: '0.7rem 1rem',
                   borderRadius: '1.25rem',
                   borderTopRightRadius: isMe ? '4px' : '1.25rem',
@@ -685,7 +685,7 @@ export default function ChatDetailPage() {
                 }}>
                   {msg.reply_to && (
                     <div style={{
-                      background: isMe ? 'rgba(255,255,255,0.15)' : '#f3f4f6',
+                      background: isMe ? 'rgba(255,255,255,0.15)' : 'var(--input)',
                       borderLeft: `3px solid ${isMe ? 'rgba(255,255,255,0.6)' : 'var(--primary)'}`,
                       borderRadius: '6px',
                       padding: '0.4rem 0.6rem',
@@ -788,7 +788,7 @@ export default function ChatDetailPage() {
                           {bankAccounts && bankAccounts.length > 0 ? (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
                               {bankAccounts.map((acc: any) => (
-                                <div key={acc.id} style={{ background: isMe ? 'rgba(255,255,255,0.1)' : '#f9fafb', padding: '8px', borderRadius: '6px', border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid #e5e7eb' }}>
+                                <div key={acc.id} style={{ background: isMe ? 'rgba(255,255,255,0.1)' : 'var(--input)', padding: '8px', borderRadius: '6px', border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)' }}>
                                   <div style={{ fontWeight: 700, fontSize: '0.8rem' }}>{acc.bank_name}</div>
                                   <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', fontWeight: 700 }}>{acc.account_number}</div>
                                   <div style={{ fontSize: '0.7rem', opacity: 0.8 }}>a.n. {acc.account_name}</div>
@@ -818,7 +818,7 @@ export default function ChatDetailPage() {
                     justifyContent: 'flex-end', 
                     alignItems: 'center', 
                     gap: '4px',
-                    color: isMe ? 'rgba(255,255,255,0.9)' : '#9ca3af'
+                    color: isMe ? 'rgba(255,255,255,0.9)' : 'var(--muted-foreground)'
                   }}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     {isMe && !msg.is_optimistic && <span style={{ color: msg.is_read ? '#4ade80' : 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center' }}><Icons.CheckCheck size={14} /></span>}
@@ -834,21 +834,21 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Input Area */}
-      <div style={{ background: 'white', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
+      <div style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
 
         {isChatClosed ? (
           isOrderCancelled ? (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#991b1b' }}>
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--danger)' }}>
               <Icons.X size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan ini telah dibatalkan. Sesi chat ini telah berakhir.</span>
             </div>
           ) : activeOrder?.status === 'completed' ? (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--success)' }}>
               <Icons.CheckCheck size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan telah selesai. Sesi chat ini telah berakhir.</span>
             </div>
           ) : (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#374151' }}>
+            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--foreground)' }}>
               <Icons.Package size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Produk ini sudah terjual. Sesi chat ini telah berakhir.</span>
             </div>
@@ -856,7 +856,7 @@ export default function ChatDetailPage() {
         ) : (
         <>
         {isExpired && (
-          <div style={{ margin: '1rem 1.5rem 0', padding: '0.85rem 1rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#6b7280' }}>
+          <div style={{ margin: '1rem 1.5rem 0', padding: '0.85rem 1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--muted-foreground)' }}>
             <Icons.Clock size={18} />
             <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Chat ini sempat tidak aktif selama {CHAT_EXPIRY_DAYS} hari. Kirim pesan untuk melanjutkan obrolan.</span>
           </div>
@@ -879,11 +879,11 @@ export default function ChatDetailPage() {
                 whiteSpace: 'nowrap',
                 padding: '6px 14px',
                 borderRadius: '16px',
-                background: '#f3f4f6',
-                border: '1px solid #e5e7eb',
+                background: 'var(--input)',
+                border: '1px solid var(--border)',
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                color: '#4b5563',
+                color: 'var(--muted-foreground)',
                 cursor: 'pointer',
                 transition: 'all 0.1s'
               }}
@@ -895,14 +895,14 @@ export default function ChatDetailPage() {
 
         {/* Action Toolbar */}
         <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 0', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button onClick={handleSendLocation} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: '#4b5563', cursor: 'pointer' }}>
+          <button onClick={handleSendLocation} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)', cursor: 'pointer' }}>
             <Icons.MapPin size={14} color="var(--primary)" /> Kirim Lokasi
           </button>
-          <button onClick={handleRequestPhone} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: '#4b5563', cursor: 'pointer' }}>
+          <button onClick={handleRequestPhone} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)', cursor: 'pointer' }}>
             <Icons.PhoneCall size={14} color="#f59e0b" /> Minta No WA
           </button>
           {activeOrder && (
-            <button onClick={handleShareOrder} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: '#4b5563', cursor: 'pointer' }}>
+            <button onClick={handleShareOrder} disabled={sending} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)', cursor: 'pointer' }}>
               <Icons.Package size={14} color="var(--primary)" /> Bagikan Pesanan
             </button>
           )}
@@ -910,16 +910,16 @@ export default function ChatDetailPage() {
 
         {replyingTo && (
           <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0.75rem 1.5rem 0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f3f4f6', borderLeft: '3px solid var(--primary)', borderRadius: '8px', padding: '0.5rem 0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--input)', borderLeft: '3px solid var(--primary)', borderRadius: '8px', padding: '0.5rem 0.75rem' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--primary)' }}>
                   Membalas {replyingTo.sender?.id === user?.id ? 'diri sendiri' : (replyingTo.sender?.name || otherUser?.name || 'pengguna')}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#4b5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {getMessagePreview(replyingTo.message)}
                 </div>
               </div>
-              <button onClick={() => setReplyingTo(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center', padding: '4px' }}>
+              <button onClick={() => setReplyingTo(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)', display: 'flex', alignItems: 'center', padding: '4px' }}>
                 <Icons.X size={18} />
               </button>
             </div>
@@ -930,7 +930,7 @@ export default function ChatDetailPage() {
           <input
             type="text"
             className="input-field"
-            style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: '#f3f4f6', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }}
+            style={{ flex: 1, borderRadius: '28px', padding: '0.8rem 1.5rem', background: 'var(--input)', color: 'var(--foreground)', border: '1px solid transparent', outline: 'none', fontSize: '0.95rem' }}
             placeholder="Tulis pesan..."
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
@@ -956,7 +956,7 @@ export default function ChatDetailPage() {
         const replyBtn = (
           <button
             onClick={() => { setReplyingTo(contextMenuMsg); setContextMenuMsg(null); setContextMenuPos(null); }}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: '#111827', cursor: 'pointer', whiteSpace: 'nowrap' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: 'var(--foreground)', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             <Icons.Reply size={isDesktop ? 16 : 20} /> Balas
           </button>
@@ -964,7 +964,7 @@ export default function ChatDetailPage() {
         const deleteBtn = canDelete && (
           <button
             onClick={() => { const m = contextMenuMsg; setContextMenuMsg(null); setContextMenuPos(null); handleDeleteMessage(m); }}
-            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', borderTop: isDesktop ? '1px solid var(--border)' : '1px solid #f3f4f6', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: '#dc2626', cursor: 'pointer', whiteSpace: 'nowrap' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: isDesktop ? '0.6rem 1rem' : '1rem 1.5rem', background: 'none', border: 'none', borderTop: '1px solid var(--border)', textAlign: 'left', fontSize: isDesktop ? '0.9rem' : '1rem', fontWeight: 600, color: 'var(--danger)', cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             <Icons.Trash2 size={isDesktop ? 16 : 20} /> Hapus
           </button>
@@ -983,7 +983,7 @@ export default function ChatDetailPage() {
                   position: 'fixed',
                   left: Math.min(contextMenuPos.x, window.innerWidth - 170),
                   top: Math.min(contextMenuPos.y, window.innerHeight - 110),
-                  background: 'white', borderRadius: '10px', border: '1px solid var(--border)',
+                  background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--border)',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.15)', overflow: 'hidden', minWidth: '150px', display: 'flex', flexDirection: 'column'
                 }}
               >
@@ -993,13 +993,13 @@ export default function ChatDetailPage() {
             ) : (
               <div
                 onClick={(e) => e.stopPropagation()}
-                style={{ background: 'white', width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column' }}
+                style={{ background: 'var(--card)', width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px))', display: 'flex', flexDirection: 'column' }}
               >
                 {replyBtn}
                 {deleteBtn}
                 <button
                   onClick={() => { setContextMenuMsg(null); setContextMenuPos(null); }}
-                  style={{ marginTop: '4px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '8px solid #f9fafb', textAlign: 'center', fontSize: '0.95rem', fontWeight: 700, color: '#6b7280', cursor: 'pointer' }}
+                  style={{ marginTop: '4px', padding: '1rem 1.5rem', background: 'none', border: 'none', borderTop: '8px solid var(--input)', textAlign: 'center', fontSize: '0.95rem', fontWeight: 700, color: 'var(--muted-foreground)', cursor: 'pointer' }}
                 >
                   Batal
                 </button>
@@ -1012,24 +1012,24 @@ export default function ChatDetailPage() {
       {/* Upload Proof Modal */}
       {showUploadModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
-          <div style={{ background: 'white', borderRadius: '16px', width: '100%', maxWidth: '400px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+          <div style={{ background: 'var(--card)', borderRadius: '16px', width: '100%', maxWidth: '400px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', margin: 0 }}>Upload Bukti Pembayaran</h3>
-              <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}>
+              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', margin: 0, color: 'var(--foreground)' }}>Upload Bukti Pembayaran</h3>
+              <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-foreground)' }}>
                 <Icons.X size={20} />
               </button>
             </div>
-            
+
             <div style={{ padding: '1.5rem', flex: 1, overflowY: 'auto' }}>
-              <p style={{ fontSize: '0.9rem', color: '#6b7280', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.9rem', color: 'var(--muted-foreground)', marginBottom: '1.5rem' }}>
                 Pesanan berhasil dibuat! Silakan upload foto atau *screenshot* bukti transfer Anda untuk memverifikasi pembayaran.
               </p>
 
               <form onSubmit={handleUploadProof} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <label style={{ 
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', 
-                  cursor: 'pointer', padding: '2rem 1.5rem', border: '2px dashed var(--primary)', borderRadius: '12px', 
-                  background: '#f0fdf4', color: 'var(--primary)', textAlign: 'center', transition: 'all 0.2s'
+                <label style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  cursor: 'pointer', padding: '2rem 1.5rem', border: '2px dashed var(--primary)', borderRadius: '12px',
+                  background: 'var(--primary-light)', color: 'var(--primary)', textAlign: 'center', transition: 'all 0.2s'
                 }}>
                   <Icons.Upload size={32} />
                   <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>
