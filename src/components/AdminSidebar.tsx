@@ -47,20 +47,28 @@ const menuGroups: MenuGroup[] = [
   },
 ];
 
-export default function AdminSidebar({ currentPath }: { currentPath: string }) {
+interface AdminSidebarProps {
+  currentPath: string;
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function AdminSidebar({ currentPath, mobileOpen = false, onClose }: AdminSidebarProps) {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="admin-sidebar" style={{
-      width: '264px',
-      minWidth: '264px',
-      borderRight: '1px solid var(--border)',
-      padding: '1.5rem 1rem',
-      background: 'var(--card)',
-      display: 'flex',
-      alignSelf: 'stretch',
-    }}>
-      <div style={{
+    <>
+      {mobileOpen && <div className="admin-sidebar-backdrop" onClick={onClose} />}
+      <aside className={`admin-sidebar${mobileOpen ? ' admin-sidebar-open' : ''}`} style={{
+        width: '264px',
+        minWidth: '264px',
+        borderRight: '1px solid var(--border)',
+        padding: '1.5rem 1rem',
+        background: 'var(--card)',
+        display: 'flex',
+        alignSelf: 'stretch',
+      }}>
+      <div className="admin-sidebar-inner" style={{
         display: 'flex',
         flexDirection: 'column',
         position: 'sticky',
@@ -82,10 +90,22 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
           }}>
             <Icons.Shield size={18} color="#FFFFFF" />
           </div>
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--foreground)', letterSpacing: '-0.01em' }}>Admin Panel</div>
             <div style={{ fontWeight: 600, fontSize: '0.68rem', color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Lapak Kos</div>
           </div>
+          <button
+            className="admin-sidebar-close"
+            onClick={onClose}
+            aria-label="Tutup menu"
+            style={{
+              width: '32px', height: '32px', borderRadius: '9px', border: '1px solid var(--border)',
+              background: 'var(--input)', color: 'var(--muted-foreground)', cursor: 'pointer', flexShrink: 0,
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Icons.X size={16} />
+          </button>
         </div>
 
         {/* ── Grouped menu ── */}
@@ -104,7 +124,7 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
               {group.items.map(menu => {
                 const isActive = currentPath.startsWith(menu.path);
                 return (
-                  <Link key={menu.path} href={menu.path} className="admin-sidebar-link" style={{
+                  <Link key={menu.path} href={menu.path} onClick={onClose} className="admin-sidebar-link" style={{
                     fontWeight: isActive ? 700 : 500,
                     color: isActive ? 'var(--primary)' : 'var(--foreground)',
                     display: 'flex',
@@ -184,6 +204,7 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
           )}
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

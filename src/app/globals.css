@@ -1,5 +1,13 @@
 @import 'leaflet/dist/leaflet.css';
 
+.admin-mobile-toggle {
+  display: none;
+}
+
+.admin-sidebar-close {
+  display: none;
+}
+
 .lightbox-scroll-track {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -402,36 +410,43 @@ input, textarea, select {
   .md-flex-col { flex-direction: column !important; }
   .md-grid-1 { grid-template-columns: 1fr !important; }
   
+  /* Admin sidebar becomes an off-canvas drawer on mobile instead of a cramped
+     horizontal-scroll strip, since not every menu item fit on one row. */
+  .admin-mobile-toggle {
+    display: flex !important;
+  }
   .admin-sidebar {
-    width: 100% !important;
-    min-width: 100% !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border);
-    flex-direction: row !important;
-    overflow-x: auto;
-    padding: 1rem !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 85vw;
+    padding: 1.5rem 1rem !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+    box-shadow: none;
   }
-  .admin-sidebar-nav {
-    flex-direction: row !important;
-    overflow-y: visible !important;
+  .admin-sidebar.admin-sidebar-open {
+    transform: translateX(0);
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
   }
-  .admin-sidebar-group {
-    display: contents;
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
   }
-  .admin-sidebar-menu {
-    flex-direction: row !important;
-    gap: 0.5rem !important;
+  .admin-sidebar-close {
+    display: flex !important;
   }
-  .admin-sidebar-group-label {
-    display: none !important;
+  .admin-sidebar-inner {
+    top: 0 !important;
+    max-height: 100vh !important;
   }
-  .admin-sidebar-link {
-    white-space: nowrap;
-  }
-  .admin-sidebar-footer {
-    display: none !important;
-  }
-  
+
   /* Overrides for utility classes on mobile */
   .page-padding { padding: 1.25rem !important; }
   .card-padding { padding: 1.25rem !important; }
