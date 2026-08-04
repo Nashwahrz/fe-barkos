@@ -25,8 +25,9 @@ interface Promotion {
   ad_type?: string | null;
   ad_media_url?: string | null;
   manual_proof_path?: string | null;
-  product?: { nama_barang?: string; user?: { name?: string } };
+  product?: { nama_barang?: string };
   package?: { name?: string };
+  seller?: { name?: string };
 }
 
 export default function AdminPromotions() {
@@ -42,7 +43,7 @@ export default function AdminPromotions() {
     searchQuery, setSearchQuery,
     currentPage, setCurrentPage,
     totalPages, paginatedData, totalItems
-  } = useTablePagination(promotions, ['product.nama_barang', 'product.user.name', 'package.name', 'product_id'], 10);
+  } = useTablePagination(promotions, ['product.nama_barang', 'seller.name', 'package.name', 'product_id'], 10);
 
   useEffect(() => {
     if (!authLoading) {
@@ -116,33 +117,38 @@ export default function AdminPromotions() {
   const columns: DataTableColumn<Promotion>[] = [
     {
       key: 'produk', header: 'Produk', render: promo => (
-        <>
-          <div style={{ fontWeight: 800, color: 'var(--foreground)' }}>{promo.product?.nama_barang || '-'}</div>
-          <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>ID: #{promo.product_id}</div>
-        </>
+        <div className="flex items-center gap-3">
+          <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--input)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icons.Package size={18} color="var(--muted-foreground)" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 800, color: 'var(--foreground)' }}>{promo.product?.nama_barang || '-'}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--muted-foreground)' }}>ID: #{promo.product_id}</div>
+          </div>
+        </div>
       ),
     },
-    { key: 'penjual', header: 'Penjual', render: promo => <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>{promo.product?.user?.name || '-'}</span> },
+    { key: 'penjual', header: 'Penjual', render: promo => <span style={{ color: 'var(--foreground)', fontWeight: 500 }}>{promo.seller?.name || '-'}</span> },
     {
       key: 'paket', header: 'Paket', render: promo => (
-        <span style={{ padding: '6px 12px', borderRadius: '8px', background: 'var(--primary-light)', color: 'var(--primary)', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(13, 148, 136, 0.2)' }}>
-          {promo.package?.name || '-'}
-        </span>
+        <Badge tone="primary">{promo.package?.name || '-'}</Badge>
       ),
     },
     { key: 'biaya', header: 'Biaya', render: promo => <span style={{ fontWeight: 800, color: 'var(--foreground)' }}>Rp {Number(promo.amount_paid || 0).toLocaleString('id-ID')}</span> },
     {
       key: 'metode', header: 'Metode', render: promo => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
-          <span style={{ padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: promo.payment_method === 'manual_transfer' ? 'rgba(217, 119, 6, 0.1)' : 'var(--input)', color: promo.payment_method === 'manual_transfer' ? '#d97706' : 'var(--foreground)' }}>
-            {promo.payment_method === 'manual_transfer' ? 'Transfer Manual' : 'Midtrans'}
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
+          {promo.payment_method === 'manual_transfer' ? (
+            <Badge tone="warning">Transfer Manual</Badge>
+          ) : (
+            <Badge tone="neutral">Midtrans</Badge>
+          )}
           {promo.payment_method === 'manual_transfer' && promo.manual_proof_path && (
             <button
               onClick={() => setPreviewProof(promo)}
-              style={{ fontSize: '0.7rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, padding: 0 }}
+              style={{ fontSize: '0.75rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, padding: 0, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
-              Lihat Bukti
+              <Icons.Eye size={12} /> Lihat Bukti
             </button>
           )}
           {promo.payment_method === 'manual_transfer' && promo.payment_status === 'pending' && promo.manual_proof_path && (
@@ -150,14 +156,14 @@ export default function AdminPromotions() {
               <button
                 onClick={() => handleApprovePayment(promo.id)}
                 disabled={reviewLoadingId === promo.id}
-                style={{ fontSize: '0.68rem', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+                style={{ fontSize: '0.72rem', background: 'rgba(5, 150, 105, 0.1)', color: 'var(--success)', border: '1px solid rgba(5, 150, 105, 0.2)', padding: '4px 10px', borderRadius: '7px', cursor: 'pointer', fontWeight: 700 }}
               >
                 Setujui
               </button>
               <button
                 onClick={() => handleRejectPayment(promo.id)}
                 disabled={reviewLoadingId === promo.id}
-                style={{ fontSize: '0.68rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+                style={{ fontSize: '0.72rem', background: 'rgba(220, 38, 38, 0.1)', color: 'var(--danger)', border: '1px solid rgba(220, 38, 38, 0.2)', padding: '4px 10px', borderRadius: '7px', cursor: 'pointer', fontWeight: 700 }}
               >
                 Tolak
               </button>
@@ -174,23 +180,25 @@ export default function AdminPromotions() {
             onClick={() => setPreviewBanner(promo)}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '8px 12px', borderRadius: '8px', border: `1px solid ${promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`, cursor: 'pointer',
-              background: promo.ad_type === 'video' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+              padding: '7px 13px', borderRadius: '999px', border: `1px solid ${promo.ad_type === 'video' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(37, 99, 235, 0.2)'}`, cursor: 'pointer',
+              background: promo.ad_type === 'video' ? 'rgba(20, 184, 166, 0.1)' : 'rgba(37, 99, 235, 0.08)',
               color: promo.ad_type === 'video' ? 'var(--accent)' : '#2563eb',
-              fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s'
+              fontWeight: 700, fontSize: '0.78rem', transition: 'transform 0.15s, box-shadow 0.15s'
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            {promo.ad_type === 'video' ? <Icons.Film size={14} /> : <Icons.Image size={14} />}
+            {promo.ad_type === 'video' ? <Icons.Film size={13} /> : <Icons.Image size={13} />}
             {promo.ad_type === 'video' ? 'Video' : 'Gambar'}
           </button>
         ) : (
-          <span style={{ color: 'var(--foreground)', opacity: 0.3, fontSize: '0.85rem' }}>—</span>
+          <span style={{ color: 'var(--muted-foreground)', opacity: 0.5, fontSize: '0.85rem' }}>—</span>
         );
       },
     },
     {
       key: 'berakhir', header: 'Berakhir', render: promo => (
-        <span style={{ color: 'var(--foreground)', opacity: 0.7, fontSize: '0.9rem', fontWeight: 500 }}>
+        <span style={{ color: 'var(--foreground)', opacity: 0.75, fontSize: '0.88rem', fontWeight: 500 }}>
           {new Date(promo.end_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
         </span>
       ),
@@ -214,13 +222,13 @@ export default function AdminPromotions() {
         <button
           onClick={() => handleDelete(promo.id as string)}
           style={{
-            background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none',
-            padding: '8px', borderRadius: '8px', cursor: 'pointer',
+            background: 'rgba(220, 38, 38, 0.08)', color: 'var(--danger)', border: '1px solid rgba(220, 38, 38, 0.15)',
+            padding: '8px', borderRadius: '9px', cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'all 0.2s'
+            transition: 'background 0.15s'
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.16)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(220, 38, 38, 0.08)'}
           title="Hapus Promosi"
         >
           <Icons.Trash size={16} />
@@ -236,12 +244,12 @@ export default function AdminPromotions() {
             <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
             <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
           </div>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end', flex: '0 0 auto' }}>
             <Link href="/admin/promotions/packages" style={{
-              background: 'var(--primary)', color: 'white', padding: '10px 20px', borderRadius: '8px', 
-              fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px',
-              fontSize: '0.9rem', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)'
+              background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', color: 'white', padding: '11px 22px', borderRadius: '12px',
+              fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px',
+              fontSize: '0.9rem', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: 'var(--shadow-brand)'
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -251,39 +259,53 @@ export default function AdminPromotions() {
 
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-                  <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
+                <div style={{ position: 'absolute', left: '14px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                  <Icons.Search size={16} color="var(--muted-foreground)" />
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Cari promosi..." 
+                <input
+                  type="text"
+                  placeholder="Cari promosi..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0 }}
+                  style={{ padding: '0.65rem 1rem 0.65rem 2.6rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0, transition: 'border-color 0.15s, box-shadow 0.15s' }}
+                  onFocus={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-light)'; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
               </div>
-              <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
-                Total: {totalItems} Promosi
+              <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.65rem 1.1rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
+                <Icons.Tag size={14} color="var(--primary)" />
+                {totalItems} Promosi
               </div>
             </div>
           </div>
         </header>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.25rem', marginBottom: '2.75rem' }}>
           {[
-            { label: 'Total Transaksi', value: promotions.length, color: 'var(--primary)', icon: <Icons.Activity size={24} color="var(--primary)" />, bg: 'var(--primary-light)' },
-            { label: 'Promosi Aktif', value: activeCount, color: 'var(--success)', icon: <Icons.CheckCircle size={24} color="var(--success)" />, bg: 'rgba(16, 185, 129, 0.1)' },
-            { label: 'Dengan Iklan', value: withAdCount, color: 'var(--accent)', icon: <Icons.Image size={24} color="var(--accent)" />, bg: 'rgba(139, 92, 246, 0.1)' },
-            { label: 'Total Pendapatan', value: `Rp ${totalRevenue.toLocaleString('id-ID')}`, color: 'var(--foreground)', icon: <Icons.DollarSign size={24} color="var(--foreground)" />, bg: 'var(--input)' },
+            { label: 'Total Transaksi', value: promotions.length, color: 'var(--primary)', icon: <Icons.Activity size={22} color="var(--primary)" />, bg: 'var(--primary-light)' },
+            { label: 'Promosi Aktif', value: activeCount, color: 'var(--success)', icon: <Icons.CheckCircle size={22} color="var(--success)" />, bg: 'rgba(5, 150, 105, 0.1)' },
+            { label: 'Dengan Iklan', value: withAdCount, color: 'var(--accent)', icon: <Icons.Image size={22} color="var(--accent)" />, bg: 'rgba(20, 184, 166, 0.1)' },
+            { label: 'Total Pendapatan', value: `Rp ${totalRevenue.toLocaleString('id-ID')}`, color: 'var(--foreground)', icon: <Icons.DollarSign size={22} color="var(--foreground)" />, bg: 'var(--input)' },
           ].map(stat => (
-            <div key={stat.label} className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', border: '1px solid var(--border)', background: 'var(--card)', borderRadius: '20px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: stat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div
+              key={stat.label}
+              className="card promo-stat-card"
+              style={{
+                position: 'relative', padding: '1.4rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1.1rem',
+                border: '1px solid var(--border)', background: 'var(--card)', borderRadius: '18px', overflow: 'hidden',
+                transition: 'transform 0.18s ease, box-shadow 0.18s ease', boxShadow: 'var(--shadow-sm)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: stat.color, opacity: 0.7 }} />
+              <div style={{ width: '46px', height: '46px', borderRadius: '13px', background: stat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {stat.icon}
               </div>
-              <div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: stat.color, lineHeight: 1.2 }}>{stat.value}</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--foreground)', opacity: 0.6, marginTop: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: '1.45rem', fontWeight: 800, color: stat.color, lineHeight: 1.2, letterSpacing: '-0.01em' }}>{stat.value}</div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted-foreground)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
               </div>
             </div>
           ))}
@@ -291,8 +313,9 @@ export default function AdminPromotions() {
 
         {/* Table */}
         <div className="card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border)', borderRadius: '20px' }}>
-          <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--border)', background: 'var(--card)' }}>
-            <h3 style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--foreground)' }}>Daftar Pembelian Promosi</h3>
+          <div style={{ padding: '1.4rem 1.75rem', borderBottom: '1px solid var(--border)', background: 'var(--card)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Icons.List size={18} color="var(--muted-foreground)" />
+            <h3 style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--foreground)', margin: 0 }}>Daftar Pembelian Promosi</h3>
           </div>
           <DataTable<Promotion>
             columns={columns}
@@ -359,7 +382,7 @@ export default function AdminPromotions() {
 
             <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewBanner.product?.nama_barang || '-'}</div>
-              <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewBanner.product?.user?.name || '-'}</div>
+              <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewBanner.seller?.name || '-'}</div>
             </div>
           </div>
         </div>
@@ -398,7 +421,7 @@ export default function AdminPromotions() {
 
             <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewProof.product?.nama_barang || '-'}</div>
-              <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewProof.product?.user?.name || '-'}</div>
+              <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewProof.seller?.name || '-'}</div>
               <div><strong style={{ opacity: 0.6 }}>Nominal:</strong> Rp {Number(previewProof.amount_paid || 0).toLocaleString('id-ID')}</div>
               {previewProof.ocr_note && (
                 <div style={{ marginTop: '4px', padding: '0.75rem', background: 'var(--input)', borderRadius: '8px', fontSize: '0.8rem' }}>
