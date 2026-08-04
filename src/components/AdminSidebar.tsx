@@ -149,19 +149,8 @@ export default function AdminSidebar({ currentPath }: { currentPath: string }) {
 
         {/* ── Footer: admin identity + quick actions ── */}
         <div className="admin-sidebar-footer" style={{ flexShrink: 0, paddingTop: '0.9rem', marginTop: '0.4rem', borderTop: '1px solid var(--border)' }}>
-          <Link href="/" style={{
-            display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '10px',
-            color: 'var(--muted-foreground)', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 600,
-            transition: 'all 0.15s ease', marginBottom: '2px',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--input)'; e.currentTarget.style.color = 'var(--foreground)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--muted-foreground)'; }}
-          >
-            <Icons.ArrowLeft size={15} /> Kembali ke Situs
-          </Link>
-
           {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px' }}>
               <div style={{
                 width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
                 background: 'var(--primary-light)', color: 'var(--primary)',
