@@ -505,7 +505,9 @@ export default function AIChatbot() {
 
         {/* Tooltip Pemberitahuan */}
         {!isOpen && showTooltip && (
-          <div style={{
+          <div
+            onPointerDown={(e) => e.stopPropagation()}
+            style={{
             position: 'absolute',
             bottom: '75px',
             right: '0',
