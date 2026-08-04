@@ -22,7 +22,7 @@ interface AdminUser {
   email: string;
   role: string;
   is_active: boolean;
-  foto?: string | null;
+  avatar?: string | null;
 }
 
 function formatDateTime(value: string | null): string {
@@ -32,13 +32,16 @@ function formatDateTime(value: string | null): string {
 
 function StatTile({ icon, label, value, small }: { icon: ReactNode; label: string; value: string | number; small?: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.7rem 0.85rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)' }}>
-      <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: '0.6rem', height: '100%',
+      padding: '0.85rem', borderRadius: '12px', background: 'var(--muted, rgba(0,0,0,0.03))', border: '1px solid var(--border)',
+    }}>
+      <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         {icon}
       </div>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-        <div style={{ fontWeight: 800, fontSize: small ? '0.85rem' : '1rem', color: 'var(--foreground)' }}>{value}</div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '2px', lineHeight: 1.3 }}>{label}</div>
+        <div style={{ fontWeight: 800, fontSize: small ? '0.85rem' : '1.05rem', color: 'var(--foreground)', lineHeight: 1.3 }}>{value}</div>
       </div>
     </div>
   );
@@ -137,8 +140,8 @@ export default function AdminUsers() {
           title="Lihat aktivitas user"
         >
           <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', fontWeight: 800, overflow: 'hidden', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
-            {u.foto ? (
-              <img src={getStorageUrl(u.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {u.avatar ? (
+              <img src={getStorageUrl(u.avatar) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               u.name.charAt(0).toUpperCase()
             )}
@@ -298,7 +301,7 @@ export default function AdminUsers() {
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.6rem' }}>
                   Ringkasan Aktivitas
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridAutoRows: '1fr', gap: '0.75rem' }}>
                   <StatTile icon={<Icons.UserPlus size={16} color="var(--primary)" />} label="Bergabung" value={formatDateTime(selectedUser.created_at)} small />
                   <StatTile icon={<Icons.Package size={16} color="var(--primary)" />} label="Produk Diunggah" value={selectedUser.activity.products_count} />
                   <StatTile icon={<Icons.CheckCircle size={16} color="var(--success)" />} label="Produk Terjual" value={selectedUser.activity.products_sold_count} />
