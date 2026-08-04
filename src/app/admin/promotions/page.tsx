@@ -36,6 +36,7 @@ export default function AdminPromotions() {
   const [promotions, setPromotions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewBanner, setPreviewBanner] = useState<any | null>(null);
+  const [previewDimensions, setPreviewDimensions] = useState<{ width: number; height: number } | null>(null);
   const [previewProof, setPreviewProof] = useState<any | null>(null);
   const [reviewLoadingId, setReviewLoadingId] = useState<string | number | null>(null);
 
@@ -177,7 +178,7 @@ export default function AdminPromotions() {
         const hasAd = promo.ad_type && promo.ad_type !== 'none' && promo.ad_media_url;
         return hasAd ? (
           <button
-            onClick={() => setPreviewBanner(promo)}
+            onClick={() => { setPreviewDimensions(null); setPreviewBanner(promo); }}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               padding: '7px 13px', borderRadius: '999px', border: `1px solid ${promo.ad_type === 'video' ? 'rgba(20, 184, 166, 0.25)' : 'rgba(37, 99, 235, 0.2)'}`, cursor: 'pointer',
@@ -357,7 +358,7 @@ export default function AdminPromotions() {
               ><Icons.X size={18} /></button>
             </div>
 
-            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: '70vh', overflow: 'auto' }}>
               {previewBanner.ad_type === 'video' ? (
                 <video
                   src={getStorageUrl(previewBanner.ad_media_url) || ''}
@@ -368,14 +369,16 @@ export default function AdminPromotions() {
                       if (p !== undefined) p.catch(() => {});
                     }
                   }}
-                  style={{ width: '100%', maxHeight: '400px', display: 'block', objectFit: 'contain' }}
+                  onLoadedMetadata={e => setPreviewDimensions({ width: e.currentTarget.videoWidth, height: e.currentTarget.videoHeight })}
+                  style={{ maxWidth: '100%', display: 'block' }}
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={getStorageUrl(previewBanner.ad_media_url) || ''}
                   alt={previewBanner.ad_title || 'iklan'}
-                  style={{ width: '100%', maxHeight: '400px', display: 'block', objectFit: 'contain' }}
+                  onLoad={e => setPreviewDimensions({ width: e.currentTarget.naturalWidth, height: e.currentTarget.naturalHeight })}
+                  style={{ maxWidth: '100%', display: 'block' }}
                 />
               )}
             </div>
@@ -383,6 +386,10 @@ export default function AdminPromotions() {
             <div style={{ padding: '1.25rem 1.5rem', background: 'var(--card)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8, display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <div><strong style={{ opacity: 0.6 }}>Produk:</strong> {previewBanner.product?.nama_barang || '-'}</div>
               <div><strong style={{ opacity: 0.6 }}>Penjual:</strong> {previewBanner.seller?.name || '-'}</div>
+              <div>
+                <strong style={{ opacity: 0.6 }}>Ukuran Asli:</strong>{' '}
+                {previewDimensions ? `${previewDimensions.width} × ${previewDimensions.height} px` : 'Memuat...'}
+              </div>
             </div>
           </div>
         </div>
