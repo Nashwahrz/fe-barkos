@@ -587,20 +587,42 @@ export default function Home() {
               style={{ display: 'flex', width: '100%', height: '100%', overflowX: 'auto', scrollSnapType: 'x mandatory' }}
             >
               {banners.map((banner, idx) => (
-                <div key={banner.id} style={{ flex: '0 0 100%', height: '100%', scrollSnapAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+                <div key={banner.id} style={{ flex: '0 0 100%', height: '100%', scrollSnapAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', padding: '2rem' }}>
                   {banner.ad_type === 'image' ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={getStorageUrl(banner.ad_media_url) || undefined}
                       alt={banner.ad_title || 'Iklan'}
-                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }}
+                      onClick={e => {
+                        if (!banner.product_id) return;
+                        e.stopPropagation();
+                        router.push(`/products/${banner.product_id}`);
+                      }}
+                      style={{ maxWidth: '100%', maxHeight: 'calc(100% - 60px)', objectFit: 'contain', borderRadius: '12px', cursor: banner.product_id ? 'pointer' : 'default' }}
                     />
                   ) : (
                     <video
                       src={getStorageUrl(banner.ad_media_url) || undefined}
                       controls autoPlay={idx === currentBannerIdx} muted playsInline
-                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px' }}
+                      style={{ maxWidth: '100%', maxHeight: 'calc(100% - 60px)', objectFit: 'contain', borderRadius: '12px' }}
                     />
+                  )}
+
+                  {banner.product_id && (
+                    <Link
+                      href={`/products/${banner.product_id}`}
+                      onClick={e => e.stopPropagation()}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '8px',
+                        background: 'white', color: 'black', padding: '10px 22px',
+                        borderRadius: '999px', fontSize: '0.9rem', fontWeight: 700,
+                        textDecoration: 'none', transition: 'transform 0.2s', flexShrink: 0,
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                      {banner.product_name || banner.ad_title || 'Lihat Produk'} <Icons.ArrowRight size={16} />
+                    </Link>
                   )}
                 </div>
               ))}
