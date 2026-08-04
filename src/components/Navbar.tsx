@@ -351,10 +351,15 @@ export default function Navbar() {
                   <Icons.Bell size={18} />
                   {unreadCount > 0 && (
                     <span style={{
-                      position: 'absolute', top: '6px', right: '6px',
-                      background: 'var(--primary)', width: '8px', height: '8px', borderRadius: '50%',
-                      border: '2px solid var(--card)',
-                    }} />
+                      position: 'absolute', top: '-2px', right: '-4px',
+                      background: 'var(--danger)', color: 'white',
+                      minWidth: '17px', height: '17px', padding: '0 4px', borderRadius: '999px',
+                      border: '2px solid var(--card)', boxSizing: 'content-box',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.62rem', fontWeight: 800, lineHeight: 1,
+                    }}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
                   )}
                 </button>
 
