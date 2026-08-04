@@ -577,12 +577,6 @@ export default function ChatDetailPage() {
               {otherUser.is_online ? 'Online' : formatLastSeen(otherUser.last_active_at)}
             </div>
           )}
-          {product && (
-            <Link href={`/products/${product.id}`} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}><Icons.Package size={14} /></span> 
-              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.nama_barang}</span>
-            </Link>
-          )}
         </div>
         {messages.length > 0 && (
           <button
@@ -594,6 +588,42 @@ export default function ChatDetailPage() {
           </button>
         )}
       </div>
+
+      {/* Product Context Card — shown automatically since every chat here is scoped to a product */}
+      {product && (
+        <Link
+          href={`/products/${product.id}`}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.75rem 1.5rem',
+            background: 'white', borderBottom: '1px solid var(--border)', textDecoration: 'none',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+          }}
+        >
+          <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', background: '#f3f4f6', flexShrink: 0, border: '1px solid var(--border)' }}>
+            {product.foto ? (
+              <img src={getStorageUrl(product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icons.Package size={20} color="#9ca3af" />
+              </div>
+            )}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {product.nama_barang}
+            </div>
+            <div style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--primary)', marginTop: '2px' }}>
+              Rp {Number(product.harga).toLocaleString('id-ID')}
+              {product.status_terjual && (
+                <span style={{ marginLeft: '8px', fontSize: '0.68rem', fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: '999px' }}>
+                  TERJUAL
+                </span>
+              )}
+            </div>
+          </div>
+          <Icons.ChevronRight size={18} color="#9ca3af" style={{ flexShrink: 0 }} />
+        </Link>
+      )}
 
       {/* Messages Area */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
