@@ -240,49 +240,48 @@ export default function AdminPromotions() {
 
   return (
     <AdminLayout currentPath="/admin/promotions">
-        <header style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1.5rem', marginBottom: '2.5rem' }}>
-          <div style={{ flex: '1 1 auto', minWidth: '300px' }}>
-            <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end', flex: '0 0 auto' }}>
+        <header style={{ marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.25rem', marginBottom: '1.5rem' }}>
+            <div style={{ flex: '1 1 auto', minWidth: '260px' }}>
+              <h1 style={{ fontSize: 'clamp(1.9rem, 4vw, 2.4rem)', fontWeight: 800, marginBottom: '0.4rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Monitor Promosi</h1>
+              <p style={{ color: 'var(--muted-foreground)', fontSize: '1rem', margin: 0 }}>Pantau distribusi paket promosi, iklan gambar/video, dan efektivitas fitur boost.</p>
+            </div>
             <Link href="/admin/promotions/packages" style={{
               background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))', color: 'white', padding: '11px 22px', borderRadius: '12px',
               fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px',
-              fontSize: '0.9rem', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: 'var(--shadow-brand)'
+              fontSize: '0.9rem', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: 'var(--shadow-brand)', flexShrink: 0,
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               <Icons.Tag size={18} /> Kelola Paket Promosi
             </Link>
+          </div>
 
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <div style={{ position: 'absolute', left: '14px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-                  <Icons.Search size={16} color="var(--muted-foreground)" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Cari promosi..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ padding: '0.65rem 1rem 0.65rem 2.6rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0, transition: 'border-color 0.15s, box-shadow 0.15s' }}
-                  onFocus={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-light)'; }}
-                  onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-                />
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'absolute', left: '14px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                <Icons.Search size={16} color="var(--muted-foreground)" />
               </div>
-              <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.65rem 1.1rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
-                <Icons.Tag size={14} color="var(--primary)" />
-                {totalItems} Promosi
-              </div>
+              <input
+                type="text"
+                placeholder="Cari promosi..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: '0.65rem 1rem 0.65rem 2.6rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0, transition: 'border-color 0.15s, box-shadow 0.15s' }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-light)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+              />
+            </div>
+            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.65rem 1.1rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
+              <Icons.Tag size={14} color="var(--primary)" />
+              {totalItems} Promosi
             </div>
           </div>
         </header>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.25rem', marginBottom: '2.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '1.25rem', marginBottom: '2.75rem' }}>
           {[
             { label: 'Total Transaksi', value: promotions.length, color: 'var(--primary)', icon: <Icons.Activity size={22} color="var(--primary)" />, bg: 'var(--primary-light)' },
             { label: 'Promosi Aktif', value: activeCount, color: 'var(--success)', icon: <Icons.CheckCircle size={22} color="var(--success)" />, bg: 'rgba(5, 150, 105, 0.1)' },
