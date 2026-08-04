@@ -376,30 +376,24 @@ export default function Home() {
                 </h2>
               </div>
               
-              <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                {/* Active slide — sized to the media's own aspect ratio (clamped so it
-                    never gets absurdly short/tall) instead of a fixed box, so uploads
-                    aren't cropped or letterboxed. */}
+              <div style={{
+                position: 'relative', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                background: '#0b0f14', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {/* Active slide — sized to the media's own aspect ratio (both width and
+                    height follow the upload's real shape, clamped to a pleasant height
+                    range) instead of a fixed full-width box, so nothing gets cropped or
+                    letterboxed. Same treatment for photos and videos. */}
                 {currentBanner && (
                   <div key={currentBanner.id} style={{
                     position: 'relative',
-                    width: '100%',
+                    height: 'clamp(240px, 34vw, 420px)',
+                    width: 'auto',
+                    maxWidth: '100%',
                     aspectRatio: currentBannerAspect,
-                    maxHeight: '460px',
-                    minHeight: '220px',
-                    background: '#111827',
                     overflow: 'hidden',
                     transition: 'aspect-ratio 0.3s ease',
                   }}>
-                    {/* Blurred backdrop fills any leftover space while the real image stays uncropped */}
-                    {currentBanner.ad_type === 'image' && (
-                      <img
-                        src={getStorageUrl(currentBanner.ad_media_url) || undefined}
-                        alt=""
-                        aria-hidden="true"
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'blur(24px) brightness(0.6)', transform: 'scale(1.1)' }}
-                      />
-                    )}
                     {currentBanner.ad_type === 'image' ? (
                       <img
                         src={getStorageUrl(currentBanner.ad_media_url) || undefined}
