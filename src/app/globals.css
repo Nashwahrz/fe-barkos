@@ -403,12 +403,25 @@ input, textarea, select {
     overflow-x: auto;
     padding: 1rem !important;
   }
+  .admin-sidebar-nav {
+    flex-direction: row !important;
+    overflow-y: visible !important;
+  }
+  .admin-sidebar-group {
+    display: contents;
+  }
   .admin-sidebar-menu {
     flex-direction: row !important;
     gap: 0.5rem !important;
   }
+  .admin-sidebar-group-label {
+    display: none !important;
+  }
   .admin-sidebar-link {
     white-space: nowrap;
+  }
+  .admin-sidebar-footer {
+    display: none !important;
   }
   
   /* Overrides for utility classes on mobile */
