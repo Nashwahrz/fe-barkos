@@ -215,7 +215,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
         <div className="product-detail-left">
           <div style={{ width: '100%', aspectRatio: '4/3', maxHeight: '400px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', background: 'var(--card)', position: 'relative', boxShadow: 'var(--shadow)' }}>
             {product.foto
-              ? <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ? <img src={getStorageUrl(product.foto) || ''} alt={product.nama_barang} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icons.Package size={64} color="var(--border)" /></div>}
             {product.is_promoted && (
               <span style={{ position: 'absolute', top: '16px', left: '16px', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--gradient-brand)', color: '#fff', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 700, boxShadow: 'var(--shadow-brand)' }}>
