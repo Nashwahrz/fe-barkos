@@ -240,7 +240,7 @@ export default function AdminUsers() {
               <Icons.Loader size={24} />
             </div>
           ) : selectedUser ? (
-            <div className="flex-col" style={{ gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* Profile header */}
               <div className="flex items-center gap-4">
                 <div style={{ position: 'relative', flexShrink: 0 }}>
