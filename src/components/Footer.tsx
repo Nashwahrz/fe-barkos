@@ -20,7 +20,7 @@ export default function Footer() {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  if (pathname.match(/^\/chat\/\d+\/\d+/)) {
+  if (pathname.match(/^\/chat\/\d+\/\d+/) || pathname.startsWith('/admin')) {
     return null;
   }
 
