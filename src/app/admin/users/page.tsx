@@ -63,6 +63,12 @@ function StatTile({ icon, label, value, small, href }: { icon: ReactNode; label:
   return <div style={style}>{content}</div>;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  [USER_ROLES.PEMBELI]: 'Pembeli',
+  [USER_ROLES.PENJUAL]: 'Penjual',
+  [USER_ROLES.SUPER_ADMIN]: 'Super Admin',
+};
+
 export default function AdminUsers() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -71,12 +77,15 @@ export default function AdminUsers() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [roleFilter, setRoleFilter] = useState('');
+
+  const roleFilteredUsers = roleFilter ? users.filter(u => u.role === roleFilter) : users;
 
   const {
     searchQuery, setSearchQuery,
     currentPage, setCurrentPage,
     totalPages, paginatedData, totalItems
-  } = useTablePagination(users, ['name', 'email', 'role', 'phone'], 10);
+  } = useTablePagination(roleFilteredUsers, ['name', 'email', 'role', 'phone'], 10);
 
   useEffect(() => {
     if (!authLoading) {
@@ -225,14 +234,24 @@ export default function AdminUsers() {
               <div style={{ position: 'absolute', left: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
                 <Icons.Search size={16} color="var(--foreground)" style={{ opacity: 0.5 }} />
               </div>
-              <input 
-                type="text" 
-                placeholder="Cari user..." 
+              <input
+                type="text"
+                placeholder="Cari user..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ padding: '0.6rem 1rem 0.6rem 2.5rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', width: '250px', fontSize: '0.9rem', margin: 0 }}
               />
             </div>
+            <select
+              value={roleFilter}
+              onChange={(e) => { setRoleFilter(e.target.value); setCurrentPage(1); }}
+              style={{ padding: '0.6rem 1rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--foreground)', outline: 'none', fontSize: '0.9rem', margin: 0, cursor: 'pointer' }}
+            >
+              <option value="">Semua Role</option>
+              {Object.values(USER_ROLES).map(role => (
+                <option key={role} value={role}>{ROLE_LABELS[role] || role}</option>
+              ))}
+            </select>
             <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
               Total: {totalItems} User
             </div>
