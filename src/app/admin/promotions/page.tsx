@@ -339,10 +339,10 @@ export default function AdminPromotions() {
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', maxWidth: '600px', width: '100%', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
+            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', width: 'fit-content', maxWidth: '95vw', minWidth: '320px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
           >
-            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {previewBanner.ad_type === 'video' ? <Icons.Film size={20} /> : <Icons.Image size={20} />}
                   Preview Iklan {previewBanner.ad_type === 'video' ? 'Video' : 'Gambar'}
@@ -353,11 +353,14 @@ export default function AdminPromotions() {
               </div>
               <button
                 onClick={() => setPreviewBanner(null)}
-                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
               ><Icons.X size={18} /></button>
             </div>
 
-            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: '70vh', overflow: 'auto' }}>
+            {/* No forced aspect ratio or crop — the image/video renders at its own natural
+                size (capped only so it never exceeds the viewport), so sellers never need
+                to think about upload dimensions. */}
+            <div style={{ background: 'var(--input)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto', maxHeight: '75vh' }}>
               {previewBanner.ad_type === 'video' ? (
                 <video
                   src={getStorageUrl(previewBanner.ad_media_url) || ''}
@@ -369,7 +372,7 @@ export default function AdminPromotions() {
                     }
                   }}
                   onLoadedMetadata={e => setPreviewDimensions({ width: e.currentTarget.videoWidth, height: e.currentTarget.videoHeight })}
-                  style={{ maxWidth: '100%', display: 'block' }}
+                  style={{ display: 'block', maxWidth: '95vw', maxHeight: '75vh' }}
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -377,7 +380,7 @@ export default function AdminPromotions() {
                   src={getStorageUrl(previewBanner.ad_media_url) || ''}
                   alt={previewBanner.ad_title || 'iklan'}
                   onLoad={e => setPreviewDimensions({ width: e.currentTarget.naturalWidth, height: e.currentTarget.naturalHeight })}
-                  style={{ maxWidth: '100%', display: 'block' }}
+                  style={{ display: 'block', maxWidth: '95vw', maxHeight: '75vh' }}
                 />
               )}
             </div>
