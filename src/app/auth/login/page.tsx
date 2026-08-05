@@ -60,67 +60,66 @@ export default function Login() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - 65px)', background: 'var(--background)' }}>
+    <div style={{ display: 'flex', minHeight: 'calc(100vh - 65px)', background: 'var(--background)', overflow: 'hidden' }}>
       
-      {/* Left Panel - Hidden on mobile, shows a beautiful welcome message */}
+      {/* Left Panel - Hidden on mobile */}
       <div className="hide-mobile" style={{
-        flex: 1,
-        background: 'linear-gradient(135deg, var(--primary) 0%, #065f46 100%)',
+        flex: '1.2',
+        background: 'linear-gradient(135deg, var(--primary) 0%, #047857 100%)',
         color: 'white',
         padding: '4rem',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative'
       }}>
         {/* Decorative blur elements */}
-        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '400px', height: '400px', background: 'rgba(255,255,255,0.15)', borderRadius: '50%', filter: 'blur(50px)' }} />
-        <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '300px', height: '300px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(40px)' }} />
+        <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '500px', height: '500px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(60px)' }} />
+        <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', background: 'rgba(255,255,255,0.15)', borderRadius: '50%', filter: 'blur(50px)' }} />
         
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '540px', margin: '0 auto' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px', 
-            background: 'rgba(255,255,255,0.2)', padding: '6px 16px', 
+            background: 'rgba(255,255,255,0.15)', padding: '6px 16px', 
             borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600,
             backdropFilter: 'blur(10px)', marginBottom: '1.5rem',
-            border: '1px solid rgba(255,255,255,0.3)'
+            border: '1px solid rgba(255,255,255,0.2)'
           }}>
             <Icons.Compass size={16} /> Platform Anak Kos
           </div>
 
           <h1 style={{ fontSize: '3.5rem', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.03em' }}>
-            Selamat Datang di<br />Lapak Kos.
+            Selamat Datang di <br/>Lapak Kos.
           </h1>
           
-          <p style={{ fontSize: '1.1rem', opacity: 0.9, lineHeight: 1.6, marginBottom: '2.5rem' }}>
-            Silakan login terlebih dahulu untuk mulai menemukan barang-barang keperluan kos dengan harga miring, atau ubah barang tak terpakai Anda menjadi uang!
+          <p style={{ fontSize: '1.1rem', opacity: 0.9, lineHeight: 1.6, marginBottom: '3rem' }}>
+            Platform andalan mahasiswa untuk mencari perabotan kos murah atau membuka lapak secara gratis. Temukan kemudahannya sekarang!
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div style={{ 
-              background: 'rgba(255,255,255,0.1)', padding: '1.25rem', borderRadius: '16px', 
+              background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '20px', 
               backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)',
-              transition: 'transform 0.2s', cursor: 'default'
-            }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-              <Icons.ShoppingBag size={28} style={{ marginBottom: '1rem', opacity: 0.9 }} />
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem' }}>Beli Kebutuhan</h3>
-              <p style={{ fontSize: '0.85rem', opacity: 0.75, lineHeight: 1.5, margin: 0 }}>
-                Temukan perabotan dan alat tulis dari sesama mahasiswa di sekitar kampus.
+            }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Icons.ShoppingBag size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Beli Kebutuhan</h3>
+              <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
+                Temukan barang kos dari sesama mahasiswa di sekitar kampus.
               </p>
             </div>
             
             <div style={{ 
-              background: 'rgba(255,255,255,0.1)', padding: '1.25rem', borderRadius: '16px', 
+              background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '20px', 
               backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)',
-              transition: 'transform 0.2s', cursor: 'default'
-            }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-              <Icons.Store size={28} style={{ marginBottom: '1rem', opacity: 0.9 }} />
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.5rem' }}>Buka Lapak</h3>
-              <p style={{ fontSize: '0.85rem', opacity: 0.75, lineHeight: 1.5, margin: 0 }}>
-                Buka toko Anda sendiri secara gratis dan jangkau pembeli dengan cepat.
+            }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Icons.Store size={24} />
+              </div>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Buka Lapak</h3>
+              <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
+                Buka toko Anda sendiri gratis dan jangkau pembeli dengan cepat.
               </p>
             </div>
           </div>
@@ -129,17 +128,20 @@ export default function Login() {
 
       {/* Right Panel - Login Form */}
       <div style={{ 
-        flex: 1, 
+        flex: '0.8', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        padding: '2rem 1rem',
+        padding: '3rem 1.5rem',
         position: 'relative'
       }}>
-        <div style={{ width: '100%', maxWidth: '400px' }}>
+        {/* Soft background glow */}
+        <div className="hide-mobile" style={{ position: 'absolute', top: '0', right: '0', width: '300px', height: '300px', background: 'var(--primary-light)', opacity: 0.3, borderRadius: '50%', filter: 'blur(80px)', zIndex: 0 }} />
+
+        <div style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 1 }}>
           
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Masuk ke Akun</h2>
+            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Masuk ke Akun</h2>
             <p style={{ opacity: 0.6, fontSize: '0.95rem', color: 'var(--foreground)' }}>Silakan isi detail Anda untuk melanjutkan</p>
           </div>
 
