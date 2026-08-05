@@ -83,12 +83,22 @@ export default function ChatDetailPage() {
   }, [user, productId, otherUserId]);
 
   useEffect(() => {
-    if (templateParam === 'transfer_check' && !templateSent && !loading) {
+    if (
+      templateParam === 'transfer_check' &&
+      !templateSent &&
+      !loading &&
+      otherUserId &&
+      otherUserId !== 'undefined'
+    ) {
       setTemplateSent(true);
-      router.replace(`/chat/${productId}/${otherUserId}`);
-      sendTemplate('[TRANSFER_CHECK]');
+      // Kirim template DULU, baru hapus query param dari URL agar tidak
+      // ada re-render yang membatalkan pengiriman sebelum selesai.
+      sendTemplate('[TRANSFER_CHECK]').then(() => {
+        router.replace(`/chat/${productId}/${otherUserId}`);
+      });
     }
-  }, [templateParam, loading, templateSent]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateParam, loading, templateSent, otherUserId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
