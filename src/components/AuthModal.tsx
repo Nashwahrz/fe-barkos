@@ -20,7 +20,7 @@ export default function AuthModal() {
   // Register States
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
-  const [regPhone, setRegPhone] = useState('');
+  const [regAsalKampus, setRegAsalKampus] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regPasswordConf, setRegPasswordConf] = useState('');
 
@@ -71,7 +71,7 @@ export default function AuthModal() {
           password: regPassword,
           password_confirmation: regPasswordConf,
           role: 'pembeli',
-          phone: regPhone || undefined
+          asal_kampus: regAsalKampus
         }),
       });
 
@@ -226,13 +226,13 @@ export default function AuthModal() {
               onChange={e => setRegEmail(e.target.value)}
             />
             <Input
-              type="tel"
-              label="Nomor WhatsApp"
-              placeholder="08123456789"
-              icon={<Icons.Phone size={18} />}
+              type="text"
+              label="Asal Kampus"
+              placeholder="Contoh: Universitas Brawijaya"
+              icon={<Icons.GraduationCap size={18} />}
               required
-              value={regPhone}
-              onChange={e => setRegPhone(e.target.value)}
+              value={regAsalKampus}
+              onChange={e => setRegAsalKampus(e.target.value)}
             />
             <Input
               type="password"
