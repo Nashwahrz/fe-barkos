@@ -38,7 +38,9 @@ export default function ChatDetailPage() {
   const [isSeller, setIsSeller] = useState(false);
   const searchParams = useSearchParams();
   const templateParam = searchParams.get('template');
-  const [templateSent, setTemplateSent] = useState(false);
+  // Gunakan ref agar guard pengiriman template tidak memicu re-render
+  // yang bisa menyebabkan effect terpanggil berulang atau state jadi stale.
+  const templateSentRef = useRef(false);
 
   const templates = {
     buyer: [
@@ -84,21 +86,45 @@ export default function ChatDetailPage() {
 
   useEffect(() => {
     if (
-      templateParam === 'transfer_check' &&
-      !templateSent &&
-      !loading &&
-      otherUserId &&
-      otherUserId !== 'undefined'
-    ) {
-      setTemplateSent(true);
-      // Kirim template DULU, baru hapus query param dari URL agar tidak
-      // ada re-render yang membatalkan pengiriman sebelum selesai.
-      sendTemplate('[TRANSFER_CHECK]').then(() => {
+      templateParam !== 'transfer_check' ||
+      templateSentRef.current ||
+      loading ||
+      !user ||
+      !otherUserId ||
+      otherUserId === 'undefined'
+    ) return;
+
+    // Tandai sudah terkirim via ref (bukan state) agar tidak ada re-render
+    // yang memicu ulang effect ini.
+    templateSentRef.current = true;
+
+    // Panggil fetchApi langsung — hindari sendTemplate() yang punya closure
+    // tersendiri dan bisa menganggap isChatClosed=true sebelum data produk
+    // selesai dimuat.
+    const doSend = async () => {
+      try {
+        await fetchApi(`/products/${productId}/chats`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: '[TRANSFER_CHECK]',
+            receiver_id: otherUserId,
+          }),
+        });
+        // Refresh pesan setelah berhasil terkirim
+        loadMessages(false);
+        // Bersihkan query param dari URL (SETELAH API sukses)
         router.replace(`/chat/${productId}/${otherUserId}`);
-      });
-    }
+      } catch (err) {
+        console.error('Gagal mengirim template transfer_check', err);
+        // Reset ref agar bisa retry jika ada kegagalan jaringan
+        templateSentRef.current = false;
+      }
+    };
+
+    doSend();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateParam, loading, templateSent, otherUserId]);
+  }, [templateParam, loading, user, otherUserId, productId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
