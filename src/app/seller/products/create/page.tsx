@@ -19,6 +19,8 @@ export default function CreateProduct() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Error per-field untuk validasi inline
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     nama_barang: '',
@@ -114,8 +116,11 @@ export default function CreateProduct() {
         setFoto(file);
         setFotoPreview(URL.createObjectURL(file));
       }
+      // Hapus error foto saat gambar sudah dipilih
+      setFieldErrors(p => ({ ...p, foto: '' }));
     }
   };
+
 
   const handleLocationChange = (lat: number, lng: number) => {
     setFormData(prev => ({
@@ -146,8 +151,47 @@ export default function CreateProduct() {
     }
   };
 
+  /**
+   * Validasi semua field wajib.
+   * Jika ada yang kosong: tampilkan error inline dan scroll+focus ke field pertama yang kosong.
+   * Return true jika semua valid, false jika ada yang kosong.
+   */
+  const validateAndFocus = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.nama_barang.trim()) errors.nama_barang = 'Nama barang wajib diisi.';
+    if (!formData.harga) errors.harga = 'Harga wajib diisi.';
+    if (!formData.category_id) errors.category_id = 'Kategori wajib dipilih.';
+    if (!formData.durasi_pemakaian.trim()) errors.durasi_pemakaian = 'Durasi pemakaian wajib diisi.';
+    if (!formData.deskripsi.trim()) errors.deskripsi = 'Deskripsi barang wajib diisi.';
+    if (!formData.latitude || !formData.longitude) errors.lokasi = 'Lokasi barang wajib ditentukan (pin peta atau GPS).';
+    if (!foto) errors.foto = 'Foto barang wajib diunggah.';
+
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      // Urutan field yang dicek — scroll ke yang pertama kosong
+      const fieldOrder = ['nama_barang', 'harga', 'category_id', 'durasi_pemakaian', 'deskripsi', 'lokasi', 'foto'];
+      const firstError = fieldOrder.find(f => errors[f]);
+      if (firstError) {
+        const el = document.getElementById(`field-${firstError}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Fokus ke input di dalamnya jika ada
+          const input = el.querySelector<HTMLElement>('input, select, textarea');
+          input?.focus();
+        }
+      }
+      return false;
+    }
+    return true;
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Validasi dulu sebelum submit
+    if (!validateAndFocus()) return;
+
     setLoading(true);
     setError(null);
 
@@ -209,28 +253,40 @@ export default function CreateProduct() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <Input 
-             type="text" 
-             name="nama_barang" 
-             label="Nama Barang"
-             placeholder="Contoh: Kipas Angin Bekas" 
-             required
-             value={formData.nama_barang}
-             onChange={handleInputChange}
-          />
+        <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div id="field-nama_barang">
+            <Input 
+               type="text" 
+               name="nama_barang" 
+               label="Nama Barang"
+               placeholder="Contoh: Kipas Angin Bekas" 
+               value={formData.nama_barang}
+               onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, nama_barang: '' })); }}
+            />
+            {fieldErrors.nama_barang && (
+              <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                ⚠ {fieldErrors.nama_barang}
+              </p>
+            )}
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-            <Input 
-               type="number" 
-               name="harga" 
-               label="Harga (Rp)"
-               placeholder="Contoh: 500000" 
-               required
-               min={0}
-               value={formData.harga}
-               onChange={handleInputChange}
-            />
+            <div id="field-harga">
+              <Input 
+                 type="number" 
+                 name="harga" 
+                 label="Harga (Rp)"
+                 placeholder="Contoh: 500000" 
+                 min={0}
+                 value={formData.harga}
+                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, harga: '' })); }}
+              />
+              {fieldErrors.harga && (
+                <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                  ⚠ {fieldErrors.harga}
+                </p>
+              )}
+            </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Terima Tawaran?</label>
@@ -262,20 +318,24 @@ export default function CreateProduct() {
               />
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div id="field-category_id" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kategori Pilihan</label>
               <select 
                  name="category_id" 
                  className="input-field" 
-                 required
                  value={formData.category_id}
-                 onChange={handleInputChange}
+                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, category_id: '' })); }}
               >
                 <option value="" disabled>-- Pilih Kategori --</option>
                 {categories.map((c: any) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+              {fieldErrors.category_id && (
+                <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '0px', fontWeight: 500 }}>
+                  ⚠ {fieldErrors.category_id}
+                </p>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kondisi</label>
@@ -292,18 +352,24 @@ export default function CreateProduct() {
               </select>
             </div>
             
-            <Input 
-               type="text" 
-               name="durasi_pemakaian" 
-               label="Durasi Pemakaian"
-               placeholder="Contoh: 6 Bulan, 1 Tahun" 
-               required
-               value={formData.durasi_pemakaian}
-               onChange={handleInputChange}
-            />
+            <div id="field-durasi_pemakaian">
+              <Input 
+                 type="text" 
+                 name="durasi_pemakaian" 
+                 label="Durasi Pemakaian"
+                 placeholder="Contoh: 6 Bulan, 1 Tahun" 
+                 value={formData.durasi_pemakaian}
+                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, durasi_pemakaian: '' })); }}
+              />
+              {fieldErrors.durasi_pemakaian && (
+                <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                  ⚠ {fieldErrors.durasi_pemakaian}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div id="field-deskripsi" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Deskripsi Barang</label>
             <textarea 
                name="deskripsi" 
@@ -311,13 +377,17 @@ export default function CreateProduct() {
                rows={6}
                style={{ height: 'auto', resize: 'vertical' }}
                placeholder="Jelaskan spesifikasi, merek, atau minus dari barang yang Anda jual." 
-               required
                value={formData.deskripsi}
-               onChange={handleInputChange}
+               onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, deskripsi: '' })); }}
             />
+            {fieldErrors.deskripsi && (
+              <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                ⚠ {fieldErrors.deskripsi}
+              </p>
+            )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div id="field-lokasi" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Lokasi Barang (Pin Point Peta)</label>
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
@@ -325,7 +395,6 @@ export default function CreateProduct() {
                    type="text" 
                    placeholder="Koordinat terpilih..." 
                    readOnly
-                   required
                    value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
                 />
               </div>
@@ -333,17 +402,22 @@ export default function CreateProduct() {
                 <Icons.Compass size={16} /> Gunakan GPS Saya
               </Button>
             </div>
+            {fieldErrors.lokasi && (
+              <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '-4px', fontWeight: 500 }}>
+                ⚠ {fieldErrors.lokasi}
+              </p>
+            )}
 
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <LocationPicker 
                 lat={formData.latitude ? parseFloat(formData.latitude) : -0.947083} 
                 lng={formData.longitude ? parseFloat(formData.longitude) : 100.417181} 
-                onChange={handleLocationChange} 
+                onChange={(lat, lng) => { handleLocationChange(lat, lng); setFieldErrors(p => ({ ...p, lokasi: '' })); }} 
               />
             </div>
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div id="field-foto" style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 600, color: 'var(--foreground)' }}>Foto Barang Utama</label>
             <div 
               style={{
@@ -417,10 +491,15 @@ export default function CreateProduct() {
                 </Button>
               </div>
             </div>
+            {fieldErrors.foto && (
+              <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '8px', fontWeight: 500 }}>
+                ⚠ {fieldErrors.foto}
+              </p>
+            )}
           </div>
 
           <div style={{ marginTop: '2rem' }}>
-            <Button type="submit" disabled={loading || !formData.latitude} variant="primary" size="lg" fullWidth>
+            <Button type="submit" disabled={loading} variant="primary" size="lg" fullWidth>
               {loading ? 'Menyimpan Barang...' : 'Listing Barang Bekas'}
             </Button>
           </div>
