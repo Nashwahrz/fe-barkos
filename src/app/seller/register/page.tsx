@@ -152,6 +152,7 @@ export default function SellerRegisterPage() {
             <input 
               type="file" 
               accept="image/jpeg, image/png, image/jpg"
+              capture="environment"
               onChange={(e) => { setIdentityDocument(e.target.files ? e.target.files[0] : null); setError(''); }}
               style={{
                 padding: '10px',
