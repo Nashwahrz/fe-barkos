@@ -349,8 +349,8 @@ export default function AdminUsers() {
                   />
                   <StatTile icon={<Icons.CheckCircle size={16} color="var(--success)" />} label="Produk Terjual" value={selectedUser.activity.products_sold_count} />
                   <StatTile icon={<Icons.Handshake size={16} color="var(--success)" />} label="Transaksi Selesai" value={selectedUser.activity.transactions_completed_count} />
-                  <StatTile icon={<Icons.TrendingUp size={16} color="var(--primary)" />} label="Total Sbg Penjual" value={selectedUser.activity.transactions_as_seller_count} />
-                  <StatTile icon={<Icons.ShoppingBag size={16} color="var(--primary)" />} label="Total Sbg Pembeli" value={selectedUser.activity.transactions_as_buyer_count} />
+                  <StatTile icon={<Icons.TrendingUp size={16} color="var(--primary)" />} label="Transaksi Jualan" value={selectedUser.activity.transactions_as_seller_count} />
+                  <StatTile icon={<Icons.ShoppingBag size={16} color="var(--primary)" />} label="Transaksi Belanja" value={selectedUser.activity.transactions_as_buyer_count} />
                 </div>
               </div>
             </div>
