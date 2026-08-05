@@ -39,13 +39,18 @@ function CallbackContent() {
       
       login(token, user);
 
-      // Redirect based on role
+      // Redirect based on role and saved path
+      const redirectPath = localStorage.getItem('redirect_after_login');
+      if (redirectPath) {
+        localStorage.removeItem('redirect_after_login');
+      }
+
       if (user.role === 'super_admin') {
         router.push('/admin/dashboard');
       } else if (user.role === 'penjual') {
         router.push('/seller/products');
       } else {
-        router.push('/');
+        router.push(redirectPath || '/');
       }
     } catch (err) {
       console.error('Callback login failed:', err);

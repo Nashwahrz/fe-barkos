@@ -55,10 +55,12 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  // If authenticated but not verified, block access to everything except the actual verification processing page
+  // If authenticated but not verified, block access to protected routes
   if (user && !user.email_verified_at) {
     const isVerificationProcessing = pathname.match(/^\/auth\/verify-email\/\d+\/[^\/]+/);
-    if (!isVerificationProcessing) {
+    const isPublicPath = pathname === '/' || pathname.startsWith('/products') || pathname.startsWith('/auth');
+    
+    if (!isVerificationProcessing && !isPublicPath) {
       const handleResend = async () => {
         setResendLoading(true);
         setResendMessage('');

@@ -45,15 +45,16 @@ export default function VerifyEmailProcess() {
           await refreshUser();
         }
 
-        // Redirect based on login status and role
-        if (user && user.role === 'penjual') {
-          router.replace('/seller/products');
-        } else if (user && user.role === 'super_admin') {
-          router.replace('/admin/dashboard');
-        } else {
-          setStatus('success');
-          setMessage('Email Anda berhasil diverifikasi!');
-        }
+        // Redirect based on login status and role after a short delay to show success message
+        setTimeout(() => {
+          if (user && user.role === 'penjual') {
+            router.replace('/seller/products');
+          } else if (user && user.role === 'super_admin') {
+            router.replace('/admin/dashboard');
+          } else {
+            router.replace('/');
+          }
+        }, 1500);
       } catch (err: any) {
         const isExpired =
           err instanceof ApiError && (err.status === 403 || err.status === 401);
