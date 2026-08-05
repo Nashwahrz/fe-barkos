@@ -77,10 +77,10 @@ export default function Login() {
         <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '500px', height: '500px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(60px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', background: 'rgba(255,255,255,0.15)', borderRadius: '50%', filter: 'blur(50px)' }} />
         
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '540px', margin: '0 auto' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '540px', margin: '4rem auto 0 auto' }}>
           
           {/* Floating attractive graphic */}
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '2.5rem' }}>
             <svg width="100" height="100" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))' }}>
               <path fill="#ffffff" fillOpacity="0.2" d="M45.7,-76.4C58.9,-69.3,68.9,-55.5,77.7,-41.4C86.5,-27.3,94.2,-13.6,93.6,-0.4C93,14.3,84.2,28.7,73.1,39.2C62,49.7,48.7,56.3,34.8,63.9C20.9,71.5,6.5,80.1,-6.6,83.1C-19.7,86,-31.4,83.4,-44,77.3C-56.6,71.3,-70.1,61.8,-79.1,49.1C-88.1,36.3,-92.6,20.3,-90.4,4.1C-88.2,-12,-79.3,-28.3,-67.7,-40.5C-56.1,-52.7,-41.8,-60.8,-28.1,-65.7C-14.4,-70.5,-1.3,-72.1,12.5,-71C26.2,-69.9,40.5,-66.1,52.1,-58C63.7,-50,72.5,-37.6,78.8,-24.1C85.1,-10.7,88.9,3.9,86.1,17.4C83.3,30.9,74,43.3,62.8,53.4C51.6,63.5,38.6,71.2,25,75.4" transform="translate(100 100) scale(1.05)" />
               <path fill="#ffffff" fillOpacity="0.4" d="M39.9,-65.4C52.1,-58.5,62.6,-48,70.9,-35.5C79.2,-23.1,85.2,-8.6,83.9,5.2C82.5,19,73.8,32,63.1,42.5C52.5,53,40,61,26.4,66C12.8,71,-1.8,73,-16.1,70.8C-30.5,68.6,-44.6,62.3,-56.1,52.4C-67.6,42.4,-76.6,28.8,-79.9,14C-83.3,-0.7,-81,-16.5,-73.2,-29.6C-65.5,-42.6,-52.3,-53,-38.7,-59.5C-25.1,-66,-11,-68.5,1.9,-71.7C14.8,-75,27.7,-72.3,39.9,-65.4Z" transform="translate(100 100) scale(0.9)" />
@@ -99,7 +99,17 @@ export default function Login() {
             <Icons.Compass size={16} /> Platform Anak Kos
           </div>
 
-          <h1 style={{ fontSize: '3.5rem', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.25rem', letterSpacing: '-0.03em' }}>
+          <h1 style={{ 
+            fontSize: '3.75rem', 
+            fontWeight: 900, 
+            lineHeight: 1.1, 
+            marginBottom: '1.25rem', 
+            letterSpacing: '-0.03em',
+            background: 'linear-gradient(to right, #ffffff, #a7f3d0)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            display: 'inline-block'
+          }}>
             Selamat Datang di <br/>Lapak Kos.
           </h1>
           
