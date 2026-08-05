@@ -565,6 +565,11 @@ export default function Navbar() {
                               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                 <Icons.ShoppingBag size={15} /> Pesanan Saya
                               </Link>
+                              <Link href="/offers" onClick={() => setShowProfileDropdown(false)} style={dropdownItemStyle}
+                              onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                <Icons.Zap size={15} /> Penawaran Saya
+                              </Link>
 
                               {/* Install & Push — in dropdown */}
                               {deferredPrompt && (
