@@ -486,7 +486,10 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                   <Button 
                     onClick={() => {
                       const sellerId = product.user_id || product.user?.id;
-                      router.push(`/chat/${product.id}/${sellerId}?template=transfer_check`);
+                      // Simpan template di sessionStorage — lebih reliable daripada URL query
+                      // param karena useSearchParams() bisa return null saat navigasi di Next.js.
+                      sessionStorage.setItem('pendingChatTemplate', 'transfer_check');
+                      router.push(`/chat/${product.id}/${sellerId}`);
                     }} 
                     variant="primary"
                     size="lg"
@@ -494,6 +497,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                   >
                     <Icons.MessageCircle size={16} /> Tanya Stok (Transfer)
                   </Button>
+
                 ) : (
                   <Button onClick={handlePlaceOrder} disabled={buyLoading} variant="primary" size="lg" fullWidth>
                     {buyLoading ? 'Memproses...' : 'Kirim Pesanan'}

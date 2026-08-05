@@ -36,8 +36,9 @@ export default function ChatDetailPage() {
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
-  const searchParams = useSearchParams();
-  const templateParam = searchParams.get('template');
+  // Gunakan sessionStorage bukan URL query param — useSearchParams() di Next.js
+  // App Router bisa return null saat client-side navigation (timing/hydration issue).
+  const [pendingTemplate, setPendingTemplate] = useState<string | null>(null);
   // Gunakan ref agar guard pengiriman template tidak memicu re-render
   // yang bisa menyebabkan effect terpanggil berulang atau state jadi stale.
   const templateSentRef = useRef(false);
@@ -68,6 +69,16 @@ export default function ChatDetailPage() {
     }
   }, [user, authLoading, router]);
 
+  // Baca template dari sessionStorage saat mount (lebih reliable daripada URL params)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = sessionStorage.getItem('pendingChatTemplate');
+    if (stored) {
+      setPendingTemplate(stored);
+      sessionStorage.removeItem('pendingChatTemplate');
+    }
+  }, []);
+
   // Load initial data and start polling
   useEffect(() => {
     if (!user) return;
@@ -86,7 +97,7 @@ export default function ChatDetailPage() {
 
   useEffect(() => {
     if (
-      templateParam !== 'transfer_check' ||
+      pendingTemplate !== 'transfer_check' ||
       templateSentRef.current ||
       loading ||
       !user ||
@@ -113,10 +124,8 @@ export default function ChatDetailPage() {
         });
         // Refresh pesan setelah berhasil terkirim
         loadMessages(false);
-        // Bersihkan query param dari URL (SETELAH API sukses)
-        router.replace(`/chat/${productId}/${otherUserId}`);
       } catch (err) {
-        console.error('Gagal mengirim template transfer_check', err);
+        console.error('[TRANSFER_CHECK] gagal kirim template:', err);
         // Reset ref agar bisa retry jika ada kegagalan jaringan
         templateSentRef.current = false;
       }
@@ -124,7 +133,8 @@ export default function ChatDetailPage() {
 
     doSend();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateParam, loading, user, otherUserId, productId]);
+  }, [pendingTemplate, loading, user, otherUserId, productId]);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
