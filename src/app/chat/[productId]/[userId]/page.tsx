@@ -295,8 +295,10 @@ export default function ChatDetailPage() {
 
   // Note: isExpired intentionally does NOT block sending — a new message is what
   // "revives" an idle chat (it becomes the newest message, so isExpired flips
-  // back to false). Only a sold product or cancelled order permanently closes it.
-  const isChatClosed = isOrderCancelled || isProductSold;
+  // back to false). A cancelled order does NOT close the chat either — the buyer
+  // must be able to re-negotiate or ask about stock again after cancelling. Only
+  // a sold product permanently closes it.
+  const isChatClosed = isProductSold;
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -837,12 +839,7 @@ export default function ChatDetailPage() {
       <div style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
 
         {isChatClosed ? (
-          isOrderCancelled ? (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--danger)' }}>
-              <Icons.X size={20} />
-              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan ini telah dibatalkan. Sesi chat ini telah berakhir.</span>
-            </div>
-          ) : activeOrder?.status === 'completed' ? (
+          activeOrder?.status === 'completed' ? (
             <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--success)' }}>
               <Icons.CheckCheck size={20} />
               <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan telah selesai. Sesi chat ini telah berakhir.</span>
@@ -855,6 +852,12 @@ export default function ChatDetailPage() {
           )
         ) : (
         <>
+        {isOrderCancelled && (
+          <div style={{ margin: '1rem 1.5rem 0', padding: '0.85rem 1rem', background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--danger)' }}>
+            <Icons.X size={18} />
+            <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>Pesanan sebelumnya untuk produk ini dibatalkan. Kamu tetap bisa lanjut chat atau tanya stok lagi di sini.</span>
+          </div>
+        )}
         {isExpired && (
           <div style={{ margin: '1rem 1.5rem 0', padding: '0.85rem 1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--muted-foreground)' }}>
             <Icons.Clock size={18} />
