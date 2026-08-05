@@ -73,7 +73,7 @@ export default function Login() {
       {/* Left Panel - Hidden on mobile */}
       <div className="hide-mobile" style={{
         flex: '1.1',
-        background: 'linear-gradient(135deg, var(--primary) 0%, #047857 100%)',
+        background: 'var(--hero-gradient)',
         color: 'white',
         padding: '3rem',
         display: 'flex',
@@ -180,7 +180,7 @@ export default function Login() {
           background: 'var(--card)',
           padding: '2rem 2rem',
           borderRadius: '24px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
+          boxShadow: 'var(--shadow-lg)',
           border: '1px solid var(--border)'
         }}>
           

@@ -180,7 +180,7 @@ function RegisterForm() {
       {/* Left Panel - Hidden on mobile */}
       <div className="hide-mobile" style={{
         flex: '1.1',
-        background: 'linear-gradient(135deg, var(--primary) 0%, #047857 100%)',
+        background: 'var(--hero-gradient)',
         color: 'white',
         padding: '3rem',
         display: 'flex',
@@ -273,7 +273,8 @@ function RegisterForm() {
         alignItems: 'center', 
         justifyContent: 'center', 
         padding: '2rem 1.5rem',
-        position: 'relative'
+        position: 'relative',
+        overflowY: 'auto'
       }}>
         {/* Soft background glow on desktop */}
         <div className="hide-mobile" style={{ position: 'absolute', top: '0', right: '0', width: '300px', height: '300px', background: 'var(--primary-light)', opacity: 0.3, borderRadius: '50%', filter: 'blur(80px)', zIndex: 0 }} />
@@ -285,9 +286,9 @@ function RegisterForm() {
           position: 'relative', 
           zIndex: 1,
           background: 'var(--card)',
-          padding: '2rem',
+          padding: '2.5rem 2rem',
           borderRadius: '24px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
+          boxShadow: 'var(--shadow-lg)',
           border: '1px solid var(--border)'
         }}>
           

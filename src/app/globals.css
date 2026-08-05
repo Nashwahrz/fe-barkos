@@ -49,6 +49,7 @@
   /* Brand gradients */
   --gradient-brand: linear-gradient(135deg, #0D9488 0%, #14B8A6 55%, #2DD4BF 100%);
   --gradient-brand-soft: linear-gradient(135deg, rgba(13,148,136,0.10) 0%, rgba(45,212,191,0.06) 100%);
+  --hero-gradient: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
 
   /* Translucent surface for glass-effect navbars/sheets */
   --glass-surface: rgba(255, 255, 255, 0.78);
@@ -66,11 +67,12 @@
   --input-border: #4B5563;
   --primary-light: rgba(13, 148, 136, 0.15);
   --glass-surface: rgba(31, 41, 55, 0.78);
+  --hero-gradient: linear-gradient(135deg, #0f766e 0%, #022c22 100%);
 
   /* UI Elements */
   --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.5);
   --shadow: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -2px rgba(0,0,0,0.3);
+  --shadow-lg: 0 20px 40px -5px rgba(0,0,0,0.5), 0 10px 15px -3px rgba(0,0,0,0.3);
 }
 
 * {
