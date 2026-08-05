@@ -62,12 +62,20 @@ export default function Login() {
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 65px)', background: 'var(--background)', overflow: 'hidden' }}>
       
+      {/* Global Style for Keyframes */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes floatAnim {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-15px); }
+        }
+      `}} />
+
       {/* Left Panel - Hidden on mobile */}
       <div className="hide-mobile" style={{
-        flex: '1.2',
+        flex: '1.1',
         background: 'linear-gradient(135deg, var(--primary) 0%, #047857 100%)',
         color: 'white',
-        padding: '4rem',
+        padding: '3rem',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -77,11 +85,11 @@ export default function Login() {
         <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '500px', height: '500px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(60px)' }} />
         <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '400px', height: '400px', background: 'rgba(255,255,255,0.15)', borderRadius: '50%', filter: 'blur(50px)' }} />
         
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '540px', margin: '2rem auto 0 auto' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '460px', margin: '2rem auto 0 auto' }}>
           
           {/* Floating attractive graphic */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <svg width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))' }}>
+          <div style={{ marginBottom: '1.5rem', animation: 'floatAnim 4s ease-in-out infinite' }}>
+            <svg width="75" height="75" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))' }}>
               <path fill="#ffffff" fillOpacity="0.2" d="M45.7,-76.4C58.9,-69.3,68.9,-55.5,77.7,-41.4C86.5,-27.3,94.2,-13.6,93.6,-0.4C93,14.3,84.2,28.7,73.1,39.2C62,49.7,48.7,56.3,34.8,63.9C20.9,71.5,6.5,80.1,-6.6,83.1C-19.7,86,-31.4,83.4,-44,77.3C-56.6,71.3,-70.1,61.8,-79.1,49.1C-88.1,36.3,-92.6,20.3,-90.4,4.1C-88.2,-12,-79.3,-28.3,-67.7,-40.5C-56.1,-52.7,-41.8,-60.8,-28.1,-65.7C-14.4,-70.5,-1.3,-72.1,12.5,-71C26.2,-69.9,40.5,-66.1,52.1,-58C63.7,-50,72.5,-37.6,78.8,-24.1C85.1,-10.7,88.9,3.9,86.1,17.4C83.3,30.9,74,43.3,62.8,53.4C51.6,63.5,38.6,71.2,25,75.4" transform="translate(100 100) scale(1.05)" />
               <path fill="#ffffff" fillOpacity="0.4" d="M39.9,-65.4C52.1,-58.5,62.6,-48,70.9,-35.5C79.2,-23.1,85.2,-8.6,83.9,5.2C82.5,19,73.8,32,63.1,42.5C52.5,53,40,61,26.4,66C12.8,71,-1.8,73,-16.1,70.8C-30.5,68.6,-44.6,62.3,-56.1,52.4C-67.6,42.4,-76.6,28.8,-79.9,14C-83.3,-0.7,-81,-16.5,-73.2,-29.6C-65.5,-42.6,-52.3,-53,-38.7,-59.5C-25.1,-66,-11,-68.5,1.9,-71.7C14.8,-75,27.7,-72.3,39.9,-65.4Z" transform="translate(100 100) scale(0.9)" />
               <circle cx="100" cy="100" r="22" fill="#ffffff" fillOpacity="0.9" />
@@ -91,8 +99,8 @@ export default function Login() {
 
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px', 
-            background: 'rgba(255,255,255,0.15)', padding: '6px 14px', 
-            borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600,
+            background: 'rgba(255,255,255,0.15)', padding: '4px 12px', 
+            borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600,
             backdropFilter: 'blur(10px)', marginBottom: '1rem',
             border: '1px solid rgba(255,255,255,0.2)'
           }}>
@@ -100,7 +108,7 @@ export default function Login() {
           </div>
 
           <h1 style={{ 
-            fontSize: '2.75rem', 
+            fontSize: '2.4rem', 
             fontWeight: 900, 
             lineHeight: 1.15, 
             marginBottom: '1rem', 
@@ -113,33 +121,33 @@ export default function Login() {
             Selamat Datang di <br/>Lapak Kos.
           </h1>
           
-          <p style={{ fontSize: '1rem', opacity: 0.9, lineHeight: 1.5, marginBottom: '2.5rem', maxWidth: '90%' }}>
+          <p style={{ fontSize: '0.95rem', opacity: 0.9, lineHeight: 1.5, marginBottom: '2.5rem', maxWidth: '95%' }}>
             Platform andalan mahasiswa untuk mencari perabotan kos murah atau membuka lapak secara gratis. Temukan kemudahannya sekarang!
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div style={{ 
-              background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '20px', 
+              background: 'rgba(255,255,255,0.1)', padding: '1.25rem', borderRadius: '16px', 
               backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)',
             }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                <Icons.ShoppingBag size={24} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Icons.ShoppingBag size={20} />
               </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Beli Kebutuhan</h3>
-              <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Beli Kebutuhan</h3>
+              <p style={{ fontSize: '0.8rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
                 Temukan barang kos dari sesama mahasiswa di sekitar kampus.
               </p>
             </div>
             
             <div style={{ 
-              background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '20px', 
+              background: 'rgba(255,255,255,0.1)', padding: '1.25rem', borderRadius: '16px', 
               backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)',
             }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                <Icons.Store size={24} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Icons.Store size={20} />
               </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Buka Lapak</h3>
-              <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Buka Lapak</h3>
+              <p style={{ fontSize: '0.8rem', opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
                 Buka toko Anda sendiri gratis dan jangkau pembeli dengan cepat.
               </p>
             </div>
@@ -149,11 +157,11 @@ export default function Login() {
 
       {/* Right Panel - Login Form */}
       <div style={{ 
-        flex: '0.8', 
+        flex: '0.9', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        padding: '2rem 1rem',
+        padding: '2rem 1.5rem',
         position: 'relative'
       }}>
         {/* Soft background glow on desktop */}
@@ -162,22 +170,22 @@ export default function Login() {
         {/* Form Container (Card Style) */}
         <div style={{ 
           width: '100%', 
-          maxWidth: '440px', 
+          maxWidth: '380px', 
           position: 'relative', 
           zIndex: 1,
           background: 'var(--card)',
-          padding: '2.5rem 2rem',
+          padding: '2rem 2rem',
           borderRadius: '24px',
           boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
           border: '1px solid var(--border)'
         }}>
           
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <div className="mobile-only" style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'var(--primary-light)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', marginBottom: '1rem' }}>
-              <Icons.Store size={28} />
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div className="mobile-only" style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--primary-light)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', marginBottom: '1rem' }}>
+              <Icons.Store size={24} />
             </div>
-            <h2 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Masuk ke Akun</h2>
-            <p style={{ opacity: 0.6, fontSize: '0.95rem', color: 'var(--foreground)' }}>Silakan isi detail Anda untuk melanjutkan</p>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '0.25rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Masuk ke Akun</h2>
+            <p style={{ opacity: 0.6, fontSize: '0.85rem', color: 'var(--foreground)' }}>Silakan isi detail Anda untuk melanjutkan</p>
           </div>
 
           {error && (
