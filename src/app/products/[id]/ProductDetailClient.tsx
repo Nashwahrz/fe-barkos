@@ -50,7 +50,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
 
   // Report modal
   const [showReport, setShowReport] = useState(false);
-  const [reportData, setReportData] = useState({ reason: '', description: '' });
+  const [reportData, setReportData] = useState({ reason: '', customReason: '', description: '' });
   const [reportLoading, setReportLoading] = useState(false);
 
   // Offer modal
@@ -168,7 +168,8 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
     if (!user) { router.push('/auth/login'); return; }
     setReportLoading(true);
     try {
-      await fetchApi('/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: id, ...reportData }) });
+      const payloadReason = reportData.reason === 'Lainnya' ? reportData.customReason : reportData.reason;
+      await fetchApi('/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: id, reason: payloadReason, description: reportData.description }) });
       alert('Laporan berhasil dikirim. Terima kasih!');
       setShowReport(false);
     } catch { alert('Gagal mengirim laporan.'); }
@@ -564,6 +565,17 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                   <option value="Salah Kategori">Salah Kategori</option>
                   <option value="Lainnya">Lainnya</option>
                 </select>
+                {reportData.reason === 'Lainnya' && (
+                  <input 
+                    type="text" 
+                    className="input-field" 
+                    placeholder="Tuliskan alasan lainnya..." 
+                    value={reportData.customReason} 
+                    onChange={e => setReportData({ ...reportData, customReason: e.target.value })} 
+                    style={{ width: '100%', marginTop: '0.5rem' }} 
+                    required 
+                  />
+                )}
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--foreground)' }}>Keterangan Tambahan</label>
