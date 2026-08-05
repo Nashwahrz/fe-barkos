@@ -27,10 +27,11 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  const { data: productData, isLoading: loading, mutate } = useSWR(`/products/${id}`, swrFetcher, {
+  const { data: productData, error: productError, isLoading: loading, mutate } = useSWR(`/products/${id}`, swrFetcher, {
     fallbackData: initialProduct ? { data: initialProduct } : undefined
   });
   const product = productData?.data || productData || initialProduct;
+  const notFound = !product && !loading && !!productError;
 
   const [distanceInfo, setDistanceInfo] = useState<string | null>(null);
   const [buyerLocation, setBuyerLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -200,6 +201,19 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
   };
 
   const resetBuy = () => { setShowBuyModal(false); setBuyStep('method'); setPaymentMethod('cod'); setNotes(''); setTransaction(null); setProofFile(null); setBuyError(''); };
+
+  if (notFound) return (
+    <div style={{ textAlign: 'center', padding: '80px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--foreground)' }}>
+      <Icons.Package size={48} color="var(--border)" />
+      <div>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px' }}>Produk tidak ditemukan</h2>
+        <p style={{ opacity: 0.6, fontSize: '0.95rem' }}>Produk yang kamu cari mungkin sudah dihapus atau tidak tersedia.</p>
+      </div>
+      <Link href="/products" style={{ color: 'var(--primary)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem', marginTop: '8px' }}>
+        <Icons.ArrowLeft size={16} /> Kembali ke Katalog
+      </Link>
+    </div>
+  );
 
   if (!product) return (
     <div style={{ textAlign: 'center', padding: '80px 0', opacity: 0.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--foreground)' }}>
