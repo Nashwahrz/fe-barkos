@@ -65,11 +65,13 @@ export default function AdminCategories() {
           method: 'PUT',
           body: JSON.stringify({ name })
         });
+        alert('Kategori berhasil diperbarui!');
       } else {
         await fetchApi('/admin/categories', {
           method: 'POST',
           body: JSON.stringify({ name })
         });
+        alert('Kategori berhasil ditambahkan!');
       }
       setName('');
       setEditingId(null);
