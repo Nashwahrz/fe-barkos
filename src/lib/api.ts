@@ -100,3 +100,12 @@ export async function unsubscribeFromPushNotifications(endpoint: string) {
     body: JSON.stringify({ endpoint }),
   });
 }
+
+/**
+ * Favorites
+ */
+export async function toggleFavorite(productId: number) {
+  return fetchApi(`/favorites/${productId}/toggle`, {
+    method: 'POST',
+  });
+}

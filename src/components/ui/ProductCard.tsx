@@ -1,7 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getStorageUrl } from '@/lib/api';
+import { getStorageUrl, toggleFavorite } from '@/lib/api';
 import { Icons } from '@/components/Icons';
 
 export interface ProductCardProps {
@@ -10,6 +12,37 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product, promoted = false }: ProductCardProps) {
+  const [isFavorited, setIsFavorited] = useState(product.is_favorited || false);
+  const [isLiking, setIsLiking] = useState(false);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if logged in (simple check if token exists)
+    if (typeof window !== 'undefined' && !localStorage.getItem('auth_token')) {
+      alert('Silakan login terlebih dahulu untuk memfavoritkan barang.');
+      return;
+    }
+
+    if (isLiking) return;
+
+    try {
+      setIsLiking(true);
+      // Optimistic update
+      setIsFavorited(!isFavorited);
+      
+      const res = await toggleFavorite(product.id);
+      setIsFavorited(res.is_favorited);
+    } catch (err) {
+      console.error(err);
+      // Revert on error
+      setIsFavorited(!isFavorited);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   return (
     <Link
       href={`/products/${product.id}`}
@@ -49,6 +82,27 @@ export function ProductCard({ product, promoted = false }: ProductCardProps) {
           Rekomendasi
         </div>
       )}
+
+      {/* Favorite Button */}
+      <button
+        onClick={handleFavoriteClick}
+        disabled={isLiking}
+        style={{
+          position: 'absolute', top: '10px', right: '10px', zIndex: 3,
+          background: 'var(--card)',
+          border: 'none',
+          borderRadius: '50%',
+          width: '32px', height: '32px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: isLiking ? 'wait' : 'pointer',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+          color: isFavorited ? 'var(--danger)' : 'var(--foreground)',
+          transition: 'all 0.2s ease',
+          opacity: isLiking ? 0.7 : 1
+        }}
+      >
+        <Icons.Heart size={16} fill={isFavorited ? 'currentColor' : 'none'} />
+      </button>
 
       {/* Image */}
       <div style={{
