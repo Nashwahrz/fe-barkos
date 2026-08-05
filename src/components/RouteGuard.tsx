@@ -20,8 +20,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    // If there is no user and we are not on an auth page
-    if (!user && !pathname.startsWith('/auth')) {
+    const isPublicPath = pathname === '/' || pathname.startsWith('/products') || pathname.startsWith('/auth');
+
+    // If there is no user and we are not on a public page
+    if (!user && !isPublicPath) {
       router.push('/auth/login');
       return;
     }
@@ -47,8 +49,9 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If not authenticated and not on an auth page, render nothing while redirecting
-  if (!user && !pathname.startsWith('/auth')) {
+  // If not authenticated and not on a public page, render nothing while redirecting
+  const isPublicPath = pathname === '/' || pathname.startsWith('/products') || pathname.startsWith('/auth');
+  if (!user && !isPublicPath) {
     return null;
   }
 
