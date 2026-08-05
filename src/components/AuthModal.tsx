@@ -6,6 +6,7 @@ import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { fetchApi } from '@/lib/api';
+import { ReCaptchaV2 } from '@/components/ui/ReCaptchaV2';
 
 export default function AuthModal() {
   const { authModalType, openAuthModal, closeAuthModal, login } = useAuth();
@@ -24,10 +25,20 @@ export default function AuthModal() {
   const [regPassword, setRegPassword] = useState('');
   const [regPasswordConf, setRegPasswordConf] = useState('');
 
+  // Captcha States
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
+
+  const handleCaptchaVerify = React.useCallback((token: string | null) => {
+    setRecaptchaToken(token);
+  }, []);
+
   // Handle outside click
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       closeAuthModal();
+      setRecaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     }
   };
 
@@ -40,12 +51,16 @@ export default function AuthModal() {
       const res = await fetchApi('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+        body: JSON.stringify({ email: loginEmail, password: loginPassword, recaptcha_token: recaptchaToken }),
       });
       login(res.access_token, res.user);
       closeAuthModal();
+      setRecaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     } catch (err: any) {
       setError(err.message || 'Login gagal. Periksa kembali email dan password Anda.');
+      setRecaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     } finally {
       setLoading(false);
     }
@@ -71,18 +86,23 @@ export default function AuthModal() {
           password: regPassword,
           password_confirmation: regPasswordConf,
           role: 'pembeli',
-          asal_kampus: regAsalKampus
+          asal_kampus: regAsalKampus,
+          recaptcha_token: recaptchaToken
         }),
       });
 
       login(res.access_token, res.user);
       closeAuthModal();
+      setRecaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     } catch (err: any) {
       let msg = err.message || 'Gagal mendaftar.';
       if (err.response?.data?.errors) {
         msg = Object.values(err.response.data.errors).flat().join(', ');
       }
       setError(msg);
+      setRecaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     } finally {
       setLoading(false);
     }
@@ -168,7 +188,13 @@ export default function AuthModal() {
               onChange={e => setLoginPassword(e.target.value)}
             />
             
-            <Button type="submit" disabled={loading} variant="primary" size="lg" style={{ marginTop: '0.5rem', height: '52px', fontSize: '1rem' }} fullWidth>
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
+              <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
+                <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
+              </div>
+            </div>
+
+            <Button type="submit" disabled={loading || !recaptchaToken} variant="primary" size="lg" style={{ marginTop: '0.5rem', height: '52px', fontSize: '1rem' }} fullWidth>
               {loading ? 'Masuk...' : 'Masuk'}
             </Button>
             
@@ -253,7 +279,13 @@ export default function AuthModal() {
               onChange={e => setRegPasswordConf(e.target.value)}
             />
 
-            <Button type="submit" disabled={loading} variant="primary" size="lg" style={{ marginTop: '0.5rem', height: '52px', fontSize: '1rem' }} fullWidth>
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
+              <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
+                <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
+              </div>
+            </div>
+
+            <Button type="submit" disabled={loading || !recaptchaToken} variant="primary" size="lg" style={{ marginTop: '0.5rem', height: '52px', fontSize: '1rem' }} fullWidth>
               {loading ? 'Mendaftar...' : 'Daftar'}
             </Button>
             
