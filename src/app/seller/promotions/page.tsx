@@ -303,7 +303,10 @@ export default function SellerPromotions() {
                         <div style={{ fontWeight: 800, color: isSelected ? 'var(--primary)' : '#111827', fontSize: '1rem' }}>{pkg.name}</div>
                         <div style={{ color: 'var(--primary)', fontWeight: 900, fontSize: '1.1rem' }}>Rp {Number(pkg.price).toLocaleString('id-ID')}</div>
                       </div>
-                      <div style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 500 }}>Durasi Aktif: {pkg.duration_days} Hari</div>
+                      <div style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 500 }}>
+                        Durasi Aktif: {pkg.duration_days} Hari
+                        {pkg.quota_impressions && ` • Quota: ${pkg.quota_impressions.toLocaleString('id-ID')} Tayangan`}
+                      </div>
                     </div>
                   );
                 })}

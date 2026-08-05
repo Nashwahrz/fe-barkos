@@ -22,7 +22,7 @@ export default function PromotionPackages() {
   const [editingPackage, setEditingPackage] = useState<any | null>(null);
   
   // Form states
-  const [formData, setFormData] = useState({ name: '', price: '', duration_days: '' });
+  const [formData, setFormData] = useState({ name: '', price: '', duration_days: '', quota_impressions: '' });
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -53,11 +53,12 @@ export default function PromotionPackages() {
       setFormData({
         name: pkg.name,
         price: pkg.price.toString(),
-        duration_days: pkg.duration_days.toString()
+        duration_days: pkg.duration_days.toString(),
+        quota_impressions: pkg.quota_impressions ? pkg.quota_impressions.toString() : ''
       });
     } else {
       setEditingPackage(null);
-      setFormData({ name: '', price: '', duration_days: '' });
+      setFormData({ name: '', price: '', duration_days: '', quota_impressions: '' });
     }
     setError('');
     setIsModalOpen(true);
@@ -133,6 +134,7 @@ export default function PromotionPackages() {
                   <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>NAMA PAKET</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>HARGA</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>DURASI AKTIF</th>
+                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>KUOTA (TAYANGAN)</th>
                   <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
                 </tr>
               </thead>
@@ -154,6 +156,9 @@ export default function PromotionPackages() {
                     </td>
                     <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>
                       {pkg.duration_days} Hari
+                    </td>
+                    <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>
+                      {pkg.quota_impressions ? `${pkg.quota_impressions.toLocaleString('id-ID')}` : 'Tak Terbatas'}
                     </td>
                     <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
@@ -202,6 +207,13 @@ export default function PromotionPackages() {
             value={formData.duration_days}
             onChange={e => setFormData({ ...formData, duration_days: e.target.value })}
             required
+          />
+          <Input
+            label="Kuota Tayangan (Opsional)"
+            type="number"
+            placeholder="Mis. 10"
+            value={formData.quota_impressions}
+            onChange={e => setFormData({ ...formData, quota_impressions: e.target.value })}
           />
           <div style={{ marginTop: '0.5rem', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>Batal</Button>

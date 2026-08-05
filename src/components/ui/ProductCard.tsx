@@ -84,12 +84,14 @@ export function ProductCard({ product, promoted = false }: ProductCardProps) {
       {promoted && (
         <div style={{
           position: 'absolute', top: '10px', left: '10px', zIndex: 2,
-          display: 'inline-block',
+          display: 'inline-flex', alignItems: 'center', gap: '4px',
           background: 'var(--primary)',
-          color: '#ffffff', fontWeight: 600, fontSize: '0.65rem',
-          padding: '4px 8px', borderRadius: '6px'
+          color: '#ffffff', fontWeight: 700, fontSize: '0.7rem',
+          padding: '4px 8px', borderRadius: '6px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          Rekomendasi
+          <Icons.Star size={12} fill="currentColor" />
+          Sponsor
         </div>
       )}
 
