@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchApi, swrFetcher } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import useSWR, { mutate } from 'swr';
+import dynamic from 'next/dynamic';
 
 interface User {
   id: number;
@@ -28,6 +29,9 @@ interface AuthContextType {
   login: (token: string, userData: User) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  authModalType: 'login' | 'register' | null;
+  openAuthModal: (type: 'login' | 'register') => void;
+  closeAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +39,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [authModalType, setAuthModalType] = useState<'login' | 'register' | null>(null);
   const router = useRouter();
 
   // Load token on mount
@@ -77,6 +82,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/auth/login');
   }
 
+  function openAuthModal(type: 'login' | 'register') {
+    setAuthModalType(type);
+  }
+
+  function closeAuthModal() {
+    setAuthModalType(null);
+  }
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -84,12 +97,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       unreadCount: 0,
       login, 
       logout, 
-      refreshUser 
+      refreshUser,
+      authModalType,
+      openAuthModal,
+      closeAuthModal
     }}>
       {children}
+      {/* 
+        We use a dynamic import for AuthModal so we don't cause circular dependencies 
+        or increase initial bundle size unnecessarily.
+      */}
+      {authModalType && <AuthModal />}
     </AuthContext.Provider>
   );
 }
+
+// Dynamically imported AuthModal
+const AuthModal = dynamic(() => import('@/components/AuthModal'), { ssr: false });
 
 export function useAuth() {
   const context = useContext(AuthContext);

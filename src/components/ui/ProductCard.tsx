@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getStorageUrl, toggleFavorite } from '@/lib/api';
 import { Icons } from '@/components/Icons';
+import { useAuth } from '@/components/AuthProvider';
 
 export interface ProductCardProps {
   product: any;
@@ -12,6 +13,7 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product, promoted = false }: ProductCardProps) {
+  const { user, openAuthModal } = useAuth();
   const [isFavorited, setIsFavorited] = useState(product.is_favorited || false);
   const [isLiking, setIsLiking] = useState(false);
 
@@ -19,9 +21,9 @@ export function ProductCard({ product, promoted = false }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Check if logged in (simple check if token exists)
-    if (typeof window !== 'undefined' && !localStorage.getItem('auth_token')) {
-      alert('Silakan login terlebih dahulu untuk memfavoritkan barang.');
+    // Check if logged in via context
+    if (!user) {
+      openAuthModal('login');
       return;
     }
 
@@ -43,9 +45,17 @@ export function ProductCard({ product, promoted = false }: ProductCardProps) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      openAuthModal('login');
+    }
+  };
+
   return (
     <Link
       href={`/products/${product.id}`}
+      onClick={handleCardClick}
       style={{
         display: 'flex',
         flexDirection: 'column',
