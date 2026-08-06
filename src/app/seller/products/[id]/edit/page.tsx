@@ -40,6 +40,10 @@ export default function EditProduct() {
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [bankName, setBankName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+
   useEffect(() => {
     if (!authLoading) {
       if (!user || user.role !== USER_ROLES.PENJUAL) {
@@ -75,6 +79,15 @@ export default function EditProduct() {
       });
       setIsOfferEnabled(p.is_offer_enabled !== false);
       setCurrentFoto(p.foto);
+      setPaymentMethod(p.payment_method || 'cod');
+      
+      if (p.user?.bank_accounts && p.user.bank_accounts.length > 0) {
+        setBankName(p.user.bank_accounts[0].bank_name);
+        setAccountNumber(p.user.bank_accounts[0].account_number);
+      } else if (user?.bank_accounts && user.bank_accounts.length > 0) {
+        setBankName(user.bank_accounts[0].bank_name);
+        setAccountNumber(user.bank_accounts[0].account_number);
+      }
 
     } catch (err) {
       console.error('Failed to load data', err);
@@ -203,6 +216,12 @@ export default function EditProduct() {
       submitData.append('is_offer_enabled', isOfferEnabled ? '1' : '0');
       if (isOfferEnabled && formData.minimum_offer_price !== undefined) {
         submitData.append('minimum_offer_price', formData.minimum_offer_price);
+      }
+
+      submitData.append('payment_method', paymentMethod);
+      if (['bank_transfer', 'both'].includes(paymentMethod)) {
+        submitData.append('bank_name', bankName);
+        submitData.append('account_number', accountNumber);
       }
 
       if (foto) {
@@ -348,6 +367,43 @@ export default function EditProduct() {
                value={formData.durasi_pemakaian}
                onChange={handleInputChange}
             />
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Metode Pembayaran</label>
+              <select 
+                 name="payment_method" 
+                 className="input-field" 
+                 value={paymentMethod}
+                 onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <option value="cod">COD (Bayar di Tempat)</option>
+                <option value="bank_transfer">Transfer Bank</option>
+                <option value="both">Keduanya (COD & Transfer)</option>
+              </select>
+            </div>
+
+            {['bank_transfer', 'both'].includes(paymentMethod) && (
+              <>
+                <Input 
+                   type="text" 
+                   name="bank_name" 
+                   label="Nama Bank"
+                   placeholder="Contoh: BCA, BNI, Mandiri"
+                   required
+                   value={bankName}
+                   onChange={(e) => setBankName(e.target.value)}
+                />
+                <Input 
+                   type="text" 
+                   name="account_number" 
+                   label="Nomor Rekening"
+                   placeholder="Contoh: 1234567890"
+                   required
+                   value={accountNumber}
+                   onChange={(e) => setAccountNumber(e.target.value)}
+                />
+              </>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

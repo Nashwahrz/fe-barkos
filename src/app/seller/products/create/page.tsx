@@ -37,6 +37,17 @@ export default function CreateProduct() {
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [bankName, setBankName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+
+  useEffect(() => {
+    if (user?.bank_accounts && user.bank_accounts.length > 0) {
+      setBankName(user.bank_accounts[0].bank_name);
+      setAccountNumber(user.bank_accounts[0].account_number);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!authLoading) {
       if (!user || user.role !== USER_ROLES.PENJUAL) {
@@ -166,6 +177,10 @@ export default function CreateProduct() {
     if (!formData.deskripsi.trim()) errors.deskripsi = 'Deskripsi barang wajib diisi.';
     if (!formData.latitude || !formData.longitude) errors.lokasi = 'Lokasi barang wajib ditentukan (pin peta atau GPS).';
     if (!foto) errors.foto = 'Foto barang wajib diunggah.';
+    if (['bank_transfer', 'both'].includes(paymentMethod)) {
+      if (!bankName.trim()) errors.bank_name = 'Nama Bank wajib diisi untuk transfer.';
+      if (!accountNumber.trim()) errors.account_number = 'Nomor Rekening wajib diisi.';
+    }
 
     setFieldErrors(errors);
 
@@ -213,6 +228,12 @@ export default function CreateProduct() {
       if (formData.latitude && formData.longitude) {
         submitData.append('latitude', formData.latitude);
         submitData.append('longitude', formData.longitude);
+      }
+
+      submitData.append('payment_method', paymentMethod);
+      if (['bank_transfer', 'both'].includes(paymentMethod)) {
+        submitData.append('bank_name', bankName);
+        submitData.append('account_number', accountNumber);
       }
 
       if (foto) {
@@ -367,6 +388,55 @@ export default function CreateProduct() {
                 </p>
               )}
             </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Metode Pembayaran</label>
+              <select
+                name="payment_method"
+                className="input-field"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <option value="cod">COD (Bayar di Tempat)</option>
+                <option value="bank_transfer">Transfer Bank</option>
+                <option value="both">Keduanya (COD & Transfer)</option>
+              </select>
+            </div>
+
+            {['bank_transfer', 'both'].includes(paymentMethod) && (
+              <>
+                <div id="field-bank_name">
+                  <Input
+                    type="text"
+                    name="bank_name"
+                    label="Nama Bank"
+                    placeholder="Contoh: BCA, BNI, Mandiri"
+                    value={bankName}
+                    onChange={(e) => { setBankName(e.target.value); setFieldErrors(p => ({ ...p, bank_name: '' })); }}
+                  />
+                  {fieldErrors.bank_name && (
+                    <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                      ⚠ {fieldErrors.bank_name}
+                    </p>
+                  )}
+                </div>
+                <div id="field-account_number">
+                  <Input
+                    type="text"
+                    name="account_number"
+                    label="Nomor Rekening"
+                    placeholder="Contoh: 1234567890"
+                    value={accountNumber}
+                    onChange={(e) => { setAccountNumber(e.target.value); setFieldErrors(p => ({ ...p, account_number: '' })); }}
+                  />
+                  {fieldErrors.account_number && (
+                    <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                      ⚠ {fieldErrors.account_number}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <div id="field-deskripsi" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
