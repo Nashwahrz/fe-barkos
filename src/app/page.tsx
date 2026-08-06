@@ -744,6 +744,12 @@ export default function Home() {
               .category-card-all:hover .category-text {
                 color: var(--foreground);
               }
+              @media (max-width: 768px) {
+                .category-card { width: 85px; gap: 10px; }
+                .category-icon-wrapper { border-radius: 22px; }
+                .category-icon-wrapper svg { width: 28px; height: 28px; }
+                .category-text { font-size: 0.8rem; }
+              }
             `}</style>
             <div style={{ 
               display: 'flex', gap: '24px',
@@ -755,10 +761,8 @@ export default function Home() {
             }}>
               {dbCategories.length === 0
                 ? Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} style={{
-                      display: 'flex', flexDirection: 'column', gap: '16px', width: '110px', flexShrink: 0
-                    }}>
-                      <div style={{ width: '100%', aspectRatio: '1', borderRadius: '24px', background: 'var(--border)', opacity: 0.3 }} />
+                    <div key={i} className="category-card" style={{ pointerEvents: 'none' }}>
+                      <div className="category-icon-wrapper" style={{ background: 'var(--border)', opacity: 0.2, border: 'none', boxShadow: 'none' }} />
                       <div style={{ width: '60%', height: '12px', borderRadius: '4px', background: 'var(--border)', opacity: 0.3, margin: '0 auto' }} />
                     </div>
                   ))
