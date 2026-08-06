@@ -86,7 +86,7 @@ export default function CreateProduct() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
-          
+
           canvas.toBlob((blob) => {
             if (blob) {
               const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg", {
@@ -214,7 +214,7 @@ export default function CreateProduct() {
         submitData.append('latitude', formData.latitude);
         submitData.append('longitude', formData.longitude);
       }
-      
+
       if (foto) {
         submitData.append('foto', foto);
       }
@@ -255,13 +255,13 @@ export default function CreateProduct() {
 
         <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div id="field-nama_barang">
-            <Input 
-               type="text" 
-               name="nama_barang" 
-               label="Nama Barang"
-               placeholder="Contoh: Kipas Angin Bekas" 
-               value={formData.nama_barang}
-               onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, nama_barang: '' })); }}
+            <Input
+              type="text"
+              name="nama_barang"
+              label="Nama Barang"
+              placeholder="Contoh: Kipas Angin Bekas"
+              value={formData.nama_barang}
+              onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, nama_barang: '' })); }}
             />
             {fieldErrors.nama_barang && (
               <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
@@ -272,14 +272,14 @@ export default function CreateProduct() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
             <div id="field-harga">
-              <Input 
-                 type="number" 
-                 name="harga" 
-                 label="Harga (Rp)"
-                 placeholder="Contoh: 500000" 
-                 min={0}
-                 value={formData.harga}
-                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, harga: '' })); }}
+              <Input
+                type="number"
+                name="harga"
+                label="Harga (Rp)"
+                placeholder="Contoh: 500000"
+                min={0}
+                value={formData.harga}
+                onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, harga: '' })); }}
               />
               {fieldErrors.harga && (
                 <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
@@ -287,7 +287,7 @@ export default function CreateProduct() {
                 </p>
               )}
             </div>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Terima Tawaran?</label>
               <label style={{
@@ -308,23 +308,23 @@ export default function CreateProduct() {
 
             {isOfferEnabled && (
               <Input
-                 type="number"
-                 name="minimum_offer_price"
-                 label="Minimal Harga Tawar (Rp)"
-                 placeholder="Opsional, misal: 450000"
-                 min={0}
-                 value={formData.minimum_offer_price}
-                 onChange={handleInputChange}
+                type="number"
+                name="minimum_offer_price"
+                label="Minimal Harga Tawar (Rp)"
+                placeholder="Opsional, misal: 450000"
+                min={0}
+                value={formData.minimum_offer_price}
+                onChange={handleInputChange}
               />
             )}
 
             <div id="field-category_id" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kategori Pilihan</label>
-              <select 
-                 name="category_id" 
-                 className="input-field" 
-                 value={formData.category_id}
-                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, category_id: '' })); }}
+              <select
+                name="category_id"
+                className="input-field"
+                value={formData.category_id}
+                onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, category_id: '' })); }}
               >
                 <option value="" disabled>-- Pilih Kategori --</option>
                 {categories.map((c: any) => (
@@ -339,27 +339,27 @@ export default function CreateProduct() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Kondisi</label>
-              <select 
-                 name="kondisi" 
-                 className="input-field" 
-                 required
-                 value={formData.kondisi}
-                 onChange={handleInputChange}
+              <select
+                name="kondisi"
+                className="input-field"
+                required
+                value={formData.kondisi}
+                onChange={handleInputChange}
               >
                 <option value="baru">Baru</option>
                 <option value="sangat baik">Sangat Baik</option>
                 <option value="layak pakai">Layak Pakai</option>
               </select>
             </div>
-            
+
             <div id="field-durasi_pemakaian">
-              <Input 
-                 type="text" 
-                 name="durasi_pemakaian" 
-                 label="Durasi Pemakaian"
-                 placeholder="Contoh: 6 Bulan, 1 Tahun" 
-                 value={formData.durasi_pemakaian}
-                 onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, durasi_pemakaian: '' })); }}
+              <Input
+                type="text"
+                name="durasi_pemakaian"
+                label="Durasi Pemakaian"
+                placeholder="Contoh: 6 Bulan, 1 Tahun"
+                value={formData.durasi_pemakaian}
+                onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, durasi_pemakaian: '' })); }}
               />
               {fieldErrors.durasi_pemakaian && (
                 <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
@@ -371,14 +371,14 @@ export default function CreateProduct() {
 
           <div id="field-deskripsi" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Deskripsi Barang</label>
-            <textarea 
-               name="deskripsi" 
-               className="input-field" 
-               rows={6}
-               style={{ height: 'auto', resize: 'vertical' }}
-               placeholder="Jelaskan spesifikasi, merek, atau minus dari barang yang Anda jual." 
-               value={formData.deskripsi}
-               onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, deskripsi: '' })); }}
+            <textarea
+              name="deskripsi"
+              className="input-field"
+              rows={6}
+              style={{ height: 'auto', resize: 'vertical' }}
+              placeholder="Jelaskan spesifikasi, merek, atau minus dari barang yang Anda jual."
+              value={formData.deskripsi}
+              onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, deskripsi: '' })); }}
             />
             {fieldErrors.deskripsi && (
               <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
@@ -391,11 +391,11 @@ export default function CreateProduct() {
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Lokasi Barang (Pin Point Peta)</label>
             <div style={{ display: 'flex', gap: '12px' }}>
               <div style={{ flex: 1 }}>
-                <Input 
-                   type="text" 
-                   placeholder="Koordinat terpilih..." 
-                   readOnly
-                   value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
+                <Input
+                  type="text"
+                  placeholder="Koordinat terpilih..."
+                  readOnly
+                  value={formData.latitude && formData.longitude ? `${formData.latitude}, ${formData.longitude}` : ''}
                 />
               </div>
               <Button type="button" onClick={getLocation} variant="secondary" style={{ whiteSpace: 'nowrap' }}>
@@ -409,17 +409,17 @@ export default function CreateProduct() {
             )}
 
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
-              <LocationPicker 
-                lat={formData.latitude ? parseFloat(formData.latitude) : -0.947083} 
-                lng={formData.longitude ? parseFloat(formData.longitude) : 100.417181} 
-                onChange={(lat, lng) => { handleLocationChange(lat, lng); setFieldErrors(p => ({ ...p, lokasi: '' })); }} 
+              <LocationPicker
+                lat={formData.latitude ? parseFloat(formData.latitude) : -0.947083}
+                lng={formData.longitude ? parseFloat(formData.longitude) : 100.417181}
+                onChange={(lat, lng) => { handleLocationChange(lat, lng); setFieldErrors(p => ({ ...p, lokasi: '' })); }}
               />
             </div>
           </div>
 
           <div id="field-foto" style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 600, color: 'var(--foreground)' }}>Foto Barang Utama</label>
-            <div 
+            <div
               style={{
                 border: '2px dashed var(--border)',
                 borderRadius: '12px',
@@ -450,30 +450,30 @@ export default function CreateProduct() {
                 </div>
               )}
             </div>
-            
+
             {/* Hidden Inputs */}
-            <input 
-               id="foto-upload-camera"
-               type="file" 
-               accept="image/jpeg, image/png, image/webp" 
-               capture="environment"
-               style={{ display: 'none' }}
-               onChange={(e) => {
-                 handleFileChange(e);
-                 const optionsDiv = document.getElementById('photo-options-modal');
-                 if (optionsDiv) optionsDiv.style.display = 'none';
-               }}
+            <input
+              id="foto-upload-camera"
+              type="file"
+              accept="image/jpeg, image/png, image/webp"
+              capture="environment"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                handleFileChange(e);
+                const optionsDiv = document.getElementById('photo-options-modal');
+                if (optionsDiv) optionsDiv.style.display = 'none';
+              }}
             />
-            <input 
-               id="foto-upload-gallery"
-               type="file" 
-               accept="image/jpeg, image/png, image/webp" 
-               style={{ display: 'none' }}
-               onChange={(e) => {
-                 handleFileChange(e);
-                 const optionsDiv = document.getElementById('photo-options-modal');
-                 if (optionsDiv) optionsDiv.style.display = 'none';
-               }}
+            <input
+              id="foto-upload-gallery"
+              type="file"
+              accept="image/jpeg, image/png, image/webp"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                handleFileChange(e);
+                const optionsDiv = document.getElementById('photo-options-modal');
+                if (optionsDiv) optionsDiv.style.display = 'none';
+              }}
             />
 
             {/* Photo Source Options Modal (Simple Overlay) */}
@@ -500,7 +500,7 @@ export default function CreateProduct() {
 
           <div style={{ marginTop: '2rem' }}>
             <Button type="submit" disabled={loading} variant="primary" size="lg" fullWidth>
-              {loading ? 'Menyimpan Barang...' : 'Listing Barang Bekas'}
+              {loading ? 'Menyimpan Barang...' : 'Upload Barang Bekas'}
             </Button>
           </div>
         </form>
