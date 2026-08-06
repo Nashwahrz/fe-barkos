@@ -39,18 +39,19 @@ function CallbackContent() {
       
       login(token, user);
 
-      // Redirect based on role and saved path
+      // Redirect back to the page the user was on before logging in, when there
+      // is one — RouteGuard still enforces role restrictions afterward, so this
+      // is safe even if the saved path doesn't belong to the user's role.
       const redirectPath = localStorage.getItem('redirect_after_login');
       if (redirectPath) {
         localStorage.removeItem('redirect_after_login');
-      }
-
-      if (user.role === 'super_admin') {
+        router.push(redirectPath);
+      } else if (user.role === 'super_admin') {
         router.push('/admin/dashboard');
       } else if (user.role === 'penjual') {
         router.push('/seller/products');
       } else {
-        router.push(redirectPath || '/');
+        router.push('/');
       }
     } catch (err) {
       console.error('Callback login failed:', err);

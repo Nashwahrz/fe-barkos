@@ -24,6 +24,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
     // If there is no user and we are not on a public page
     if (!user && !isPublicPath) {
+      localStorage.setItem('redirect_after_login', pathname);
       router.push('/auth/login');
       return;
     }

@@ -40,9 +40,16 @@ export default function Login() {
       });
 
       login(data.access_token, data.user);
-      
-      // Check role and redirect
-      if (data.user.role === 'super_admin') {
+
+      // Redirect back to the page the user was on before being sent here to log
+      // in, when there is one — RouteGuard still enforces role restrictions
+      // afterward, so this is safe even if the saved path doesn't belong to the
+      // user's role.
+      const redirectPath = localStorage.getItem('redirect_after_login');
+      if (redirectPath) {
+        localStorage.removeItem('redirect_after_login');
+        router.push(redirectPath);
+      } else if (data.user.role === 'super_admin') {
         router.push('/admin/dashboard');
       } else if (data.user.role === 'penjual') {
         router.push('/seller/products');

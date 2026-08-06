@@ -156,7 +156,7 @@ export default function AuthModal() {
             {authModalType === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
           </h2>
           <p style={{ opacity: 0.6, fontSize: '0.85rem', color: 'var(--foreground)' }}>
-            {authModalType === 'login' ? 'Silakan login untuk melanjutkan' : 'Daftar sekarang untuk berbelanja'}
+            {authModalType === 'login' ? 'Untuk memudahkan Anda, silakan login terlebih dahulu' : 'Daftar sekarang untuk berbelanja'}
           </p>
         </div>
 
