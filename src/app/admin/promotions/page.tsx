@@ -25,9 +25,17 @@ interface Promotion {
   ad_type?: string | null;
   ad_media_url?: string | null;
   manual_proof_path?: string | null;
+  target_user_ids?: (string | number)[] | null;
   product?: { nama_barang?: string };
-  package?: { name?: string };
+  package?: { name?: string; random_recipient_count?: number | null };
   seller?: { name?: string };
+}
+
+interface Recipient {
+  id: string | number;
+  name: string;
+  email: string;
+  role: string;
 }
 
 export default function AdminPromotions() {
@@ -39,6 +47,10 @@ export default function AdminPromotions() {
   const [previewDimensions, setPreviewDimensions] = useState<{ width: number; height: number } | null>(null);
   const [previewProof, setPreviewProof] = useState<any | null>(null);
   const [reviewLoadingId, setReviewLoadingId] = useState<string | number | null>(null);
+  const [recipientsPromo, setRecipientsPromo] = useState<Promotion | null>(null);
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [recipientsLoading, setRecipientsLoading] = useState(false);
+  const [rerollLoading, setRerollLoading] = useState(false);
 
   const {
     searchQuery, setSearchQuery,
@@ -101,6 +113,34 @@ export default function AdminPromotions() {
       alert(err.message || 'Gagal menolak pembayaran');
     } finally {
       setReviewLoadingId(null);
+    }
+  }
+
+  async function openRecipients(promo: Promotion) {
+    setRecipientsPromo(promo);
+    setRecipientsLoading(true);
+    try {
+      const data = await fetchApi(`/admin/promotions/${promo.id}/recipients`);
+      setRecipients(data.data || []);
+    } catch (err) {
+      console.error('Gagal memuat daftar akun random:', err);
+      setRecipients([]);
+    } finally {
+      setRecipientsLoading(false);
+    }
+  }
+
+  async function handleReroll() {
+    if (!recipientsPromo) return;
+    setRerollLoading(true);
+    try {
+      const data = await fetchApi(`/admin/promotions/${recipientsPromo.id}/recipients/reroll`, { method: 'POST' });
+      setRecipients(data.data || []);
+      await loadPromotions();
+    } catch (err: any) {
+      alert(err.message || 'Gagal generate ulang akun random');
+    } finally {
+      setRerollLoading(false);
     }
   }
 
@@ -217,6 +257,20 @@ export default function AdminPromotions() {
           <Badge tone="neutral">Expired</Badge>
         );
       },
+    },
+    {
+      key: 'target', header: 'Target Random', render: promo => (
+        promo.package?.random_recipient_count ? (
+          <button
+            onClick={() => openRecipients(promo)}
+            style={{ fontSize: '0.78rem', background: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', border: '1px solid rgba(147, 51, 234, 0.2)', padding: '6px 12px', borderRadius: '999px', cursor: 'pointer', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          >
+            <Icons.Users size={13} /> {promo.target_user_ids?.length || 0} / {promo.package.random_recipient_count} akun
+          </button>
+        ) : (
+          <span style={{ color: 'var(--muted-foreground)', opacity: 0.5, fontSize: '0.85rem' }}>Semua akun</span>
+        )
+      ),
     },
     {
       key: 'aksi', header: 'Aksi', align: 'right', render: promo => (
@@ -444,6 +498,64 @@ export default function AdminPromotions() {
                   <Button variant="secondary" onClick={() => { handleRejectPayment(previewProof.id); setPreviewProof(null); }}>Tolak</Button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Daftar Akun Random ── */}
+      {recipientsPromo && (
+        <div
+          onClick={() => setRecipientsPromo(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 3000,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem'
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: 'var(--card)', borderRadius: '24px', overflow: 'hidden', maxWidth: '480px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}
+          >
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--foreground)' }}>Target Akun Random</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', marginTop: '2px' }}>{recipientsPromo.product?.nama_barang || '-'}</div>
+              </div>
+              <button
+                onClick={() => setRecipientsPromo(null)}
+                style={{ background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '50%', width: '34px', height: '34px', cursor: 'pointer', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+              ><Icons.X size={18} /></button>
+            </div>
+
+            <div style={{ padding: '1rem 1.5rem', flex: '1 1 auto', overflowY: 'auto', minHeight: '120px' }}>
+              {recipientsLoading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', color: 'var(--muted-foreground)' }}>
+                  <Icons.Loader size={24} />
+                </div>
+              ) : recipients.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>
+                  Belum ada akun random tergenerate untuk promosi ini.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {recipients.map(r => (
+                    <div key={r.id} style={{ padding: '0.75rem 1rem', background: 'var(--input)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, color: 'var(--foreground)', fontSize: '0.9rem' }}>{r.name}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--muted-foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.email}</div>
+                      </div>
+                      <Badge tone="neutral">{r.role}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div style={{ padding: '1.1rem 1.5rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+              <Button variant="primary" onClick={handleReroll} disabled={rerollLoading}>
+                {rerollLoading ? 'Generate ulang...' : 'Generate Ulang Akun Random'}
+              </Button>
             </div>
           </div>
         </div>
