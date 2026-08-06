@@ -178,9 +178,16 @@ export default function AdminReports() {
                     <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Produk yang dilaporkan</div>
                     <div style={{ fontWeight: 800, color: 'var(--foreground)', fontSize: '1.1rem' }}>{report.product.nama_barang}</div>
                   </div>
-                  <Button href={`/admin/products/${report.product.id}`} variant="secondary" size="md">
-                    Lihat Produk <Icons.ArrowRight size={16} />
-                  </Button>
+                  <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+                    {report.product.user && (
+                      <Button href={`/chat/${report.product.id}/${report.product.user.id}`} variant="secondary" size="md">
+                        <Icons.MessageCircle size={16} /> Chat Penjual
+                      </Button>
+                    )}
+                    <Button href={`/admin/products/${report.product.id}`} variant="secondary" size="md">
+                      Lihat Produk <Icons.ArrowRight size={16} />
+                    </Button>
+                  </div>
                 </div>
               ) : report.status === 'resolved' && (
                 <div className="flex items-center gap-3" style={{ padding: '1.25rem', border: '1px dashed var(--border)', borderRadius: '12px', color: 'var(--foreground)', opacity: 0.6 }}>

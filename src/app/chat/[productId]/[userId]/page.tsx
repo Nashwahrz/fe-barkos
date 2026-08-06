@@ -145,7 +145,7 @@ export default function ChatDetailPage() {
       const data = await fetchApi(`/products/${productId}`);
       const productData = data.data || data;
       setProduct(productData);
-      
+
       // Check if current user is the owner (seller)
       const currentUserId = Number(user?.id);
       const sellerId = Number(productData?.user_id || productData?.user?.id);
@@ -155,19 +155,26 @@ export default function ChatDetailPage() {
       if (currentUserId !== sellerId) {
         setOtherUser(productData.user);
       }
-      
+
       // Try to find if there is an active order for this product between these users
       const transData = await fetchApi('/transactions');
       const allTrans = Array.isArray(transData) ? transData : (transData.data || []);
-      
+
       const order = allTrans.find((t: any) => {
         const tProdId = t.product_id || (t.product && t.product.id);
         return Number(tProdId) === Number(productId);
       });
-      
+
       if (order) setActiveOrder(order);
-    } catch (err) {
-      console.error('Failed to load product or order info', err);
+    } catch (err: any) {
+      // Product may have been removed (e.g. by moderation) — the chat thread
+      // itself still lives on, so fall back to a "Produk dihapus" banner
+      // instead of leaving the context card stuck blank forever.
+      if (err?.status === 404) {
+        setProduct({ deleted: true });
+      } else {
+        console.error('Failed to load product or order info', err);
+      }
     }
   }
 
@@ -638,7 +645,18 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Product Context Card — shown automatically since every chat here is scoped to a product */}
-      {product && (
+      {product?.deleted ? (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.75rem 1.5rem',
+          background: 'var(--card)', borderBottom: '1px solid var(--border)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)', color: 'var(--muted-foreground)',
+        }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'var(--input)', flexShrink: 0, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icons.Trash2 size={20} color="var(--muted-foreground)" />
+          </div>
+          <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Produk dihapus</div>
+        </div>
+      ) : product && (
         <Link
           href={`/products/${product.id}`}
           style={{
