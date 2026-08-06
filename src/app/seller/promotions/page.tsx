@@ -305,7 +305,6 @@ export default function SellerPromotions() {
                       </div>
                       <div style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 500 }}>
                         Durasi Aktif: {pkg.duration_days} Hari
-                        {pkg.quota_impressions && ` • Quota: ${pkg.quota_impressions.toLocaleString('id-ID')} Tayangan`}
                       </div>
                     </div>
                   );

@@ -22,7 +22,7 @@ export default function PromotionPackages() {
   const [editingPackage, setEditingPackage] = useState<any | null>(null);
   
   // Form states
-  const [formData, setFormData] = useState({ name: '', price: '', duration_days: '', quota_impressions: '', random_recipient_count: '' });
+  const [formData, setFormData] = useState({ name: '', price: '', duration_days: '', random_recipient_count: '' });
   const [formLoading, setFormLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -54,12 +54,11 @@ export default function PromotionPackages() {
         name: pkg.name,
         price: pkg.price.toString(),
         duration_days: pkg.duration_days.toString(),
-        quota_impressions: pkg.quota_impressions ? pkg.quota_impressions.toString() : '',
         random_recipient_count: pkg.random_recipient_count ? pkg.random_recipient_count.toString() : ''
       });
     } else {
       setEditingPackage(null);
-      setFormData({ name: '', price: '', duration_days: '', quota_impressions: '', random_recipient_count: '' });
+      setFormData({ name: '', price: '', duration_days: '', random_recipient_count: '' });
     }
     setError('');
     setIsModalOpen(true);
@@ -135,7 +134,6 @@ export default function PromotionPackages() {
                   <th style={{ padding: '1.25rem 2rem', fontWeight: 700 }}>NAMA PAKET</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>HARGA</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>DURASI AKTIF</th>
-                  <th style={{ padding: '1.25rem', fontWeight: 700 }}>KUOTA (TAYANGAN)</th>
                   <th style={{ padding: '1.25rem', fontWeight: 700 }}>AKUN RANDOM</th>
                   <th style={{ padding: '1.25rem 2rem', fontWeight: 700, textAlign: 'right' }}>AKSI</th>
                 </tr>
@@ -143,7 +141,7 @@ export default function PromotionPackages() {
               <tbody style={{ fontSize: '0.95rem' }}>
                 {packages.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
+                    <td colSpan={5} style={{ padding: '4rem', textAlign: 'center', color: 'var(--foreground)', opacity: 0.5 }}>
                       <Icons.Folder size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                       <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>Belum ada paket promosi.</div>
                     </td>
@@ -158,9 +156,6 @@ export default function PromotionPackages() {
                     </td>
                     <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>
                       {pkg.duration_days} Hari
-                    </td>
-                    <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>
-                      {pkg.quota_impressions ? `${pkg.quota_impressions.toLocaleString('id-ID')}` : 'Tak Terbatas'}
                     </td>
                     <td style={{ padding: '1.25rem', color: 'var(--foreground)' }}>
                       {pkg.random_recipient_count ? `${pkg.random_recipient_count.toLocaleString('id-ID')} akun` : 'Semua akun'}
@@ -212,13 +207,6 @@ export default function PromotionPackages() {
             value={formData.duration_days}
             onChange={e => setFormData({ ...formData, duration_days: e.target.value })}
             required
-          />
-          <Input
-            label="Kuota Tayangan (Opsional)"
-            type="number"
-            placeholder="Mis. 10"
-            value={formData.quota_impressions}
-            onChange={e => setFormData({ ...formData, quota_impressions: e.target.value })}
           />
           <Input
             label="Jumlah Akun Random (Opsional)"

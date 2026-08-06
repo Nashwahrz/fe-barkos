@@ -137,7 +137,11 @@ export default function AdminProductDetail() {
                 </div>
               )}
               <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
-                {product.status_terjual ? <Badge tone="danger">Terjual</Badge> : <Badge tone="success">Tersedia</Badge>}
+                {product.status_terjual ? (
+                  <Badge tone="danger" style={{ background: '#dc2626', color: '#fff', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>Terjual</Badge>
+                ) : (
+                  <Badge tone="success" style={{ background: '#059669', color: '#fff', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>Tersedia</Badge>
+                )}
               </div>
             </div>
             {images.length > 1 && (
