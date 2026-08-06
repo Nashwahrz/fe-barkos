@@ -38,6 +38,8 @@ export default function ChatDetailPage() {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [showOtherUserProfile, setShowOtherUserProfile] = useState(false);
+  const [isChatClosed, setIsChatClosed] = useState(false);
+  const [chatClosedReason, setChatClosedReason] = useState<string | null>(null);
   // Gunakan sessionStorage bukan URL query param — useSearchParams() di Next.js
   // App Router bisa return null saat client-side navigation (timing/hydration issue).
   const [pendingTemplate, setPendingTemplate] = useState<string | null>(null);
@@ -168,6 +170,20 @@ export default function ChatDetailPage() {
       });
 
       if (order) setActiveOrder(order);
+
+      // Fetch chat status (whether it's closed)
+      try {
+        const statusData = await fetchApi(`/products/${productId}/chats/${otherUserId}/status`);
+        if (statusData.is_closed) {
+          setIsChatClosed(true);
+          setChatClosedReason(statusData.is_auto_closed ? 'Sesi percakapan otomatis ditutup (3 hari sejak produk terjual).' : 'Penjual telah mengakhiri sesi percakapan ini.');
+        } else {
+          setIsChatClosed(false);
+          setChatClosedReason(null);
+        }
+      } catch (err) {
+        console.error('Failed to load chat status', err);
+      }
     } catch (err: any) {
       // Product may have been removed (e.g. by moderation) — the chat thread
       // itself still lives on, so fall back to a "Produk dihapus" banner
@@ -314,6 +330,20 @@ export default function ChatDetailPage() {
     }
   }
 
+  async function handleCloseChatSession() {
+    if (!otherUserId || otherUserId === 'undefined') return;
+    if (!window.confirm('Tutup sesi obrolan ini? Pembeli tidak akan bisa lagi mengirimkan pesan ke Anda terkait produk ini.')) return;
+
+    try {
+      await fetchApi(`/products/${productId}/chats/${otherUserId}/close`, { method: 'POST' });
+      setIsChatClosed(true);
+      setChatClosedReason('Anda telah mengakhiri sesi percakapan ini.');
+      alert('Sesi obrolan berhasil ditutup.');
+    } catch (err: any) {
+      alert(err.message || 'Gagal menutup percakapan');
+    }
+  }
+
   function formatLastSeen(lastActiveAt?: string | null): string {
     if (!lastActiveAt) return 'Offline';
     const diffMs = Date.now() - new Date(lastActiveAt).getTime();
@@ -353,7 +383,7 @@ export default function ChatDetailPage() {
   // back to false). A cancelled order does NOT close the chat either — the buyer
   // must be able to re-negotiate or ask about stock again after cancelling. Only
   // a sold product permanently closes it.
-  const isChatClosed = isProductSold;
+  // const isChatClosed = isProductSold; // REMOVED: Now handled by state from backend
 
   async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -646,13 +676,13 @@ export default function ChatDetailPage() {
             >
               <Icons.Trash2 size={20} />
             </button>
-            {user?.role === 'super_admin' && (
+            {isSeller && !isChatClosed && (
               <button
-                onClick={handleDeleteConversation}
+                onClick={handleCloseChatSession}
                 title="Tutup Percakapan"
                 style={{ background: 'var(--danger)', border: 'none', cursor: 'pointer', padding: '0.5rem 0.8rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', color: 'white', fontWeight: 600, fontSize: '0.85rem' }}
               >
-                <Icons.Ban size={16} /> Tutup
+                <Icons.Ban size={16} /> Tutup Sesi
               </button>
             )}
           </div>
@@ -918,17 +948,10 @@ export default function ChatDetailPage() {
       <div style={{ background: 'var(--card)', borderTop: '1px solid var(--border)', boxShadow: '0 -4px 6px rgba(0,0,0,0.02)' }}>
 
         {isChatClosed ? (
-          activeOrder?.status === 'completed' ? (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.2)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--success)' }}>
-              <Icons.CheckCheck size={20} />
-              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Pesanan telah selesai. Sesi chat ini telah berakhir.</span>
-            </div>
-          ) : (
-            <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--foreground)' }}>
-              <Icons.Package size={20} />
-              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Produk ini sudah terjual. Sesi chat ini telah berakhir.</span>
-            </div>
-          )
+          <div style={{ margin: '1rem 1.5rem', padding: '1rem', background: 'var(--input)', border: '1px solid var(--border)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--foreground)' }}>
+            <Icons.Ban size={20} />
+            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{chatClosedReason || 'Sesi percakapan ini telah berakhir.'}</span>
+          </div>
         ) : (
         <>
         {isOrderCancelled && (
