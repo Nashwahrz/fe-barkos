@@ -613,26 +613,28 @@ export default function ChatDetailPage() {
         <button onClick={() => router.push(user?.role === 'super_admin' ? '/admin/reports' : '/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
           <Icons.ArrowLeft size={24} />
         </button>
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-            {otherUser?.foto ? (
-              <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              otherUser?.name?.charAt(0).toUpperCase() || '?'
+        <Link href={`/users/${otherUserId}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0, textDecoration: 'none' }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+              {otherUser?.foto ? (
+                <img src={getStorageUrl(otherUser.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                otherUser?.name?.charAt(0).toUpperCase() || '?'
+              )}
+            </div>
+            {otherUser?.is_online && (
+              <span style={{ position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--success)', border: '2px solid var(--card)' }} />
             )}
           </div>
-          {otherUser?.is_online && (
-            <span style={{ position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--success)', border: '2px solid var(--card)' }} />
-          )}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--foreground)', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
-          {otherUser && (
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: otherUser.is_online ? 'var(--success)' : 'var(--muted-foreground)', marginTop: '1px' }}>
-              {otherUser.is_online ? 'Online' : formatLastSeen(otherUser.last_active_at)}
-            </div>
-          )}
-        </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--foreground)', lineHeight: '1.2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name || 'Memuat...'}</div>
+            {otherUser && (
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: otherUser.is_online ? 'var(--success)' : 'var(--muted-foreground)', marginTop: '1px' }}>
+                {otherUser.is_online ? 'Online' : formatLastSeen(otherUser.last_active_at)}
+              </div>
+            )}
+          </div>
+        </Link>
         {messages.length > 0 && (
           <button
             onClick={handleDeleteConversation}

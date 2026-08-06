@@ -6,6 +6,21 @@ export interface UserActivity {
   transactions_as_buyer_count: number;
 }
 
+export interface PublicProfile {
+  id: number;
+  name: string;
+  avatar: string | null;
+  asal_kampus: string | null;
+  role: string;
+  created_at: string | null;
+  is_online: boolean;
+  last_active_at: string | null;
+  activity: {
+    products_count: number;
+    products_sold_count: number;
+  };
+}
+
 export interface UserDetail {
   id: number;
   name: string;

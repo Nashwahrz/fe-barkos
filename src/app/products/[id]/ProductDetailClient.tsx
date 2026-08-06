@@ -319,7 +319,10 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           </div>
 
           {/* Seller Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--gradient-brand-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '1.5rem' }}>
+          <Link
+            href={`/users/${product.user_id || product.user?.id}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--gradient-brand-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '1.5rem', textDecoration: 'none' }}
+          >
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--gradient-brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
               {product.user?.foto ? (
                 <img src={getStorageUrl(product.user.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -327,11 +330,12 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                 product.user?.name?.charAt(0).toUpperCase()
               )}
             </div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--foreground)' }}>{product.user?.name}</div>
               <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
             </div>
-          </div>
+            <Icons.ChevronRight size={18} color="var(--muted-foreground)" style={{ flexShrink: 0 }} />
+          </Link>
 
           {/* ── Action Buttons ── */}
           {!isSeller && !isAdmin && !product.status_terjual && (
