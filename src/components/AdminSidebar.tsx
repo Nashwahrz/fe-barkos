@@ -138,6 +138,9 @@ export default function AdminSidebar({ currentPath, mobileOpen = false, onClose 
                     transition: 'all 0.15s ease',
                     opacity: isActive ? 1 : 0.75,
                     position: 'relative',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
                   onMouseEnter={e => {
                     if (!isActive) {
@@ -158,8 +161,10 @@ export default function AdminSidebar({ currentPath, mobileOpen = false, onClose 
                         width: '3px', height: '60%', borderRadius: '0 4px 4px 0', background: 'var(--primary)',
                       }} />
                     )}
-                    <menu.Icon size={16} color={isActive ? 'var(--primary)' : 'currentColor'} />
-                    {menu.name}
+                    <div style={{ flexShrink: 0, display: 'flex' }}>
+                      <menu.Icon size={16} color={isActive ? 'var(--primary)' : 'currentColor'} />
+                    </div>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{menu.name}</span>
                   </Link>
                 );
               })}
