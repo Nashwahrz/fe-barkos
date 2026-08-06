@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -21,6 +21,7 @@ export default function CreateProduct() {
   const [error, setError] = useState<string | null>(null);
   // Error per-field untuk validasi inline
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState({
     nama_barang: '',
@@ -202,8 +203,17 @@ export default function CreateProduct() {
     return true;
   };
 
-  async function handleSubmit(e: React.FormEvent) {
+  const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      executeSubmit();
+    }, 500);
+  };
+
+  async function executeSubmit() {
     // Validasi dulu sebelum submit
     if (!validateAndFocus()) return;
 
@@ -274,7 +284,7 @@ export default function CreateProduct() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <form onSubmit={onFormSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div id="field-nama_barang">
             <Input
               type="text"

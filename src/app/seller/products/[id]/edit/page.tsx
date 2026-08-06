@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -23,6 +23,7 @@ export default function EditProduct() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentFoto, setCurrentFoto] = useState<string | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState({
     nama_barang: '',
@@ -189,8 +190,17 @@ export default function EditProduct() {
     }
   };
 
-  async function handleSubmit(e: React.FormEvent) {
+  const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      executeSubmit();
+    }, 500);
+  };
+
+  async function executeSubmit() {
     setSaving(true);
     setError(null);
 
@@ -276,7 +286,7 @@ export default function EditProduct() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <form onSubmit={onFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <Input 
              type="text" 
              name="nama_barang" 
