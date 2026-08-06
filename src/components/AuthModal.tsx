@@ -31,6 +31,11 @@ export default function AuthModal() {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
 
+  // Password Visibility States
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegPasswordConf, setShowRegPasswordConf] = useState(false);
+
   const handleCaptchaVerify = React.useCallback((token: string | null) => {
     setRecaptchaToken(token);
   }, []);
@@ -182,15 +187,25 @@ export default function AuthModal() {
             />
             
             <Input
-              type="password"
+              type={showLoginPassword ? 'text' : 'password'}
               label="Password"
               placeholder="••••••••"
               icon={<Icons.Lock size={18} />}
               required
               value={loginPassword}
               onChange={e => setLoginPassword(e.target.value)}
+              endIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  tabIndex={-1}
+                >
+                  {showLoginPassword ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
+                </button>
+              }
             />
-            
+
             <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
               <div style={{ transform: 'scale(0.85)', transformOrigin: 'center' }}>
                 <ReCaptchaV2 key={captchaKey} onVerify={handleCaptchaVerify} />
@@ -267,22 +282,42 @@ export default function AuthModal() {
               onChange={e => setRegAsalKampus(e.target.value)}
             />
             <Input
-              type="password"
+              type={showRegPassword ? 'text' : 'password'}
               label="Password"
               placeholder="••••••••"
               icon={<Icons.Lock size={18} />}
               required
               value={regPassword}
               onChange={e => setRegPassword(e.target.value)}
+              endIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowRegPassword(!showRegPassword)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  tabIndex={-1}
+                >
+                  {showRegPassword ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
+                </button>
+              }
             />
             <Input
-              type="password"
+              type={showRegPasswordConf ? 'text' : 'password'}
               label="Konfirmasi Password"
               placeholder="••••••••"
               icon={<Icons.Lock size={18} />}
               required
               value={regPasswordConf}
               onChange={e => setRegPasswordConf(e.target.value)}
+              endIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowRegPasswordConf(!showRegPasswordConf)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                  tabIndex={-1}
+                >
+                  {showRegPasswordConf ? <Icons.EyeOff size={16} /> : <Icons.Eye size={16} />}
+                </button>
+              }
             />
 
             <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
