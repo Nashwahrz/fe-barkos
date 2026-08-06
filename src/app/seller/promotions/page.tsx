@@ -306,6 +306,9 @@ export default function SellerPromotions() {
                       <div style={{ fontSize: '0.85rem', opacity: 0.7, fontWeight: 500 }}>
                         Durasi Aktif: {pkg.duration_days} Hari
                       </div>
+                      <div style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 600, marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Icons.Users size={12} /> Estimasi Jangkauan: {(pkg.duration_days * 500).toLocaleString('id-ID')} - {(pkg.duration_days * 1500).toLocaleString('id-ID')} User
+                      </div>
                     </div>
                   );
                 })}
