@@ -306,7 +306,7 @@ export default function ChatDetailPage() {
 
     try {
       await fetchApi(`/products/${productId}/chats/${otherUserId}`, { method: 'DELETE' });
-      router.push('/chat');
+      router.push(user?.role === 'super_admin' ? '/admin/reports' : '/chat');
     } catch (err: any) {
       alert(err.message || 'Gagal menghapus percakapan');
     }
@@ -610,7 +610,7 @@ export default function ChatDetailPage() {
 
       {/* Chat Header */}
       <div style={{ padding: '0.8rem 1.5rem', background: 'var(--card)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1rem', zIndex: 10, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-        <button onClick={() => router.push('/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
+        <button onClick={() => router.push(user?.role === 'super_admin' ? '/admin/reports' : '/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
           <Icons.ArrowLeft size={24} />
         </button>
         <div style={{ position: 'relative', flexShrink: 0 }}>
