@@ -124,13 +124,14 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999, 
+      position: 'fixed', inset: 0, zIndex: 9999,
       background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '1rem'
+      padding: '1rem',
+      overflowY: 'auto'
     }}>
-      <div className="card" style={{ width: '100%', maxWidth: '600px', padding: '1.5rem', background: 'var(--card)', color: 'var(--foreground)' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '600px', padding: '1.5rem', background: 'var(--card)', color: 'var(--foreground)', maxHeight: '90vh', overflowY: 'auto', margin: 'auto' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.25rem' }}>Lokasi Pencarian</h2>
         <p style={{ opacity: 0.7, fontSize: '0.9rem', marginBottom: '1.25rem' }}>Cari alamat atau atur radius titik pencarian kos/barang bekas.</p>
         
