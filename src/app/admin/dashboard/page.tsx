@@ -37,12 +37,17 @@ export default function AdminDashboard() {
         return;
       }
       loadData();
+
+      // Poll for fresh data in the background so the dashboard stays up to
+      // date without the admin needing to manually refresh the page.
+      const interval = setInterval(() => loadData({ silent: true }), 15000);
+      return () => clearInterval(interval);
     }
   }, [user, authLoading, router]);
 
-  async function loadData() {
+  async function loadData(opts: { silent?: boolean } = {}) {
     try {
-      setLoading(true);
+      if (!opts.silent) setLoading(true);
       const [statsData, activitiesData, trendsData] = await Promise.all([
         fetchApi('/admin/stats'),
         fetchApi('/admin/recent-activities'),
@@ -54,7 +59,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Gagal mengambil data dashboard:', err);
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
