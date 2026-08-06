@@ -268,14 +268,25 @@ export default function SellerPromotions() {
             {/* Step 1: Produk */}
             <div>
               <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.6rem', fontWeight: 700, color: 'var(--foreground)' }}>1. Pilih Produk</label>
-              <select className="input-field" style={{ height: '48px', borderRadius: '8px' }} value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)} required>
-                <option value="">-- Pilih Produk Aktif --</option>
-                {myProducts.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.nama_barang} {p.is_promoted ? '(Sedang Promo)' : ''}
-                  </option>
-                ))}
-              </select>
+              <div style={{ position: 'relative' }}>
+                <select 
+                  className="input-field" 
+                  style={{ height: '48px', borderRadius: '8px', appearance: 'none', paddingRight: '2.5rem', width: '100%' }} 
+                  value={selectedProduct} 
+                  onChange={e => setSelectedProduct(e.target.value)} 
+                  required
+                >
+                  <option value="">-- Pilih Produk Aktif --</option>
+                  {myProducts.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.nama_barang} {p.is_promoted ? '(Sedang Promo)' : ''}
+                    </option>
+                  ))}
+                </select>
+                <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#6b7280' }}>
+                  <Icons.ChevronDown size={18} />
+                </div>
+              </div>
               {myProducts.length === 0 && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.6rem' }}>Kamu belum memiliki produk aktif untuk dipromosikan.</p>}
             </div>
 
