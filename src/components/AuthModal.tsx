@@ -284,9 +284,10 @@ export default function AuthModal() {
             <Input
               type={showRegPassword ? 'text' : 'password'}
               label="Password"
-              placeholder="••••••••"
+              placeholder="Minimal 8 karakter"
               icon={<Icons.Lock size={18} />}
               required
+              minLength={8}
               value={regPassword}
               onChange={e => setRegPassword(e.target.value)}
               endIcon={
@@ -306,6 +307,7 @@ export default function AuthModal() {
               placeholder="••••••••"
               icon={<Icons.Lock size={18} />}
               required
+              minLength={8}
               value={regPasswordConf}
               onChange={e => setRegPasswordConf(e.target.value)}
               endIcon={
