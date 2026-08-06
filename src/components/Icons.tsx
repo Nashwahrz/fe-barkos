@@ -503,6 +503,12 @@ export const Icons = {
       <line x1="23" y1="11" x2="17" y2="11"/>
     </svg>
   ),
+  Ban: ({ size = 20, color = 'currentColor', style, className }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} className={className}>
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+    </svg>
+  ),
   XCircle: ({ size = 20, color = 'currentColor', style, className }: IconProps) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} className={className}>
       <circle cx="12" cy="12" r="10"/>
