@@ -5,6 +5,7 @@ import { fetchApi, getStorageUrl } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import UserProfileModal from '@/components/UserProfileModal';
 import { Icons } from '@/components/Icons';
 
 export default function ChatDetailPage() {
@@ -36,6 +37,7 @@ export default function ChatDetailPage() {
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
+  const [showOtherUserProfile, setShowOtherUserProfile] = useState(false);
   // Gunakan sessionStorage bukan URL query param — useSearchParams() di Next.js
   // App Router bisa return null saat client-side navigation (timing/hydration issue).
   const [pendingTemplate, setPendingTemplate] = useState<string | null>(null);
@@ -613,7 +615,7 @@ export default function ChatDetailPage() {
         <button onClick={() => router.push(user?.role === 'super_admin' ? '/admin/reports' : '/chat')} style={{ fontSize: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
           <Icons.ArrowLeft size={24} />
         </button>
-        <Link href={`/users/${otherUserId}`} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0, textDecoration: 'none' }}>
+        <button onClick={() => setShowOtherUserProfile(true)} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
               {otherUser?.foto ? (
@@ -634,7 +636,7 @@ export default function ChatDetailPage() {
               </div>
             )}
           </div>
-        </Link>
+        </button>
         {messages.length > 0 && (
           <button
             onClick={handleDeleteConversation}
@@ -1130,6 +1132,10 @@ export default function ChatDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {showOtherUserProfile && otherUserId && otherUserId !== 'undefined' && (
+        <UserProfileModal userId={otherUserId} onClose={() => setShowOtherUserProfile(false)} />
       )}
 
     </div>

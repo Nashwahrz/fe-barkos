@@ -7,6 +7,7 @@ import useSWR from 'swr';
 import { fetchApi, getStorageUrl, swrFetcher } from '@/lib/api';
 import { offerApi } from '@/services/api/offer.api';
 import { useAuth } from '@/components/AuthProvider';
+import UserProfileModal from '@/components/UserProfileModal';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -57,6 +58,9 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
   const [offerLoading, setOfferLoading] = useState(false);
+
+  // Seller profile modal
+  const [showSellerProfile, setShowSellerProfile] = useState(false);
   const [offerError, setOfferError] = useState('');
 
   const { data: offersData } = useSWR(user ? 'buyer-offers' : null, () => offerApi.getBuyerOffers());
@@ -319,9 +323,9 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
           </div>
 
           {/* Seller Info */}
-          <Link
-            href={`/users/${product.user_id || product.user?.id}`}
-            style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--gradient-brand-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '1.5rem', textDecoration: 'none' }}
+          <button
+            onClick={() => setShowSellerProfile(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--gradient-brand-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: '1.5rem', width: '100%', cursor: 'pointer', textAlign: 'left' }}
           >
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--gradient-brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
               {product.user?.foto ? (
@@ -335,7 +339,11 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
               <div style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)' }}>{product.user?.asal_kampus || 'Mahasiswa'}</div>
             </div>
             <Icons.ChevronRight size={18} color="var(--muted-foreground)" style={{ flexShrink: 0 }} />
-          </Link>
+          </button>
+
+          {showSellerProfile && (product.user_id || product.user?.id) && (
+            <UserProfileModal userId={product.user_id || product.user?.id} onClose={() => setShowSellerProfile(false)} />
+          )}
 
           {/* ── Action Buttons ── */}
           {!isSeller && !isAdmin && !product.status_terjual && (
