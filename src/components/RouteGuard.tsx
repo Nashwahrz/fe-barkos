@@ -31,7 +31,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
     if (user) {
       // Role-based redirection and protection
-      if (user.role === 'super_admin' && !pathname.startsWith('/admin') && !pathname.startsWith('/auth')) {
+      if (user.role === 'super_admin' && !pathname.startsWith('/admin') && !pathname.startsWith('/auth') && !pathname.startsWith('/chat')) {
         router.push('/admin/dashboard');
       } else if (user.role === 'penjual' && pathname.startsWith('/admin')) {
         router.push('/seller/products');
