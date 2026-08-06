@@ -638,13 +638,24 @@ export default function ChatDetailPage() {
           </div>
         </button>
         {messages.length > 0 && (
-          <button
-            onClick={handleDeleteConversation}
-            title="Hapus Percakapan"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}
-          >
-            <Icons.Trash2 size={20} />
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              onClick={handleDeleteConversation}
+              title="Hapus Percakapan"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}
+            >
+              <Icons.Trash2 size={20} />
+            </button>
+            {user?.role === 'super_admin' && (
+              <button
+                onClick={handleDeleteConversation}
+                title="Tutup Percakapan"
+                style={{ background: 'var(--danger)', border: 'none', cursor: 'pointer', padding: '0.5rem 0.8rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', color: 'white', fontWeight: 600, fontSize: '0.85rem' }}
+              >
+                <Icons.Ban size={16} /> Tutup
+              </button>
+            )}
+          </div>
         )}
       </div>
 
