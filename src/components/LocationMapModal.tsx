@@ -96,6 +96,22 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
     }
   };
 
+  // Debounce: search automatically as the user types, no need to press "Cari Alamat".
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      handleSearch();
+    }, 500);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
   const handleSelectResult = (item: any) => {
     const newLat = parseFloat(item.lat);
     const newLng = parseFloat(item.lon);
