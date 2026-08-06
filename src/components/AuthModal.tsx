@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { Icons } from '@/components/Icons';
 import { Button } from '@/components/ui/Button';
@@ -10,7 +11,8 @@ import { ReCaptchaV2 } from '@/components/ui/ReCaptchaV2';
 
 export default function AuthModal() {
   const { authModalType, openAuthModal, closeAuthModal, login } = useAuth();
-  
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -95,6 +97,7 @@ export default function AuthModal() {
       closeAuthModal();
       setRecaptchaToken(null);
       setCaptchaKey(k => k + 1);
+      router.push('/auth/verify-email');
     } catch (err: any) {
       let msg = err.message || 'Gagal mendaftar.';
       if (err.response?.data?.errors) {
