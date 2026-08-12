@@ -59,11 +59,11 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '50px 20px' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '30px' }}>
-        <Link href="/profile" style={{
+        <Link href="/" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: '40px', height: '40px', borderRadius: '50%',
           background: 'var(--card)', border: '1px solid var(--border)',
@@ -85,7 +85,7 @@ export default function FavoritesPage() {
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {[...Array(6)].map((_, i) => (
             <div key={i} style={{ height: '100px', background: 'var(--border)', borderRadius: '12px', animation: 'pulse 1.5s infinite' }} />
           ))}

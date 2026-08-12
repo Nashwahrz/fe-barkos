@@ -254,6 +254,7 @@ export default function Navbar() {
               {[
                 { label: 'Beranda', href: '/' },
                 { label: 'Katalog', href: '/products' },
+                { label: 'Testimoni', href: '/testimoni' },
               ].map(item => (
                 <Link key={item.href} href={item.href} style={{
                   padding: '7px 16px', borderRadius: '8px', fontWeight: 500,
