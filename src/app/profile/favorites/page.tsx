@@ -60,7 +60,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+    <div style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '40px 20px' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '30px' }}>
@@ -120,9 +120,9 @@ export default function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+        <div className="product-grid" style={{ width: '100%' }}>
           {products.map(product => (
-            <React.Fragment key={product.id}>
+            <div key={product.id} style={{ display: 'flex', flexDirection: 'column' }}>
               {/* Desktop Card View */}
               <div className="fav-desktop" style={{ width: '100%', height: '100%' }}>
                 <div style={{ position: 'relative', width: '100%' }}>
@@ -244,7 +244,7 @@ export default function FavoritesPage() {
                   <Icons.Heart size={16} fill="currentColor" />
                 </button>
               </Link>
-            </React.Fragment>
+            </div>
           ))}
         </div>
       )}
