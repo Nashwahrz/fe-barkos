@@ -201,6 +201,15 @@ export default function EditProduct() {
   };
 
   async function executeSubmit() {
+    if (isOfferEnabled && formData.minimum_offer_price && formData.harga) {
+      if (parseInt(formData.minimum_offer_price) > parseInt(formData.harga)) {
+        setError('Harga tawar tidak boleh melebihi harga asli.');
+        const el = document.getElementById('field-minimum_offer_price');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+
     setSaving(true);
     setError(null);
 
@@ -326,15 +335,17 @@ export default function EditProduct() {
             </div>
 
             {isOfferEnabled && (
-              <Input
-                 type="number"
-                 name="minimum_offer_price"
-                 label="Minimal Harga Tawar (Rp)"
-                 placeholder="Opsional, misal: 450000"
-                 min={0}
-                 value={formData.minimum_offer_price}
-                 onChange={handleInputChange}
-              />
+              <div id="field-minimum_offer_price">
+                <Input
+                   type="number"
+                   name="minimum_offer_price"
+                   label="Minimal Harga Tawar (Rp)"
+                   placeholder="Opsional, misal: 450000"
+                   min={0}
+                   value={formData.minimum_offer_price}
+                   onChange={handleInputChange}
+                />
+              </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

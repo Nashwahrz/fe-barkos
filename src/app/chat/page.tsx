@@ -83,14 +83,14 @@ export default function ChatListPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: 0 }}>
           {conversations.map((conv, idx) => {
-            const lastMsg = conv.last_message;
+            const lastMsg = conv.last_message || {};
             const otherUser = conv.other_user || { id: 0, name: 'Pengguna' };
-            const unreadCount = conv.unread_count;
-            const product = lastMsg.product;
+            const unreadCount = conv.unread_count || 0;
+            const product = lastMsg.product || { id: 0, nama_barang: 'Produk Telah Dihapus' };
             
             return (
               <Link 
-                href={`/chat/${product.id}/${otherUser.id}`} 
+                href={product.id ? `/chat/${product.id}/${otherUser.id}` : '#'} 
                 key={idx}
                 className="card flex items-center justify-between"
                 style={{ 
@@ -102,15 +102,20 @@ export default function ChatListPage() {
                   textDecoration: 'none',
                   gap: '12px',
                   minWidth: 0,
-                  width: '100%'
+                  width: '100%',
+                  opacity: product.id ? 1 : 0.7,
+                  cursor: product.id ? 'pointer' : 'default'
+                }}
+                onClick={(e) => {
+                  if (!product.id) e.preventDefault();
                 }}
                 onMouseEnter={e => {
-                  if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  if (product.id && unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
+                  if (product.id) e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={e => {
-                  if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--border)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  if (product.id && unreadCount === 0) e.currentTarget.style.borderColor = 'var(--border)';
+                  if (product.id) e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div className="flex items-center gap-3" style={{ flex: 1, minWidth: 0 }}>
@@ -129,7 +134,7 @@ export default function ChatListPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--foreground)', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{otherUser?.name}</div>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      <Icons.Package size={14} style={{ flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{product?.nama_barang}</span>
+                      <Icons.Package size={14} style={{ flexShrink: 0 }} /> <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', color: product.id ? 'inherit' : 'var(--danger)' }}>{product.nama_barang}</span>
                     </div>
                     <div style={{ fontSize: '0.9rem', color: unreadCount > 0 ? 'var(--foreground)' : 'var(--foreground)', opacity: unreadCount > 0 ? 1 : 0.6, fontWeight: unreadCount > 0 ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {lastMsg?.sender?.id === user?.id ? 'Anda: ' : ''}
@@ -149,7 +154,7 @@ export default function ChatListPage() {
                 <div className="flex flex-col items-end gap-2" style={{ flexShrink: 0, minWidth: '60px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ fontSize: '0.8rem', color: 'var(--foreground)', opacity: 0.5, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                      {new Date(lastMsg?.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                      {new Date(lastMsg?.created_at || Date.now()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                     </div>
                     <button
                       onClick={(e) => handleDeleteConversation(e, product.id, otherUser.id)}
