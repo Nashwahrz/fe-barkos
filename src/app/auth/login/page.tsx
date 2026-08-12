@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
@@ -25,6 +25,15 @@ export default function Login() {
 
   const handleCaptchaVerify = useCallback((token: string | null) => {
     setRecaptchaToken(token);
+  }, []);
+
+  // Check for redirected errors (like account deactivated)
+  React.useEffect(() => {
+    const savedError = localStorage.getItem('login_error');
+    if (savedError) {
+      setError(savedError);
+      localStorage.removeItem('login_error');
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

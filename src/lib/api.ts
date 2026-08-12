@@ -53,11 +53,13 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     
     // Auto logout if unauthenticated or deactivated
     if ((response.status === 401 || response.status === 403) && typeof window !== 'undefined') {
-      if (data.message && data.message.includes('dinonaktifkan')) {
-        alert(data.message);
-      }
       localStorage.removeItem('auth_token');
-      window.location.href = '/auth/login';
+      if (data.message && data.message.includes('dinonaktifkan')) {
+        localStorage.setItem('login_error', data.message);
+      }
+      if (window.location.pathname !== '/auth/login') {
+        window.location.href = '/auth/login';
+      }
     }
     
     throw error;
