@@ -108,13 +108,13 @@ export default function AdminDashboard() {
 
   const violatorColumns: DataTableColumn<any>[] = [
     { key: 'user', header: 'Pengguna', render: u => (
-      <div>
-        <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{u.name}</div>
-        <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{u.email}</div>
+      <div style={{ minWidth: 0, maxWidth: '200px' }}>
+        <div style={{ fontWeight: 700, color: 'var(--foreground)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.name}</div>
+        <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>
       </div>
     ) },
     { key: 'reports', header: 'Jumlah Laporan', render: u => (
-      <Badge tone="danger">{u.received_reports_count} Laporan</Badge>
+      <Badge tone="danger" style={{ whiteSpace: 'nowrap' }}>{u.received_reports_count} Laporan</Badge>
     ) },
     { key: 'status', header: 'Status', render: u => (
       u.is_active ? (
@@ -124,13 +124,13 @@ export default function AdminDashboard() {
       )
     ) },
     { key: 'aksi', header: 'Aksi', align: 'right', render: u => (
-      <div style={{ display: 'inline-flex', gap: '8px' }}>
+      <div style={{ display: 'inline-flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'flex-end' }}>
         <button
           onClick={() => handleToggleStatus(u.id)}
           disabled={actionLoading === u.id}
           style={{
             padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
-            color: u.is_active ? 'var(--warning)' : 'var(--success)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'
+            color: u.is_active ? 'var(--warning)' : 'var(--success)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
           }}
         >
           {actionLoading === u.id ? <Icons.Loader size={12} /> : (u.is_active ? <><Icons.Power size={12} /> Nonaktifkan</> : <><Icons.Power size={12} /> Aktifkan</>)}
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
           disabled={actionLoading === u.id}
           style={{
             padding: '6px 10px', borderRadius: '6px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
-            color: 'var(--danger)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'
+            color: 'var(--danger)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
           }}
         >
           {actionLoading === u.id ? <Icons.Loader size={12} /> : <><Icons.Trash2 size={12} /> Hapus</>}
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'flex-start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 450px), 1fr))', gap: '2rem', alignItems: 'flex-start' }}>
         {/* Recent Tables */}
         <Card padding="none">
           <CardHeader
