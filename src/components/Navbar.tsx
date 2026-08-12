@@ -11,7 +11,7 @@ import { notificationApi } from '@/services/api/notification.api';
 import { AppNotification } from '@/types/notification';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { subscribeToPushNotifications } from '@/lib/api';
+import { subscribeToPushNotifications, unsubscribeFromPushNotifications } from '@/lib/api';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -199,6 +199,23 @@ export default function Navbar() {
     }
   };
 
+  const handlePushUnsubscribe = async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      
+      if (subscription) {
+        await unsubscribeFromPushNotifications(subscription.endpoint);
+        await subscription.unsubscribe();
+        setIsPushEnabled(false);
+        alert('Notifikasi HP berhasil dinonaktifkan.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Gagal menonaktifkan notifikasi: ' + err.message);
+    }
+  };
+
   const isActive = (path: string) => pathname === path;
 
   const toggleTheme = () => {
@@ -281,22 +298,30 @@ export default function Navbar() {
           {/* ── Right Actions ── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 1 }}>
 
-            {/* Push Subscribe Button - Mobile/Desktop */}
-            {user && !isPushEnabled && (
+            {/* Push Toggle Button - Mobile/Desktop */}
+            {user && (
               <button
-                onClick={handlePushSubscribe}
-                title="Aktifkan Notif HP"
+                onClick={isPushEnabled ? handlePushUnsubscribe : handlePushSubscribe}
+                title={isPushEnabled ? "Nonaktifkan Notif HP" : "Aktifkan Notif HP"}
                 className="hide-mobile"
                 style={{
-                  padding: '6px 12px', borderRadius: '8px', border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.35)' : 'var(--primary)'}`,
+                  padding: '6px 12px', borderRadius: '8px', border: `1px solid ${navTransparent ? 'rgba(255,255,255,0.35)' : (isPushEnabled ? 'var(--border)' : 'var(--primary)')}`,
                   display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
-                  color: navTransparent ? '#fff' : 'var(--primary)', background: navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)',
+                  color: navTransparent ? '#fff' : (isPushEnabled ? textColor : 'var(--primary)'),
+                  background: navTransparent ? 'rgba(255,255,255,0.1)' : (isPushEnabled ? 'transparent' : 'var(--primary-light)'),
                   fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.2s', marginRight: '4px'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.2)' : 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : 'var(--primary-light)'; e.currentTarget.style.color = navTransparent ? '#fff' : 'var(--primary)'; }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.2)' : (isPushEnabled ? 'var(--input)' : 'var(--primary)');
+                  e.currentTarget.style.color = isPushEnabled ? textColor : '#fff';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = navTransparent ? 'rgba(255,255,255,0.1)' : (isPushEnabled ? 'transparent' : 'var(--primary-light)');
+                  e.currentTarget.style.color = navTransparent ? '#fff' : (isPushEnabled ? textColor : 'var(--primary)');
+                }}
               >
-                <Icons.Bell size={15} /> Aktifkan Notif
+                {isPushEnabled ? <Icons.BellOff size={15} /> : <Icons.Bell size={15} />} 
+                {isPushEnabled ? 'Notif Aktif' : 'Aktifkan Notif'}
               </button>
             )}
 
@@ -586,15 +611,14 @@ export default function Navbar() {
                                   <Icons.Download size={15} /> Install Aplikasi
                                 </button>
                               )}
-                              {!isPushEnabled && (
-                                <button onClick={() => { setShowProfileDropdown(false); handlePushSubscribe(); }} style={{
-                                  ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: 'var(--primary)'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
-                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                  <Icons.Bell size={15} /> Aktifkan Notif HP
-                                </button>
-                              )}
+                              <button onClick={() => { setShowProfileDropdown(false); isPushEnabled ? handlePushUnsubscribe() : handlePushSubscribe(); }} style={{
+                                ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: isPushEnabled ? 'var(--danger)' : 'var(--primary)'
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
+                              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                                {isPushEnabled ? <Icons.BellOff size={15} /> : <Icons.Bell size={15} />} 
+                                {isPushEnabled ? 'Matikan Notif HP' : 'Aktifkan Notif HP'}
+                              </button>
 
                               <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
                               <button onClick={() => { setShowProfileDropdown(false); logout(); }} style={{

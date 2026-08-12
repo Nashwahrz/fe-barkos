@@ -111,6 +111,14 @@ export const Icons = {
       <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
     </svg>
   ),
+  BellOff: ({ size = 20, color = 'currentColor', style, className }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} className={className}>
+      <path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"></path>
+      <path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      <line x1="2" y1="2" x2="22" y2="22"></line>
+    </svg>
+  ),
   Zap: ({ size = 20, color = 'currentColor', style, className }: IconProps) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
