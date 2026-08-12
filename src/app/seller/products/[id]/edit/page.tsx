@@ -68,7 +68,7 @@ export default function EditProduct() {
       const p = productRes.data || productRes;
       setFormData({
         nama_barang: p.nama_barang || '',
-        harga: p.harga?.toString() || '',
+        harga: p.harga ? Math.round(Number(p.harga)).toString() : '',
         category_id: p.category?.id?.toString() || p.category_id?.toString() || '',
         kondisi: p.kondisi || 'baru',
         durasi_pemakaian: p.durasi_pemakaian || '',
@@ -76,7 +76,7 @@ export default function EditProduct() {
         status_terjual: p.status_terjual ? '1' : '0',
         latitude: p.latitude?.toString() || '',
         longitude: p.longitude?.toString() || '',
-        minimum_offer_price: p.minimum_offer_price?.toString() || '',
+        minimum_offer_price: p.minimum_offer_price ? Math.round(Number(p.minimum_offer_price)).toString() : '',
       });
       setIsOfferEnabled(p.is_offer_enabled !== false);
       setCurrentFoto(p.foto);
@@ -101,6 +101,7 @@ export default function EditProduct() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   const compressImage = async (file: File): Promise<File> => {
@@ -201,6 +202,13 @@ export default function EditProduct() {
   };
 
   async function executeSubmit() {
+    if (isOfferEnabled && formData.minimum_offer_price) {
+      if (Number(formData.minimum_offer_price) > Number(formData.harga)) {
+        setError('Minimal harga tawar tidak boleh melebihi harga asli.');
+        return;
+      }
+    }
+
     setSaving(true);
     setError(null);
 
