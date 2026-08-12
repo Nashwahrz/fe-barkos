@@ -393,7 +393,7 @@ export default function AdminUsers() {
                     {/* Overlay to prevent right click / drag / interactions */}
                     <div style={{ position: 'absolute', inset: 0, zIndex: 10 }} onContextMenu={(e) => e.preventDefault()} onDragStart={(e) => e.preventDefault()} />
                     <img
-                      src={selectedUser.identity_document_url}
+                      src={getStorageUrl(selectedUser.identity_document_url) || ''}
                       alt="KTP/KTM"
                       className="protected-image"
                       style={{
