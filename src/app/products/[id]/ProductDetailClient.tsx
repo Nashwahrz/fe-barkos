@@ -72,9 +72,17 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
       const payment = searchParams.get('payment');
       if (payment === 'transfer') {
         setPaymentMethod('bank_transfer');
+      } else if (product?.payment_method === 'bank_transfer') {
+        setPaymentMethod('bank_transfer');
+      } else {
+        setPaymentMethod('cod');
       }
+    } else if (product?.payment_method === 'bank_transfer') {
+      setPaymentMethod('bank_transfer');
+    } else {
+      setPaymentMethod('cod');
     }
-  }, [searchParams]);
+  }, [searchParams, product?.payment_method]);
 
   const calculateDistance = () => {
     if (!product?.latitude || !product?.longitude) {
@@ -205,7 +213,7 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
     }
   };
 
-  const resetBuy = () => { setShowBuyModal(false); setBuyStep('method'); setPaymentMethod('cod'); setNotes(''); setTransaction(null); setProofFile(null); setBuyError(''); };
+  const resetBuy = () => { setShowBuyModal(false); setBuyStep('method'); setPaymentMethod(product?.payment_method === 'bank_transfer' ? 'bank_transfer' : 'cod'); setNotes(''); setTransaction(null); setProofFile(null); setBuyError(''); };
 
   if (notFound) return (
     <div style={{ textAlign: 'center', padding: '80px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--foreground)' }}>
@@ -447,7 +455,12 @@ export default function ProductDetailClient({ initialProduct, productId }: { ini
                     {[
                       { value: 'cod', Icon: Icons.Handshake, title: 'COD (Bayar di Tempat)' },
                       { value: 'bank_transfer', Icon: Icons.CreditCard, title: 'Transfer Bank' },
-                    ].map(m => (
+                    ]
+                    .filter(m => {
+                      if (!product?.payment_method || product.payment_method === 'both') return true;
+                      return m.value === product.payment_method;
+                    })
+                    .map(m => (
                       <button key={m.value} onClick={() => setPaymentMethod(m.value as any)}
                         style={{
                           display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem',

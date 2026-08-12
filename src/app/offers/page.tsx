@@ -108,7 +108,7 @@ export default function BuyerOffers() {
                   </Button>
                 )}
                 {offer.status === 'accepted' && (
-                  <Button href={`/products/${offer.product_id}`} variant="primary" size="md">
+                  <Button href={`/products/${offer.product_id}?checkout=true`} variant="primary" size="md">
                     Beli Sekarang
                   </Button>
                 )}
