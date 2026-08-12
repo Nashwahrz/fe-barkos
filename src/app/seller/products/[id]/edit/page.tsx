@@ -22,6 +22,7 @@ export default function EditProduct() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [currentFoto, setCurrentFoto] = useState<string | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -334,15 +335,30 @@ export default function EditProduct() {
             </div>
 
             {isOfferEnabled && (
-              <Input
-                 type="number"
-                 name="minimum_offer_price"
-                 label="Minimal Harga Tawar (Rp)"
-                 placeholder="Opsional, misal: 450000"
-                 min={0}
-                 value={formData.minimum_offer_price}
-                 onChange={handleInputChange}
-              />
+              <div id="field-minimum_offer_price">
+                <Input
+                  type="number"
+                  name="minimum_offer_price"
+                  label="Minimal Harga Tawar (Rp)"
+                  placeholder="Opsional, misal: 450000"
+                  min={0}
+                  max={formData.harga ? Number(formData.harga) : undefined}
+                  value={formData.minimum_offer_price}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    if (formData.harga && Number(e.target.value) > Number(formData.harga)) {
+                      setFieldErrors(p => ({ ...p, minimum_offer_price: 'Minimal harga tawar tidak boleh melebihi harga asli.' }));
+                    } else {
+                      setFieldErrors(p => ({ ...p, minimum_offer_price: '' }));
+                    }
+                  }}
+                />
+                {fieldErrors.minimum_offer_price && (
+                  <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                    ⚠ {fieldErrors.minimum_offer_price}
+                  </p>
+                )}
+              </div>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

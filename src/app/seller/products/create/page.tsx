@@ -350,8 +350,16 @@ export default function CreateProduct() {
                   label="Minimal Harga Tawar (Rp)"
                   placeholder="Opsional, misal: 450000"
                   min={0}
+                  max={formData.harga ? Number(formData.harga) : undefined}
                   value={formData.minimum_offer_price}
-                  onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, minimum_offer_price: '' })); }}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    if (formData.harga && Number(e.target.value) > Number(formData.harga)) {
+                      setFieldErrors(p => ({ ...p, minimum_offer_price: 'Minimal harga tawar tidak boleh melebihi harga asli.' }));
+                    } else {
+                      setFieldErrors(p => ({ ...p, minimum_offer_price: '' }));
+                    }
+                  }}
                 />
                 {fieldErrors.minimum_offer_price && (
                   <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
