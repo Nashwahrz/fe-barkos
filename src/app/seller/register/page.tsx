@@ -20,61 +20,63 @@ export default function SellerRegisterPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const processImage = (file: File, autoCrop: boolean): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
+  const processImage = async (file: File, autoCrop: boolean): Promise<File> => {
+    try {
+      // createImageBitmap automatically handles EXIF orientation correctly in modern browsers
+      const img = await createImageBitmap(file);
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
 
-          if (autoCrop) {
-            // Target ratio for ID card (e.g., 1.58:1)
-            const targetRatio = 1.58;
-            const imgRatio = width / height;
+      if (autoCrop) {
+        // Standard ID card ratio (KTP/KTM)
+        const landscapeRatio = 1.58;
+        const portraitRatio = 1 / 1.58;
+        
+        const actualRatio = width / height;
+        // Dynamically choose target ratio based on whether the image is landscape or portrait
+        const finalTargetRatio = actualRatio > 1 ? landscapeRatio : portraitRatio;
 
-            let cropX = 0;
-            let cropY = 0;
-            let cropWidth = width;
-            let cropHeight = height;
+        let cropX = 0;
+        let cropY = 0;
+        let cropWidth = width;
+        let cropHeight = height;
 
-            if (imgRatio > targetRatio) {
-              // Image is wider, crop width
-              cropWidth = height * targetRatio;
-              cropX = (width - cropWidth) / 2;
-            } else {
-              // Image is taller, crop height
-              cropHeight = width / targetRatio;
-              cropY = (height - cropHeight) / 2;
-            }
+        if (actualRatio > finalTargetRatio) {
+          // Image is wider than target, crop width (left and right)
+          cropWidth = height * finalTargetRatio;
+          cropX = (width - cropWidth) / 2;
+        } else {
+          // Image is taller than target, crop height (top and bottom)
+          cropHeight = width / finalTargetRatio;
+          cropY = (height - cropHeight) / 2;
+        }
 
-            canvas.width = cropWidth;
-            canvas.height = cropHeight;
-            const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+      } else {
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+      }
+
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(new File([blob], file.name, { type: file.type || 'image/jpeg' }));
           } else {
-             canvas.width = width;
-             canvas.height = height;
-             const ctx = canvas.getContext('2d');
-             ctx?.drawImage(img, 0, 0, width, height);
+            reject(new Error('Canvas to Blob failed'));
           }
-
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(new File([blob], file.name, { type: file.type || 'image/jpeg' }));
-            } else {
-              reject(new Error('Canvas to Blob failed'));
-            }
-          }, file.type || 'image/jpeg', 0.9);
-        };
-        img.onerror = () => reject(new Error('Image load failed'));
-        img.src = e.target?.result as string;
-      };
-      reader.onerror = () => reject(new Error('File read failed'));
-      reader.readAsDataURL(file);
-    });
+        }, file.type || 'image/jpeg', 0.9);
+      });
+    } catch (err) {
+      console.error('Image processing failed:', err);
+      // Fallback to original file if anything fails (e.g., unsupported format)
+      return file; 
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isCamera: boolean) => {
