@@ -171,6 +171,15 @@ export default function Navbar() {
       return;
     }
     try {
+      if (!('Notification' in window)) {
+        alert('Browser Anda tidak mendukung Notifikasi (atau Anda menggunakan iOS Safari tanpa meng-install aplikasi ke Home Screen terlebih dahulu).');
+        return;
+      }
+      if (!('serviceWorker' in navigator)) {
+        alert('Service Worker tidak didukung di browser ini.');
+        return;
+      }
+
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
         alert('Izin notifikasi ditolak oleh peramban.');
@@ -180,15 +189,12 @@ export default function Navbar() {
       const registration = await navigator.serviceWorker.ready;
       let subscription = await registration.pushManager.getSubscription();
       
-      // Force unsubscribe old subscription to ensure fresh VAPID keys are used
-      if (subscription) {
-        await subscription.unsubscribe();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
       }
-      
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
 
       await subscribeToPushNotifications(subscription);
       setIsPushEnabled(true);
@@ -611,7 +617,15 @@ export default function Navbar() {
                                   <Icons.Download size={15} /> Install Aplikasi
                                 </button>
                               )}
-                              <button onClick={() => { setShowProfileDropdown(false); isPushEnabled ? handlePushUnsubscribe() : handlePushSubscribe(); }} style={{
+                              <button onClick={(e) => { 
+                                e.preventDefault();
+                                if (isPushEnabled) {
+                                  handlePushUnsubscribe();
+                                } else {
+                                  handlePushSubscribe();
+                                }
+                                setShowProfileDropdown(false); 
+                              }} style={{
                                 ...dropdownItemStyle, cursor: 'pointer', textAlign: 'left', background: 'transparent', border: 'none', width: '100%', color: isPushEnabled ? 'var(--danger)' : 'var(--primary)'
                               }}
                               onMouseEnter={e => e.currentTarget.style.background = 'var(--input)'}
