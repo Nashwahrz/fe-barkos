@@ -75,6 +75,37 @@ export default function Login() {
     }
   };
 
+  const renderError = (errorMsg: string) => {
+    if (errorMsg.includes('Template Pesan:')) {
+      const parts = errorMsg.split('Template Pesan:');
+      const mainText = parts[0].trim();
+      const templateText = parts[1].trim();
+      
+      return (
+        <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '12px', lineHeight: 1.5 }}>
+          <div>{mainText}</div>
+          <div style={{ 
+            background: 'var(--background)', 
+            padding: '12px', 
+            borderRadius: '8px', 
+            border: '1px dashed rgba(220, 38, 38, 0.4)',
+            fontSize: '0.8rem',
+            color: 'var(--foreground)',
+            fontFamily: 'monospace',
+            userSelect: 'all',
+            cursor: 'text'
+          }}>
+            <strong style={{ display: 'block', marginBottom: '6px', color: 'var(--danger)', fontFamily: 'inherit', fontSize: '0.75rem', opacity: 0.8 }}>
+              TEMPLATE PESAN (Block/Klik & Copy):
+            </strong>
+            <span style={{ opacity: 0.9 }}>{templateText}</span>
+          </div>
+        </div>
+      );
+    }
+    return <div style={{ textAlign: 'center' }}>{errorMsg}</div>;
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 65px)', background: 'var(--background)', overflow: 'hidden' }}>
       
@@ -209,8 +240,8 @@ export default function Login() {
           </div>
 
           {error && (
-            <div style={{ padding: '1rem', background: 'rgba(220, 38, 38, 0.08)', color: 'var(--danger)', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 600, textAlign: 'center', border: '1px solid rgba(220, 38, 38, 0.2)' }}>
-              {error}
+            <div style={{ padding: '1rem', background: 'rgba(220, 38, 38, 0.08)', color: 'var(--danger)', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 600, border: '1px solid rgba(220, 38, 38, 0.2)' }}>
+              {renderError(error)}
             </div>
           )}
 
