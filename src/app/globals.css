@@ -717,3 +717,12 @@ input, textarea, select {
     padding-bottom: calc(2rem + 60px + env(safe-area-inset-bottom, 16px)) !important;
   }
 }
+
+/* Favorites Layout */
+.fav-desktop { display: none !important; }
+.fav-mobile { display: flex !important; }
+
+@media (min-width: 768px) {
+  .fav-desktop { display: flex !important; }
+  .fav-mobile { display: none !important; }
+}
