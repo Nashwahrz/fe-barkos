@@ -215,10 +215,19 @@ export default function BuyerOrderDetail({ params }: { params: Promise<{ id: str
             <Icons.MessageCircle size={18} color="var(--primary)" /> Chat Penjual (Aplikasi)
           </button>
           
-          {order.status === 'confirmed' && order.seller?.phone && (
-            <a href={`https://wa.me/${order.seller.phone.replace(/^0/, '62').replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="btn btn-primary" style={{ width: '100%', background: '#25D366', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: 'none' }}>
+          {order.status === 'confirmed' && (
+            <button 
+              onClick={() => {
+                if (!order.seller?.phone) {
+                  alert('Penjual belum mencantumkan nomor WhatsApp.');
+                } else {
+                  window.open(`https://wa.me/${order.seller.phone.replace(/^0/, '62').replace(/\D/g, '')}`, '_blank');
+                }
+              }}
+              className="btn btn-primary" style={{ width: '100%', background: '#25D366', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: 'none' }}
+            >
               <Icons.Phone size={18} color="white" /> Hubungi via WhatsApp
-            </a>
+            </button>
           )}
         </div>
       </div>

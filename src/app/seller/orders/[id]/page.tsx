@@ -141,7 +141,15 @@ export default function SellerOrderDetail({ params }: { params: Promise<{ id: st
             <Button onClick={() => { if (order.product?.id && order.buyer?.id) { window.location.href = `/chat/${order.product.id}/${order.buyer.id}`; } }} variant="secondary" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
               <Icons.MessageCircle size={18} /> Chat di Aplikasi
             </Button>
-            <Button href={`https://wa.me/${order.buyer?.phone?.replace(/^0/, '62')}`} target="_blank" rel="noreferrer" variant="primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', background: '#25D366', color: 'white', borderColor: '#25D366' }}>
+            <Button 
+              onClick={() => {
+                if (!order.buyer?.phone) {
+                  alert('Pembeli belum mencantumkan nomor WhatsApp.');
+                } else {
+                  window.open(`https://wa.me/${order.buyer.phone.replace(/^0/, '62').replace(/\D/g, '')}`, '_blank');
+                }
+              }} 
+              variant="primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', background: '#25D366', color: 'white', borderColor: '#25D366' }}>
               <Icons.Phone size={18} /> Hubungi via WhatsApp
             </Button>
           </div>

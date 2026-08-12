@@ -343,11 +343,11 @@ export default function LocationMapModal({ lat, lng, products = [], onClose, onS
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
             <span style={{ fontWeight: 600 }}>Radius Pencarian</span>
-            <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{radius / 1000} km</span>
+            <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{radius >= 1000 ? `${radius / 1000} km` : `${radius} m`}</span>
           </div>
           <input 
             type="range" 
-            min="1000" max="20000" step="1000"
+            min="500" max="20000" step="500"
             value={radius}
             onChange={(e) => setRadius(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
