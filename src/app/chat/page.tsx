@@ -90,7 +90,7 @@ export default function ChatListPage() {
             
             return (
               <Link 
-                href={product.id ? `/chat/${product.id}/${otherUser.id}` : '#'} 
+                href={`/chat/${product.id || 0}/${otherUser.id}`} 
                 key={idx}
                 className="card flex items-center justify-between"
                 style={{ 
@@ -104,18 +104,15 @@ export default function ChatListPage() {
                   minWidth: 0,
                   width: '100%',
                   opacity: product.id ? 1 : 0.7,
-                  cursor: product.id ? 'pointer' : 'default'
-                }}
-                onClick={(e) => {
-                  if (!product.id) e.preventDefault();
+                  cursor: 'pointer'
                 }}
                 onMouseEnter={e => {
-                  if (product.id && unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
-                  if (product.id) e.currentTarget.style.transform = 'translateY(-2px)';
+                  if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--primary)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={e => {
-                  if (product.id && unreadCount === 0) e.currentTarget.style.borderColor = 'var(--border)';
-                  if (product.id) e.currentTarget.style.transform = 'translateY(0)';
+                  if (unreadCount === 0) e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div className="flex items-center gap-3" style={{ flex: 1, minWidth: 0 }}>

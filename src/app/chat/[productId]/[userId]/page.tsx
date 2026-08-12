@@ -190,6 +190,8 @@ export default function ChatDetailPage() {
       // instead of leaving the context card stuck blank forever.
       if (err?.status === 404) {
         setProduct({ deleted: true });
+        setIsChatClosed(true);
+        setChatClosedReason('Sesi percakapan ditutup karena produk telah dihapus.');
       } else {
         console.error('Failed to load product or order info', err);
       }
