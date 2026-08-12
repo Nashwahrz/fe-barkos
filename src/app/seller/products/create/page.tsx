@@ -173,6 +173,11 @@ export default function CreateProduct() {
 
     if (!formData.nama_barang.trim()) errors.nama_barang = 'Nama barang wajib diisi.';
     if (!formData.harga) errors.harga = 'Harga wajib diisi.';
+    if (isOfferEnabled && formData.minimum_offer_price) {
+      if (Number(formData.minimum_offer_price) > Number(formData.harga)) {
+        errors.minimum_offer_price = 'Minimal harga tawar tidak boleh melebihi harga asli.';
+      }
+    }
     if (!formData.category_id) errors.category_id = 'Kategori wajib dipilih.';
     if (!formData.durasi_pemakaian.trim()) errors.durasi_pemakaian = 'Durasi pemakaian wajib diisi.';
     if (!formData.deskripsi.trim()) errors.deskripsi = 'Deskripsi barang wajib diisi.';
@@ -187,7 +192,7 @@ export default function CreateProduct() {
 
     if (Object.keys(errors).length > 0) {
       // Urutan field yang dicek — scroll ke yang pertama kosong
-      const fieldOrder = ['nama_barang', 'harga', 'category_id', 'durasi_pemakaian', 'deskripsi', 'lokasi', 'foto'];
+      const fieldOrder = ['nama_barang', 'harga', 'minimum_offer_price', 'category_id', 'durasi_pemakaian', 'deskripsi', 'lokasi', 'foto'];
       const firstError = fieldOrder.find(f => errors[f]);
       if (firstError) {
         const el = document.getElementById(`field-${firstError}`);
@@ -338,15 +343,22 @@ export default function CreateProduct() {
             </div>
 
             {isOfferEnabled && (
-              <Input
-                type="number"
-                name="minimum_offer_price"
-                label="Minimal Harga Tawar (Rp)"
-                placeholder="Opsional, misal: 450000"
-                min={0}
-                value={formData.minimum_offer_price}
-                onChange={handleInputChange}
-              />
+              <div id="field-minimum_offer_price">
+                <Input
+                  type="number"
+                  name="minimum_offer_price"
+                  label="Minimal Harga Tawar (Rp)"
+                  placeholder="Opsional, misal: 450000"
+                  min={0}
+                  value={formData.minimum_offer_price}
+                  onChange={(e) => { handleInputChange(e); setFieldErrors(p => ({ ...p, minimum_offer_price: '' })); }}
+                />
+                {fieldErrors.minimum_offer_price && (
+                  <p style={{ color: 'var(--danger)', fontSize: '0.8rem', marginTop: '4px', fontWeight: 500 }}>
+                    ⚠ {fieldErrors.minimum_offer_price}
+                  </p>
+                )}
+              </div>
             )}
 
             <div id="field-category_id" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
