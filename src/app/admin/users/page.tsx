@@ -82,14 +82,19 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [roleFilter, setRoleFilter] = useState('');
+  const [frequentReportsFilter, setFrequentReportsFilter] = useState(false);
 
-  const roleFilteredUsers = roleFilter ? users.filter(u => u.role === roleFilter) : users;
+  const filteredUsers = users.filter(u => {
+    if (roleFilter && u.role !== roleFilter) return false;
+    if (frequentReportsFilter && (!u.received_reports_count || u.received_reports_count < 3)) return false;
+    return true;
+  });
 
   const {
     searchQuery, setSearchQuery,
     currentPage, setCurrentPage,
     totalPages, paginatedData, totalItems
-  } = useTablePagination(roleFilteredUsers, ['name', 'email', 'role', 'phone'], 10);
+  } = useTablePagination(filteredUsers, ['name', 'email', 'role', 'phone'], 10);
 
   useEffect(() => {
     if (!authLoading) {
@@ -261,6 +266,10 @@ export default function AdminUsers() {
                 <option key={role} value={role}>{ROLE_LABELS[role] || role}</option>
               ))}
             </select>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', color: frequentReportsFilter ? 'var(--danger)' : 'var(--foreground)', fontWeight: 600, padding: '0.6rem 1rem', borderRadius: '12px', border: frequentReportsFilter ? '1px solid rgba(220, 38, 38, 0.3)' : '1px solid var(--border)', background: frequentReportsFilter ? 'rgba(220, 38, 38, 0.08)' : 'var(--card)', transition: 'all 0.2s', margin: 0 }}>
+              <input type="checkbox" checked={frequentReportsFilter} onChange={(e) => { setFrequentReportsFilter(e.target.checked); setCurrentPage(1); }} style={{ accentColor: 'var(--danger)', width: '16px', height: '16px' }} />
+              Sering Dilaporkan
+            </label>
             <div style={{ background: 'var(--card)', border: '1px solid var(--border)', padding: '0.6rem 1rem', borderRadius: '12px', fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-sm)' }}>
               Total: {totalItems} User
             </div>
