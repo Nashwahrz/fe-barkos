@@ -119,7 +119,7 @@ export default function SellerOffers() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {offers.map(offer => (
-            <div key={offer.id} className="card" style={{ padding: '1.5rem', display: 'flex', gap: '1.5rem', alignItems: 'center', border: '1px solid var(--border)', background: 'var(--card)' }}>
+            <div key={offer.id} className="card flex md-flex-col md-items-start" style={{ padding: '1.5rem', gap: '1.5rem', alignItems: 'center', border: '1px solid var(--border)', background: 'var(--card)' }}>
               <div style={{ width: '88px', height: '88px', borderRadius: '16px', overflow: 'hidden', background: 'var(--input)', flexShrink: 0, border: '1px solid var(--border)' }}>
                 {offer.product?.foto ? (
                   <img src={getStorageUrl(offer.product.foto) || ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -129,12 +129,12 @@ export default function SellerOffers() {
                   </div>
                 )}
               </div>
-              <div style={{ flex: 1 }}>
+              <div className="md-w-full" style={{ flex: 1 }}>
                 <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '6px', color: 'var(--foreground)' }}>{offer.product?.nama_barang}</h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, marginBottom: '12px' }}>
                   Ditawar oleh: <strong style={{ color: 'var(--foreground)' }}>{offer.buyer?.name}</strong>
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <div className="flex md-flex-col" style={{ alignItems: 'center', gap: '1.25rem' }}>
                   <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--foreground)' }}>
                     Rp {Number(offer.offered_price).toLocaleString('id-ID')}
                   </span>
@@ -150,13 +150,17 @@ export default function SellerOffers() {
               </div>
               
               {offer.status === 'pending' && (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <Button onClick={() => handleStatus(offer.id, 'accept')} variant="primary" size="md">
-                    <Icons.CheckCircle size={16} /> Terima
-                  </Button>
-                  <Button onClick={() => handleStatus(offer.id, 'reject')} variant="danger" size="md">
-                    <Icons.X size={16} /> Tolak
-                  </Button>
+                <div className="flex md-flex-col md-w-full" style={{ gap: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <Button onClick={() => handleStatus(offer.id, 'accept')} variant="primary" size="md" style={{ width: '100%' }}>
+                      <Icons.CheckCircle size={16} /> Terima
+                    </Button>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Button onClick={() => handleStatus(offer.id, 'reject')} variant="danger" size="md" style={{ width: '100%' }}>
+                      <Icons.X size={16} /> Tolak
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>

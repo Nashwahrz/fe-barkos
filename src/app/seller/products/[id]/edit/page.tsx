@@ -276,7 +276,7 @@ export default function EditProduct() {
         <Icons.ArrowLeft size={16} /> Kembali ke Dashboard
       </Link>
 
-      <div className="card" style={{ padding: '2.5rem', borderRadius: '24px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}>
+      <div className="card md-p-4" style={{ padding: '2.5rem', borderRadius: '24px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Edit Lapak Barang</h1>
         <p style={{ color: 'var(--foreground)', opacity: 0.6, marginBottom: '2.5rem', fontSize: '0.95rem' }}>Perbarui informasi terkait barang bekas yang Anda jual.</p>
 
@@ -296,7 +296,7 @@ export default function EditProduct() {
              onChange={handleInputChange}
           />
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+          <div className="md-grid-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
             <Input 
                type="number" 
                name="harga" 
@@ -444,7 +444,7 @@ export default function EditProduct() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--foreground)' }}>Lokasi Barang (Pin Point Peta)</label>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div className="flex md-flex-col" style={{ gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <Input 
                    type="text" 

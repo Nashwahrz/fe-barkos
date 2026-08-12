@@ -149,7 +149,7 @@ export default function SellerRegisterPage() {
   }
 
   return (
-    <div style={{ background: 'var(--background)', minHeight: '100vh', padding: '40px 0' }}>
+    <div className="md-p-4" style={{ background: 'var(--background)', minHeight: '100vh', padding: '40px 0' }}>
       <div className="container" style={{ maxWidth: '560px' }}>
 
         {/* Back button */}
@@ -251,7 +251,7 @@ export default function SellerRegisterPage() {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div className="flex md-flex-col" style={{ gap: '12px' }}>
                 <button 
                   onClick={() => cameraInputRef.current?.click()}
                   style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '1.5rem 1rem', border: '1px dashed var(--primary)', borderRadius: '12px', background: 'rgba(22, 163, 74, 0.1)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}

@@ -232,13 +232,13 @@ export default function Navbar() {
         boxShadow: navTransparent ? 'none' : '0 2px 20px rgba(0,0,0,0.06)',
         transition: 'all 0.3s ease'
       }}>
-        <div className="container flex items-center justify-between" style={{ height: '64px', gap: '12px' }}>
+        <div className="container flex items-center justify-between" style={{ height: '64px', gap: '8px' }}>
 
           {/* ── Logo ── */}
           <Link href="/" style={{
             fontWeight: 800, color: textColor, whiteSpace: 'nowrap',
-            letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px',
-            textDecoration: 'none', transition: 'color 0.3s', flexShrink: 0,
+            letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '6px',
+            textDecoration: 'none', transition: 'color 0.3s', flexShrink: 1,
           }}>
             <img
               src="/logo-lapak-kos.png"
@@ -279,7 +279,7 @@ export default function Navbar() {
           )}
 
           {/* ── Right Actions ── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 1 }}>
 
             {/* Push Subscribe Button - Mobile/Desktop */}
             {user && !isPushEnabled && (

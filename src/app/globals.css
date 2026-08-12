@@ -411,6 +411,9 @@ input, textarea, select {
   
   .md-flex-col { flex-direction: column !important; }
   .md-grid-1 { grid-template-columns: 1fr !important; }
+  .md-p-4 { padding: 1rem !important; }
+  .md-w-full { width: 100% !important; }
+  .md-items-start { align-items: flex-start !important; }
   
   /* Admin sidebar becomes an off-canvas drawer on mobile instead of a cramped
      horizontal-scroll strip, since not every menu item fit on one row. */

@@ -173,7 +173,7 @@ export default function Home() {
               }
             `}</style>
             <div className="container">
-              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '16px', maxWidth: '800px', margin: '0 auto' }}>
+              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', maxWidth: '800px', margin: '0 auto' }}>
                 <div style={{
                   flex: 1, display: 'flex', alignItems: 'center',
                   background: isScrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.15)', 
