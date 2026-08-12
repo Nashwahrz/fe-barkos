@@ -33,6 +33,5 @@ export interface UserDetail {
   created_at: string | null;
   last_active_at: string | null;
   is_online: boolean;
-  identity_document_url?: string | null;
   activity: UserActivity;
 }
