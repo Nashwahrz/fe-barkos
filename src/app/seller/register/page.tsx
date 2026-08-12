@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { fetchApi } from '@/lib/api';
@@ -15,6 +15,94 @@ export default function SellerRegisterPage() {
   const [error, setError] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [identityDocument, setIdentityDocument] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const processImage = (file: File, autoCrop: boolean): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (autoCrop) {
+            // Target ratio for ID card (e.g., 1.58:1)
+            const targetRatio = 1.58;
+            const imgRatio = width / height;
+
+            let cropX = 0;
+            let cropY = 0;
+            let cropWidth = width;
+            let cropHeight = height;
+
+            if (imgRatio > targetRatio) {
+              // Image is wider, crop width
+              cropWidth = height * targetRatio;
+              cropX = (width - cropWidth) / 2;
+            } else {
+              // Image is taller, crop height
+              cropHeight = width / targetRatio;
+              cropY = (height - cropHeight) / 2;
+            }
+
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+          } else {
+             canvas.width = width;
+             canvas.height = height;
+             const ctx = canvas.getContext('2d');
+             ctx?.drawImage(img, 0, 0, width, height);
+          }
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: file.type || 'image/jpeg' }));
+            } else {
+              reject(new Error('Canvas to Blob failed'));
+            }
+          }, file.type || 'image/jpeg', 0.9);
+        };
+        img.onerror = () => reject(new Error('Image load failed'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('File read failed'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isCamera: boolean) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setError('');
+    
+    try {
+      const processedFile = await processImage(file, isCamera);
+      setIdentityDocument(processedFile);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(processedFile));
+    } catch (err) {
+      setError('Gagal memproses gambar');
+      setIdentityDocument(file);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle redirects inside useEffect — never during render
   useEffect(() => {
@@ -148,23 +236,54 @@ export default function SellerRegisterPage() {
           <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--foreground)' }}>
             Upload KTP / KTM (Wajib)
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {previewUrl ? (
+              <div style={{ position: 'relative', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewUrl} alt="Preview KTP" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: '400px', background: '#000' }} />
+                <button 
+                  onClick={() => { setIdentityDocument(null); setPreviewUrl(null); }}
+                  style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', backdropFilter: 'blur(4px)' }}
+                >
+                  <Icons.X size={20} />
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button 
+                  onClick={() => cameraInputRef.current?.click()}
+                  style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '1.5rem 1rem', border: '1px dashed var(--primary)', borderRadius: '12px', background: 'rgba(22, 163, 74, 0.1)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+                >
+                  <Icons.Camera size={32} />
+                  Ambil Foto (Kamera)
+                </button>
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '1.5rem 1rem', border: '1px dashed var(--input-border)', borderRadius: '12px', background: 'var(--input)', color: 'var(--foreground)', cursor: 'pointer', fontWeight: 500, transition: 'all 0.2s' }}
+                >
+                  <Icons.Image size={32} style={{ opacity: 0.7 }} />
+                  Pilih dari Galeri
+                </button>
+              </div>
+            )}
+            
             <input 
+              ref={cameraInputRef}
               type="file" 
               accept="image/jpeg, image/png, image/jpg"
               capture="environment"
-              onChange={(e) => { setIdentityDocument(e.target.files ? e.target.files[0] : null); setError(''); }}
-              style={{
-                padding: '10px',
-                border: '1px dashed var(--input-border)',
-                borderRadius: '8px',
-                background: 'var(--input)',
-                color: 'var(--foreground)',
-                fontSize: '0.875rem',
-                width: '100%',
-              }}
+              onChange={(e) => handleFileChange(e, true)}
+              style={{ display: 'none' }}
             />
-            <span style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Maksimal 5MB. AI kami akan memverifikasi dokumen Anda secara otomatis.</span>
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              accept="image/jpeg, image/png, image/jpg"
+              onChange={(e) => handleFileChange(e, false)}
+              style={{ display: 'none' }}
+            />
+
+            <span style={{ fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.6 }}>Maksimal 5MB. AI kami memverifikasi otomatis. Foto dari kamera akan dipotong otomatis agar pas.</span>
             
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '4px', padding: '10px', background: 'rgba(22, 163, 74, 0.08)', borderRadius: '8px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
               <Icons.Shield size={16} color="#16a34a" style={{ flexShrink: 0, marginTop: '2px' }} />
