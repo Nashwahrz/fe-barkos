@@ -242,7 +242,7 @@ export default function SellerOrdersPage() {
                 {/* Actions */}
                 <div style={{ marginTop: '1.5rem', display: 'flex', gap: '12px', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
                   {order.status === 'pending' && (
-                    <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
+                    <div className="md-w-full" style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
                       <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleConfirm(order.id, 'confirm')} disabled={isBusy} variant="primary" size="md">
                         {isBusy ? 'Memproses...' : <><Icons.Check size={16} /> Konfirmasi</>}
                       </Button>
@@ -253,7 +253,7 @@ export default function SellerOrdersPage() {
                   )}
 
                   {order.status === 'confirmed' && (
-                    <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
+                    <div className="md-w-full" style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
                       {order.payment_method === 'bank_transfer' && order.has_payment_proof && (
                         <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
                           {isBusy ? 'Memproses...' : <><Icons.CheckCircle size={16} /> Konfirmasi Selesai</>}
