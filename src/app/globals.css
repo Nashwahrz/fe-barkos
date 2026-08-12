@@ -415,6 +415,9 @@ input, textarea, select {
   .md-w-full { width: 100% !important; }
   .md-items-start { align-items: flex-start !important; }
   
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
   /* Admin sidebar becomes an off-canvas drawer on mobile instead of a cramped
      horizontal-scroll strip, since not every menu item fit on one row. */
   .admin-mobile-toggle {

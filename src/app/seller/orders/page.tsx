@@ -159,7 +159,7 @@ export default function SellerOrdersPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '2.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', flexWrap: 'wrap' }}>
+      <div className="hide-scrollbar" style={{ display: 'flex', gap: '8px', marginBottom: '2.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
             padding: '8px 20px', borderRadius: '12px', border: '1px solid', cursor: 'pointer',
@@ -242,34 +242,34 @@ export default function SellerOrdersPage() {
                 {/* Actions */}
                 <div style={{ marginTop: '1.5rem', display: 'flex', gap: '12px', flexWrap: 'wrap', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
                   {order.status === 'pending' && (
-                    <>
-                      <Button className="w-full-mobile" onClick={() => handleConfirm(order.id, 'confirm')} disabled={isBusy} variant="primary" size="md">
+                    <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
+                      <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleConfirm(order.id, 'confirm')} disabled={isBusy} variant="primary" size="md">
                         {isBusy ? 'Memproses...' : <><Icons.Check size={16} /> Konfirmasi</>}
                       </Button>
-                      <Button className="w-full-mobile" onClick={() => handleConfirm(order.id, 'reject')} disabled={isBusy} variant="danger" size="md">
+                      <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleConfirm(order.id, 'reject')} disabled={isBusy} variant="danger" size="md">
                         {isBusy ? 'Memproses...' : <><Icons.X size={16} /> Tolak</>}
                       </Button>
-                    </>
+                    </div>
                   )}
 
                   {order.status === 'confirmed' && (
-                    <>
+                    <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '200px' }}>
                       {order.payment_method === 'bank_transfer' && order.has_payment_proof && (
-                        <Button className="w-full-mobile" onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
+                        <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
                           {isBusy ? 'Memproses...' : <><Icons.CheckCircle size={16} /> Konfirmasi Selesai</>}
                         </Button>
                       )}
                       {order.payment_method === 'cod' && (
-                        <Button className="w-full-mobile" onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
+                        <Button style={{ flex: 1, justifyContent: 'center' }} onClick={() => handleComplete(order.id)} disabled={isBusy} variant="primary" size="md">
                           {isBusy ? 'Memproses...' : <><Icons.Handshake size={16} /> COD Selesai</>}
                         </Button>
                       )}
                       {order.payment_method === 'bank_transfer' && !order.has_payment_proof && (
                         <span style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
-                          <Icons.Loader size={14} /> Menunggu pembeli upload bukti bayar
+                          <Icons.Loader size={14} /> Menunggu bukti bayar
                         </span>
                       )}
-                    </>
+                    </div>
                   )}
 
                   <Link href={`/seller/orders/${order.id}`} style={{ marginLeft: 'auto', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.7, fontWeight: 600, textDecoration: 'none', alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
