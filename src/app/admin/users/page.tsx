@@ -368,6 +368,50 @@ export default function AdminUsers() {
                   <StatTile icon={<Icons.ShoppingBag size={16} color="var(--primary)" />} label="Transaksi Belanja" value={selectedUser.activity.transactions_as_buyer_count} />
                 </div>
               </div>
+
+              {/* KTP / Identity Document */}
+              {selectedUser.identity_document_url && (
+                <div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.6rem' }}>
+                    Dokumen Identitas (KTP/KTM)
+                  </div>
+                  <div
+                    className="no-print"
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      border: '1px solid var(--border)',
+                      background: 'var(--muted)',
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                      padding: '1rem'
+                    }}
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    {/* Overlay to prevent right click / drag / interactions */}
+                    <div style={{ position: 'absolute', inset: 0, zIndex: 10 }} onContextMenu={(e) => e.preventDefault()} onDragStart={(e) => e.preventDefault()} />
+                    <img
+                      src={selectedUser.identity_document_url}
+                      alt="KTP/KTM"
+                      className="protected-image"
+                      style={{
+                        width: '100%',
+                        display: 'block',
+                        objectFit: 'contain',
+                        maxHeight: '300px',
+                        pointerEvents: 'none', // Prevents interaction like drag and drop
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        WebkitTouchCallout: 'none',
+                        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.1))'
+                      }}
+                      onDragStart={(e) => e.preventDefault()}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           ) : null}
         </Modal>
