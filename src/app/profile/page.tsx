@@ -138,6 +138,33 @@ export default function ProfilePage() {
     <div className="container" style={{ paddingTop: '40px', paddingBottom: '140px', maxWidth: '800px' }}>
       <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '2rem', color: 'var(--foreground)', letterSpacing: '-0.02em' }}>Pengaturan Profil</h1>
 
+      {user && user.received_reports_count !== undefined && (
+        <div style={{
+          padding: '1.25rem', borderRadius: '12px', marginBottom: '2rem',
+          background: user.received_reports_count >= 3 ? 'rgba(220, 38, 38, 0.1)' : 'var(--card)',
+          color: user.received_reports_count >= 3 ? 'var(--danger)' : 'var(--foreground)',
+          border: `1px solid ${user.received_reports_count >= 3 ? 'rgba(220, 38, 38, 0.2)' : 'var(--border)'}`,
+          display: 'flex', alignItems: 'flex-start', gap: '12px',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          {user.received_reports_count >= 3 ? <Icons.AlertTriangle size={24} /> : <Icons.Info size={24} style={{ opacity: 0.5, marginTop: '2px' }} />}
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '4px' }}>
+              Statistik Laporan: {user.received_reports_count} kali dilaporkan
+            </div>
+            {user.received_reports_count >= 3 ? (
+              <div style={{ fontSize: '0.85rem', opacity: 0.9, lineHeight: 1.5 }}>
+                ⚠️ Peringatan: Akun Anda telah menerima laporan pelanggaran yang tinggi. Mohon perbaiki dan pastikan seluruh aktivitas/produk Anda mematuhi pedoman komunitas untuk menghindari penonaktifan sepihak dari admin.
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.85rem', opacity: 0.6, lineHeight: 1.5 }}>
+                Terima kasih telah mematuhi pedoman komunitas platform kami.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {message && (
         <div style={{
           padding: '1rem', borderRadius: '12px', marginBottom: '2rem',

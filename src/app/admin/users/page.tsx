@@ -23,6 +23,7 @@ interface AdminUser {
   role: string;
   is_active: boolean;
   avatar?: string | null;
+  received_reports_count?: number;
 }
 
 function formatDateTime(value: string | null): string {
@@ -177,6 +178,11 @@ export default function AdminUsers() {
           <div className="flex-col">
             <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{u.name}</div>
             <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{u.email}</div>
+            {u.received_reports_count && u.received_reports_count >= 3 ? (
+              <div style={{ marginTop: '4px' }}>
+                <Badge tone="danger" style={{ fontSize: '0.7rem' }}>⚠️ Sering Dilaporkan ({u.received_reports_count}x)</Badge>
+              </div>
+            ) : null}
           </div>
         </div>
       ),

@@ -20,6 +20,7 @@ interface User {
   longitude: number | null;
   email_verified_at: string | null;
   bank_accounts?: any[];
+  received_reports_count?: number;
 }
 
 interface AuthContextType {
