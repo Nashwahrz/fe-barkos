@@ -329,7 +329,8 @@ function ProductCatalogContent() {
 
           {/* Bottom Sheet */}
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
+            position: 'fixed', bottom: 0, left: '50%', transform: 'translate(-50%, 0)', zIndex: 301,
+            width: '100%', maxWidth: '500px',
             background: 'var(--card)', borderRadius: '24px 24px 0 0',
             padding: '0 1.5rem 2rem', maxHeight: '90vh', overflowY: 'auto',
             boxShadow: 'var(--shadow-lg)',
@@ -402,8 +403,8 @@ function ProductCatalogContent() {
       {/* Slide-up animation */}
       <style>{`
         @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
+          from { transform: translate(-50%, 100%); }
+          to { transform: translate(-50%, 0); }
         }
       `}</style>
     </div>
