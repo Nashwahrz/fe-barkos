@@ -26,7 +26,9 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [activities, setActivities] = useState<any>(null);
   const [trends, setTrends] = useState<any>(null);
+  const [violators, setViolators] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -38,8 +40,6 @@ export default function AdminDashboard() {
       }
       loadData();
 
-      // Poll for fresh data in the background so the dashboard stays up to
-      // date without the admin needing to manually refresh the page.
       const interval = setInterval(() => loadData({ silent: true }), 15000);
       return () => clearInterval(interval);
     }
@@ -48,18 +48,48 @@ export default function AdminDashboard() {
   async function loadData(opts: { silent?: boolean } = {}) {
     try {
       if (!opts.silent) setLoading(true);
-      const [statsData, activitiesData, trendsData] = await Promise.all([
+      const [statsData, activitiesData, trendsData, violatorsData] = await Promise.all([
         fetchApi('/admin/stats'),
         fetchApi('/admin/recent-activities'),
         fetchApi('/admin/stats/trends'),
+        fetchApi('/admin/frequent-violators'),
       ]);
       setStats(statsData.stats);
       setActivities(activitiesData);
       setTrends(trendsData);
+      setViolators(violatorsData.data || []);
     } catch (err) {
       console.error('Gagal mengambil data dashboard:', err);
     } finally {
       if (!opts.silent) setLoading(false);
+    }
+  }
+
+  async function handleToggleStatus(id: number) {
+    if (!confirm('Ubah status pengguna ini?')) return;
+    
+    setActionLoading(id);
+    try {
+      await fetchApi(`/users/${id}/status`, { method: 'PATCH' });
+      await loadData({ silent: true });
+    } catch (err) {
+      alert('Gagal mengubah status.');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleDeleteUser(id: number) {
+    if (!confirm('Apakah Anda yakin ingin menghapus user ini? Semua data terkait akan dihapus permanen.')) return;
+    
+    setActionLoading(id);
+    try {
+      await fetchApi(`/users/${id}`, { method: 'DELETE' });
+      await loadData({ silent: true });
+    } catch (err) {
+      alert('Gagal menghapus user.');
+    } finally {
+      setActionLoading(null);
     }
   }
 
@@ -74,6 +104,49 @@ export default function AdminDashboard() {
         </span>
       ),
     },
+  ];
+
+  const violatorColumns: DataTableColumn<any>[] = [
+    { key: 'user', header: 'Pengguna', render: u => (
+      <div>
+        <div style={{ fontWeight: 700, color: 'var(--foreground)' }}>{u.name}</div>
+        <div style={{ fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6 }}>{u.email}</div>
+      </div>
+    ) },
+    { key: 'reports', header: 'Jumlah Laporan', render: u => (
+      <Badge tone="danger">{u.received_reports_count} Laporan</Badge>
+    ) },
+    { key: 'status', header: 'Status', render: u => (
+      u.is_active ? (
+        <span style={{ color: 'var(--success)', fontWeight: 600, fontSize: '0.85rem' }}>Aktif</span>
+      ) : (
+        <span style={{ color: 'var(--danger)', fontWeight: 600, fontSize: '0.85rem' }}>Nonaktif</span>
+      )
+    ) },
+    { key: 'aksi', header: 'Aksi', align: 'right', render: u => (
+      <div style={{ display: 'inline-flex', gap: '8px' }}>
+        <button
+          onClick={() => handleToggleStatus(u.id)}
+          disabled={actionLoading === u.id}
+          style={{
+            padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--card)', cursor: 'pointer',
+            color: u.is_active ? 'var(--warning)' : 'var(--success)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'
+          }}
+        >
+          {actionLoading === u.id ? <Icons.Loader size={12} /> : (u.is_active ? <><Icons.Power size={12} /> Nonaktifkan</> : <><Icons.Power size={12} /> Aktifkan</>)}
+        </button>
+        <button
+          onClick={() => handleDeleteUser(u.id)}
+          disabled={actionLoading === u.id}
+          style={{
+            padding: '6px 10px', borderRadius: '6px', border: '1px solid rgba(220, 38, 38, 0.2)', background: 'rgba(220, 38, 38, 0.05)', cursor: 'pointer',
+            color: 'var(--danger)', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'
+          }}
+        >
+          {actionLoading === u.id ? <Icons.Loader size={12} /> : <><Icons.Trash2 size={12} /> Hapus</>}
+        </button>
+      </div>
+    ) },
   ];
 
   const trendSeries: TrendSeries[] | null = trends ? [
@@ -157,26 +230,49 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-      {/* Recent Tables */}
-      <Card padding="none">
-        <CardHeader
-          title="Laporan Terbaru"
-          subtitle="Aktivitas pelaporan pelanggaran terkini di platform"
-          action={
-            <Link href="/admin/reports" style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Lihat Semua <Icons.ArrowRight size={16} />
-            </Link>
-          }
-        />
-        <DataTable<Report>
-          columns={reportColumns}
-          data={activities?.recent_reports || []}
-          keyExtractor={r => r.id}
-          loading={loading}
-          skeletonRows={4}
-          emptyMessage="Tidak ada laporan terbaru."
-        />
-      </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'flex-start' }}>
+        {/* Recent Tables */}
+        <Card padding="none">
+          <CardHeader
+            title="Laporan Terbaru"
+            subtitle="Aktivitas pelaporan pelanggaran terkini di platform"
+            action={
+              <Link href="/admin/reports" style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Lihat Semua <Icons.ArrowRight size={16} />
+              </Link>
+            }
+          />
+          <DataTable<Report>
+            columns={reportColumns}
+            data={activities?.recent_reports || []}
+            keyExtractor={r => r.id}
+            loading={loading}
+            skeletonRows={4}
+            emptyMessage="Tidak ada laporan terbaru."
+          />
+        </Card>
+
+        {/* Frequent Violators Table */}
+        <Card padding="none">
+          <CardHeader
+            title="Pengguna Sering Dilaporkan"
+            subtitle="Akun yang menerima 3 laporan atau lebih"
+            action={
+              <Link href="/admin/users" style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Lihat Semua User <Icons.ArrowRight size={16} />
+              </Link>
+            }
+          />
+          <DataTable<any>
+            columns={violatorColumns}
+            data={violators}
+            keyExtractor={u => u.id}
+            loading={loading}
+            skeletonRows={4}
+            emptyMessage="Tidak ada pengguna yang mencapai batas pelanggaran."
+          />
+        </Card>
+      </div>
     </AdminLayout>
   );
 }
