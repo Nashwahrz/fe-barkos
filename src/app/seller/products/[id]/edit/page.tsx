@@ -345,12 +345,14 @@ export default function EditProduct() {
                   max={formData.harga ? Number(formData.harga) : undefined}
                   value={formData.minimum_offer_price}
                   onChange={(e) => {
-                    handleInputChange(e);
                     if (formData.harga && Number(e.target.value) > Number(formData.harga)) {
-                      setFieldErrors(p => ({ ...p, minimum_offer_price: 'Minimal harga tawar tidak boleh melebihi harga asli.' }));
-                    } else {
-                      setFieldErrors(p => ({ ...p, minimum_offer_price: '' }));
+                      alert('Minimal harga tawar tidak boleh melebihi harga asli.');
+                      setFormData(prev => ({ ...prev, minimum_offer_price: prev.harga }));
+                      setFieldErrors(p => ({ ...p, minimum_offer_price: 'Harga tawar otomatis disesuaikan dengan harga maksimal.' }));
+                      return;
                     }
+                    handleInputChange(e);
+                    setFieldErrors(p => ({ ...p, minimum_offer_price: '' }));
                   }}
                 />
                 {fieldErrors.minimum_offer_price && (
