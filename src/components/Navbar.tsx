@@ -95,7 +95,7 @@ export default function Navbar() {
 
   // Fetch notifications
   useEffect(() => {
-    if (user && !pathname.startsWith('/admin')) {
+    if (user) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 3000);
       return () => clearInterval(interval);
@@ -140,6 +140,9 @@ export default function Navbar() {
     }
     else if (t === 'chat') router.push(`/chat`);
     else if (t === 'promotion' && notif.data.product_id) router.push(`/products/${notif.data.product_id}`);
+    else if (t === 'admin_new_report') router.push('/admin/reports');
+    else if (t === 'admin_new_product') router.push('/admin/products');
+    else if (t === 'admin_promotion_payment') router.push('/admin/promotions');
     else router.push('/');
   };
 
@@ -366,7 +369,7 @@ export default function Navbar() {
             </button>
 
             {/* Notification Bell */}
-            {user && !pathname.startsWith('/admin') && (
+            {user && (
               <div style={{ position: 'relative' }}>
                 <button
                   onClick={() => setShowNotif(!showNotif)}
