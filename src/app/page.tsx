@@ -268,7 +268,7 @@ export default function Home() {
                 }}>
                   Surganya<br />
                   Barang Bekas<br />
-                  Anak Kos.
+                  Anak Kos
                 </h1>
                 <p style={{
                   fontSize: '1.125rem',
